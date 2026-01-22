@@ -1,0 +1,2 @@
+Timestamp,Y_Sim,Y_True,Error_Rel_Pct,Duration_Sec,S0,T,r,sigma,N_paths,N_steps,Knots
+2026-01-22 15:35:10,109.771803,109.417428,0.3239,0.9893,10.0,1.0,0.05,0.2,20000,50,20

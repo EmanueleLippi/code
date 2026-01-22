@@ -1,0 +1,2 @@
+Timestamp,Price,StdError,Duration_Sec,S0,K,r,T,sigma,n_steps,n_paths,basis_knots,is_call
+2026-01-21 11:13:35,4.490639,0.028078,0.9936,36.0,40.0,0.06,1.0,0.2,100,10000,10,False

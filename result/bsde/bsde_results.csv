@@ -1,0 +1,2 @@
+Timestamp,Price_BSDE,Benchmark_BS,Error_Abs,Error_Rel_Pct,Duration_Sec,S0,K,T,r,sigma,n_paths,n_steps,basis_knots
+2026-01-21 14:03:43,10.413516,10.450584,-0.037068,0.3547,0.1578,100.0,100.0,1.0,0.05,0.2,5000,50,12
