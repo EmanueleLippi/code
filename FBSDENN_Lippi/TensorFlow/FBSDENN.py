@@ -1,5 +1,6 @@
 import numpy as np 
-import tensorflow as tf 
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior() 
 import time
 from abc import ABC, abstractmethod
 from typing import Tuple, List, Dict, Optional
@@ -57,22 +58,58 @@ class FBSNN(ABC):
         # self.loss: La funzione di costo (errore) che vogliamo minimizzare.
         # self.X_pred, self.Y_pred: Le soluzioni predette dalla rete.
         # self.Y0_pred: La soluzione al tempo t=0 (il nostro target da confrontare con Xi).
-       self.loss, self.X_pred, self.Y_pred, self.Y0_pred = self.loss_function(self.t_tf, self.W_tf, self.Xi_tf)
+        self.loss, self.X_pred, self.Y_pred, self.Y0_pred = self.loss_function(self.t_tf, self.W_tf, self.Xi_tf)
 
        #Definisco l'ottimizzatore --> Algoritmo che aggiorna i pesi della rete
        # SPIEGAZIONE OTTIMIZZATORE:
        # È il motore che corregge gli errori. In questo caso, usiamo Adam.
        # - learning_rate: Quanto "grande" è il passo che fa per correggere gli errori.
        # - minimize(self.loss): Dice all'ottimizzatore: "Trova i pesi che rendono self.loss più piccolo possibile".
-       self.optimizer = tf.train.AdamOptimizer(learning_rate = self.learning_rate)
-       self.train_op seld.optimizer.minimize(self.loss)
+        self.optimizer = tf.train.AdamOptimizer(learning_rate = self.learning_rate)
+        self.train_op = self.optimizer.minimize(self.loss)
 
        #Inizializzo le variabili --> Assegno valori iniziali ai pesi e ai bias
        # SPIEGAZIONE INIZIALIZZAZIONE:
        # I pesi non possono partire da 0, altrimenti la rete non impara nulla.
        # Usiamo Xavier initialization: distribuisce i pesi in modo che la varianza rimanga costante tra i layer.
-       init = tf.global_variables_initializer()
-       self.sess.run(init)
+        init = tf.global_variables_initializer()
+        self.sess.run(init)
+
+    # SPIEGAZIONE INIZIALIZZAZIONE RETE NEURALE:
+    #
+    # SCOPO:
+    # Costruisce le variabili TensorFlow (Tensori) che rappresentano i parametri
+    # apprendibili della rete: Pesi (Weights, W) e Bias (b).
+    #
+    # FUNZIONAMENTO:
+    # 1. Input: 'layers' è una lista di interi che definisce l'architettura.
+    #    Es: [D+1, 256, 256, 1] significa:
+    #    - Input layer: D+1 neuroni (t + X)
+    #    - Hidden layers: 2 strati da 256 neuroni
+    #    - Output layer: 1 neurone (u)
+    # 2. Iterazione: Per ogni connessione tra due layer adiacenti (l -> l+1):
+    #    - Crea una matrice di pesi W di dimensione [N_in, N_out] usando Xavier Init.
+    #    - Crea un vettore di bias b di dimensione [1, N_out] inizializzato a zero.
+    # 3. Return: Restituisce le liste di tutte le variabili W e b create.
+    def initialize_NN(self, layers):
+        weights = [] # Lista per salvare i tensori dei pesi
+        biases = []  # Lista per salvare i tensori dei bias
+        num_layers = len(layers) 
+        
+        # Ciclo su tutti i layer tranne l'ultimo (perché i pesi connettono l -> l+1)
+        for l in range(0, num_layers-1):
+            # Inizializzazione Pesi (W):
+            # Usa Xavier initialization per stabilità numerica.
+            W = self.xavier_init(size = [layers[l], layers[l+1]])
+            
+            # Inizializzazione Bias (b):
+            # Inizializzati a zero. tf.Variable li rende modificabili dall'ottimizzatore.
+            b = tf.Variable(tf.zeros([1, layers[l+1]], dtype=tf.float32))
+            
+            weights.append(W)
+            biases.append(b)
+
+        return weights, biases
 
        
     # SPIEGAZIONE XAVIER/GLOROT INITIALIZATION:
@@ -176,7 +213,7 @@ class FBSNN(ABC):
     #    Questo evita di dover calcolare a mano il gradiente di g, rendendo il codice flessibile per diverse g.
     # 4. Return: Restituisce il gradiente ∇g(X).
     def Dg_tf(self, X: tf.Tensor) -> tf.Tensor:
-        return tf.gradients(self.g(X), X)[0] #Calcolo Dg ovvero il gradiente di g rispetto a X
+        return tf.gradients(self.g_tf(X), X)[0] #Calcolo Dg ovvero il gradiente di g rispetto a X
 
     # SPIEGAZIONE FUNZIONE DI COSTO (SOLUZIONE FBSDE):
     #
@@ -196,7 +233,7 @@ class FBSNN(ABC):
     #    Al tempo finale T, impone che la soluzione Y coincida con la condizione terminale nota g(X_T).
     #
     # FUNZIONAMENTO SPECIFICO DEL CODICE (RIGA PER RIGA):
-    def loss_function(self, t: tf.Tensor, W: tf.tensor, Xi: tf.tensor) -> tf.Tensor, tf.Tensor, tf.Tensor, tf.Tensor:
+    def loss_function(self, t: tf.Tensor, W: tf.Tensor, Xi: tf.Tensor) -> Tuple[tf.Tensor, tf.Tensor, tf.Tensor, tf.Tensor]:
         loss = 0 # Inizializzo loss a 0. Accumulerà gli errori commessi ad ogni passo temporale.
         X_list = [] # Lista per salvare la storia delle traiettorie di X (memoria per visualizzazione/analisi).
         Y_list = [] # Lista per salvare la storia delle traiettorie di Y.
@@ -312,4 +349,149 @@ class FBSNN(ABC):
 
         return t, W
 
+    # SPIEGAZIONE METODO TRAIN (ADDESTRAMENTO):
+    #
+    # CONTESTO GENERALE:
+    # Questo metodo gestisce il ciclo di addestramento della rete neurale. 
+    # In questo framework FBSDE, l'addestramento non avviene su un dataset fisso (come immagini o testi),
+    # ma su traiettorie stocastiche generate dinamicamente ad ogni iterazione.
+    # L'obiettivo è minimizzare la loss function definita precedentemente, che misura quanto bene
+    # la rete soddisfa l'equazione differenziale stocastica e le condizioni al contorno.
+    # 
+    # UTILIZZO SPECIFICO:
+    # Viene chiamato dall'utente dopo aver istanziato la classe. Esegue 'epochs' iterazioni 
+    # di discesa del gradiente (Adam optimizer).
+    def train(self, epochs: int, learning_rate: float):
+        # Inizializzo il timer per monitorare quanto tempo impiegano le iterazioni.
+        # Utile per capire la velocità di addestramento (iterazioni/secondo).
+        start_time = time.time()
+        
+        # CICLO DI TRAINING
+        # Itera per il numero di epoche specificato.
+        for epoch in range(epochs):
+            
+            # 1. GENERAZIONE DEI DATI (BATCH)
+            # Ad ogni epoca, generiamo un nuovo set di traiettorie del moto Browniano.
+            # self.fetch_minibatch() restituisce:
+            # - t_batch: griglia temporale [M, N+1, 1]
+            # - W_batch: traiettorie del moto Browniano [M, N+1, D]
+            # Questo è cruciale: la rete non memorizza dati, ma impara la dinamica dell'equazione
+            # vedendo sempre nuove realizzazioni del processo stocastico.
+            t_batch, W_batch = self.fetch_minibatch()
+            
+            # 2. DIZIONARIO DI ALIMENTAZIONE (FEED DICT)
+            # Mappiamo i dati Python (numpy array) ai Placeholder di TensorFlow definiti in __init__.
+            # - self.Xi_tf: punto iniziale (fisso).
+            # - self.t_tf: i tempi generati.
+            # - self.W_tf: i moti Browniani generati.
+            # - self.learning_rate: il passo di apprendimento passato come argomento.
+            tf_dict = {self.Xi_tf: self.Xi, self.t_tf: t_batch, self.W_tf: W_batch, self.learning_rate: learning_rate}
+            
+            # 3. ESECUZIONE DELLO STEP DI OTTIMIZZAZIONE
+            # Questa è l'istruzione chiave. sess.run esegue il grafo computazionale.
+            # Chiediamo di eseguire 'self.train_op': questa operazione calcola i gradienti della loss
+            # rispetto ai pesi e li aggiorna (minimizza l'errore).
+            # Non ci serve il valore di ritorno qui, ci interessa l'effetto collaterale (aggiornamento pesi).
+            self.sess.run(self.train_op, tf_dict)
+
+            # 4. MONITORAGGIO E LOGGING (Ogni 100 epoche)
+            # Per non rallentare troppo il processo, calcoliamo e stampiamo le metriche solo ogni 100 passi.
+            # (Nota: nel codice originale era 10, ma spesso si aumenta per velocità).
+            if epoch % 10 == 0:
+                # Calcoliamo il tempo trascorso per queste 10 iterazioni.
+                elapsed = time.time() - start_time
+                
+                # Eseguiamo nuovamente sess.run, ma questa volta chiediamo valori specifici per monitorare:
+                # - self.loss: il valore attuale dell'errore (deve scendere).
+                # - self.Y0_pred: la stima del valore iniziale (es. prezzo opzione). Deve convergere.
+                # - self.learning_rate: per conferma.
+                # Nota: passiamo lo stesso tf_dict, quindi ricalcola su QUESTO batch corrente.
+                loss_value, Y0_value, learning_rate_value = self.sess.run([self.loss, self.Y0_pred, self.learning_rate], tf_dict)
+                
+                # Stampiamo i risultati formattati:
+                # - %.3e: notazione scientifica con 3 decimali (utile per loss molto piccole).
+                # - %.3f: float con 3 decimali (utile per Y0).
+                print("Epoch: %d, Loss: %.3e, Y0: %.3f, Learning Rate: %.3e, Time: %.2fs" % (epoch, loss_value, Y0_value, learning_rate_value, elapsed))
+                
+                # Resettiamo il timer per misurare il prossimo blocco di iterazioni.
+                start_time = time.time()
     
+    # SPIEGAZIONE METODO PREDICT (INFERENZA/TEST):
+    #
+    # CONTESTO GENERALE:
+    # Questo metodo viene utilizzato DOPO l'addestramento per valutare il modello su nuovi dati 
+    # o per esaminare le traiettorie predette. A differenza di 'train', qui non avviene nessuna
+    # ottimizzazione dei pesi (i pesi sono congelati).
+    # Serve a rispondere alla domanda: "Data una certa evoluzione del moto Browniano W e un tempo t,
+    # quali sono le traiettorie X (Forward) e Y (Backward) che la rete prevede?"
+    #
+    # UTILIZZO SPECIFICO:
+    # Riceve in input dei dati di test (spesso generati allo stesso modo di fetch_minibatch, 
+    # ma tenuti separati come test set) e restituisce le matrici delle soluzioni.
+    def predict(self, Xi_star: np.ndarray, t_star: np.ndarray, W_star: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+        
+        # 1. PREPARAZIONE DEI DATI
+        # Creiamo il dizionario per alimentare i placeholder.
+        # Notiamo che NON passiamo 'learning_rate' perche' non stiamo addestrando (non usiamo train_op).
+        # Xi_star: punto di partenza.
+        # t_star: griglia temporale di test.
+        # W_star: realizzazioni del moto Browniano di test.
+        tf_dict = {self.Xi_tf: Xi_star, self.t_tf: t_star, self.W_tf: W_star}
+
+        # 2. ESECUZIONE DELLA PREDIZIONE
+        # Eseguiamo la sessione chiedendo in output:
+        # - self.X_pred: la traiettoria del processo Forward.
+        # - self.Y_pred: la traiettoria del processo Backward (soluzione dell'EQ).
+        # Questi nodi del grafo usano i pesi ormai addestrati per calcolare l'output.
+        #
+        # Nota: Potremmo fare una sola chiamata sess.run([self.X_pred, self.Y_pred], tf_dict)
+        # per efficienza, ma separarli funziona ugualmente.
+        X_star = self.sess.run(self.X_pred, tf_dict)
+        Y_star = self.sess.run(self.Y_pred, tf_dict)
+
+        # 3. RITORNO DEI RISULTATI
+        # Restituisce le matrici numpy con i valori predetti.
+        # Shape tipica: [M, N+1, D] o [M, N+1, 1]
+        return X_star, Y_star
+
+    # METODI ASTRATTI PER LA DEFINIZIONE DEL PROBLEMA:
+    # Questi metodi devono essere implementati nelle sottoclassi per definire 
+    # la specifica equazione differenziale (PDE) che si vuole risolvere.
+    
+    # SPIEGAZIONE PHI (GENERATORE BACKWARD):
+    # Rappresenta il termine di "drift" dell'equazione Backward, o il termine non lineare della PDE.
+    # Nell'equazione: dY_t = -phi(t, X_t, Y_t, Z_t)dt + Z_t dW_t
+    # Corrisponde alla funzione f(t, x, y, z) nei paper accademici.
+    # Input: Tempo t, Stato X, Valore Y, Gradiente Z.
+    @abstractmethod
+    def phi_tf(self, t, X, Y, Z):
+        pass
+
+    # SPIEGAZIONE G (CONDIZIONE TERMINALE):
+    # Rappresenta la condizione al contorno finale al tempo T.
+    # Y_T = g(X_T).
+    # Esempio: Nel pricing di opzioni, questa è la funzione di Payoff (es. max(X-K, 0)).
+    @abstractmethod
+    def g_tf(self, X):
+        pass
+
+    # SPIEGAZIONE MU (DRIFT FORWARD):
+    # Rappresenta la parte deterministica dell'evoluzione dello stato X.
+    # Nell'equazione: dX_t = mu(t, X_t, Y_t, Z_t)dt + sigma(...)dW_t
+    # Input: Tempo t, Stato X, e talvolta anche Y, Z (nei problemi fully coupled).
+    # Default: Ritorna 0 (nessun drift).
+    @abstractmethod
+    def mu_tf(self, t, X, Y, Z):
+        M = self.M
+        D = self.D
+        return np.zeros([M, D])
+
+    # SPIEGAZIONE SIGMA (DIFFUSIONE FORWARD):
+    # Rappresenta la volatilità o la parte stocastica dell'evoluzione dello stato X.
+    # Matrice DxD che moltiplica il moto Browniano dW.
+    # Default: Ritorna matrice identità (moto Browniano standard non scalato).
+    @abstractmethod
+    def sigma_tf(self, t, X, Y):
+        M = self.M
+        D = self.D
+        return tf.matrix_diag(tf.ones([M, D]))
