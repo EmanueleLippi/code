@@ -49,7 +49,7 @@ class FBSNN(ABC): # Forward-Backward Stochastic Neural Network
         self.W_tf = tf.placeholder(tf.float32, shape=[M, self.N+1, self.D]) # M x (N+1) x D
         self.Xi_tf = tf.placeholder(tf.float32, shape=[1, D]) # 1 x D
 
-        self.loss, self.X_pred, self.Y_pred, self.Y0_pred, self.Z0_pred = self.loss_function(self.t_tf, self.W_tf, self.Xi_tf)
+        self.loss, self.X_pred, self.Y_pred, self.Y0_pred, self.Z_pred = self.loss_function(self.t_tf, self.W_tf, self.Xi_tf)
                 
         # optimizers
         self.optimizer = tf.train.AdamOptimizer(learning_rate = self.learning_rate)
@@ -160,7 +160,7 @@ class FBSNN(ABC): # Forward-Backward Stochastic Neural Network
         Y = tf.stack(Y_list,axis=1)
         Z = tf.stack(Z_list,axis=1)
         
-        return loss, X, Y, Z, Y[0,0,0], Z[0,0,0]
+        return loss, X, Y, Y[0,0,0], Z
 
     def fetch_minibatch(self):
         T = self.T
