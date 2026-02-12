@@ -49,7 +49,7 @@ class FBSNN(ABC): # Forward-Backward Stochastic Neural Network
         self.W_tf = tf.placeholder(tf.float32, shape=[M, self.N+1, self.D]) # M x (N+1) x D
         self.Xi_tf = tf.placeholder(tf.float32, shape=[1, D]) # 1 x D
 
-        self.loss, self.X_pred, self.Y_pred, self.Y0_pred = self.loss_function(self.t_tf, self.W_tf, self.Xi_tf)
+        self.loss, self.X_pred, self.Y_pred, self.Y0_pred, self.Z0_pred = self.loss_function(self.t_tf, self.W_tf, self.Xi_tf)
                 
         # optimizers
         self.optimizer = tf.train.AdamOptimizer(learning_rate = self.learning_rate)
@@ -123,6 +123,7 @@ class FBSNN(ABC): # Forward-Backward Stochastic Neural Network
         loss = 0
         X_list = []
         Y_list = []
+        Z_list = []
         
         t0 = t[:,0,:]
         W0 = W[:,0,:]
@@ -131,6 +132,7 @@ class FBSNN(ABC): # Forward-Backward Stochastic Neural Network
         
         X_list.append(X0)
         Y_list.append(Y0)
+        Z_list.append(Z0)
         
         for n in range(0,self.N):
             t1 = t[:,n+1,:]
@@ -149,14 +151,16 @@ class FBSNN(ABC): # Forward-Backward Stochastic Neural Network
             
             X_list.append(X0)
             Y_list.append(Y0)
+            Z_list.append(Z0)
             
         loss += self.terminal_y_loss_weight * tf.reduce_mean(tf.square(Y1 - self.g_tf(X1)))
         loss += self.terminal_z_loss_weight * tf.reduce_mean(tf.square(Z1 - self.Dg_tf(X1)))
 
         X = tf.stack(X_list,axis=1)
         Y = tf.stack(Y_list,axis=1)
+        Z = tf.stack(Z_list,axis=1)
         
-        return loss, X, Y, Y[0,0,0]
+        return loss, X, Y, Z, Y[0,0,0], Z[0,0,0]
 
     def fetch_minibatch(self):
         T = self.T
@@ -212,8 +216,9 @@ class FBSNN(ABC): # Forward-Backward Stochastic Neural Network
         
         X_star = self.sess.run(self.X_pred, tf_dict)
         Y_star = self.sess.run(self.Y_pred, tf_dict)
+        Z_star = self.sess.run(self.Z_pred, tf_dict)
         
-        return X_star, Y_star
+        return X_star, Y_star, Z_star
     
     ###########################################################################
     ############################# Change Here! ################################
