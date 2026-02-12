@@ -58,7 +58,7 @@ class FBSNN(ABC):
         # self.loss: La funzione di costo (errore) che vogliamo minimizzare.
         # self.X_pred, self.Y_pred: Le soluzioni predette dalla rete.
         # self.Y0_pred: La soluzione al tempo t=0 (il nostro target da confrontare con Xi).
-        self.loss, self.X_pred, self.Y_pred, self.Y0_pred = self.loss_function(self.t_tf, self.W_tf, self.Xi_tf)
+        self.loss, self.X_pred, self.Y_pred, self.Y0_pred, self.Z_pred = self.loss_function(self.t_tf, self.W_tf, self.Xi_tf)
 
        #Definisco l'ottimizzatore --> Algoritmo che aggiorna i pesi della rete
        # SPIEGAZIONE OTTIMIZZATORE:
@@ -237,6 +237,7 @@ class FBSNN(ABC):
         loss = 0 # Inizializzo loss a 0. Accumulerà gli errori commessi ad ogni passo temporale.
         X_list = [] # Lista per salvare la storia delle traiettorie di X (memoria per visualizzazione/analisi).
         Y_list = [] # Lista per salvare la storia delle traiettorie di Y.
+        Z_list = [] # Lista per salvare la storia delle traiettorie di Z.
 
         # PARTE INIZIALE (Tempo t=0)
         t0 = t[:,0,:] # Tempo iniziale (per tutte le traiettorie M).
@@ -249,6 +250,7 @@ class FBSNN(ABC):
 
         X_list.append(X0) # Salvo X0 nello storico.
         Y_list.append(Y0) # Salvo Y0 nello storico.
+        Z_list.append(Z0) # Salvo Z0 nello storico.
 
         # PARTE 1: CICLO TEMPORALE (Eulero-Maruyama)
         for n in range(0, self.N):
@@ -289,6 +291,7 @@ class FBSNN(ABC):
             # Salvataggio nello storico
             X_list.append(X0)
             Y_list.append(Y0)
+            Z_list.append(Z0)
 
         # PARTE 2: CONDIZIONE TERMINALE
         # Alla fine del tempo T (dopo N passi), la soluzione Y deve rispettare la condizione al contorno g(X_T).
@@ -302,12 +305,13 @@ class FBSNN(ABC):
         # Pack dei risultati per il ritorno
         X = tf.stack(X_list, axis=1) # Tensore [M, N+1, D]
         Y = tf.stack(Y_list, axis=1) # Tensore [M, N+1, 1]
+        Z = tf.stack(Z_list, axis=1) # Tensore [M, N+1, D]
 
         # Ritorna:
         # loss: scalare da minimizzare
         # X, Y: traiettorie complete (per plot/analisi)
         # Y[0,0,0]: il valore iniziale Y0 della prima traiettoria (spesso il valore che cerchiamo, es. prezzo opzione).
-        return loss, X, Y, Y[0,0,0]
+        return loss/self.N, X, Y, Y[0,0,0], Z
 
 
     # SPIEGAZIONE GENERAZIONE BATCH (SIMULAZIONE STOCASTICA):
@@ -428,7 +432,7 @@ class FBSNN(ABC):
     # UTILIZZO SPECIFICO:
     # Riceve in input dei dati di test (spesso generati allo stesso modo di fetch_minibatch, 
     # ma tenuti separati come test set) e restituisce le matrici delle soluzioni.
-    def predict(self, Xi_star: np.ndarray, t_star: np.ndarray, W_star: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    def predict(self, Xi_star: np.ndarray, t_star: np.ndarray, W_star: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         
         # 1. PREPARAZIONE DEI DATI
         # Creiamo il dizionario per alimentare i placeholder.
@@ -448,11 +452,12 @@ class FBSNN(ABC):
         # per efficienza, ma separarli funziona ugualmente.
         X_star = self.sess.run(self.X_pred, tf_dict)
         Y_star = self.sess.run(self.Y_pred, tf_dict)
+        Z_star = self.sess.run(self.Z_pred, tf_dict)
 
         # 3. RITORNO DEI RISULTATI
         # Restituisce le matrici numpy con i valori predetti.
         # Shape tipica: [M, N+1, D] o [M, N+1, 1]
-        return X_star, Y_star
+        return X_star, Y_star, Z_star
 
     # METODI ASTRATTI PER LA DEFINIZIONE DEL PROBLEMA:
     # Questi metodi devono essere implementati nelle sottoclassi per definire 
