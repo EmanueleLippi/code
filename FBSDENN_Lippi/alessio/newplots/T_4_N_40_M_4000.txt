@@ -1,0 +1,13 @@
+[(1200, 0.001), (1800, 0.0005), (1800, 0.0001), (1200, 0.001), (1800, 0.0005), (1800, 0.0001)]
+[(3000, 1e-05), (2400, 1e-06)]
+=== Curriculum Log (compact) ===
+phase=curriculum, const=1.0, lr=1.0e-03, iters=1200, eval_loss=2.542e+01, eval_y0=-7.783, elapsed_sec=779.2383935451508
+phase=curriculum, const=1.0, lr=5.0e-04, iters=1800, eval_loss=1.653e+01, eval_y0=-8.180, elapsed_sec=986.7709345817566
+phase=curriculum, const=1.0, lr=1.0e-04, iters=1800, eval_loss=2.172e+01, eval_y0=-8.242, elapsed_sec=959.373117685318
+phase=curriculum, const=1.1, lr=1.0e-03, iters=1200, eval_loss=1.977e+01, eval_y0=-8.057, elapsed_sec=639.1495652198792
+phase=curriculum, const=1.1, lr=5.0e-04, iters=1800, eval_loss=1.588e+01, eval_y0=-8.058, elapsed_sec=958.6473593711853
+phase=curriculum, const=1.1, lr=1.0e-04, iters=1800, eval_loss=1.461e+01, eval_y0=-8.093, elapsed_sec=959.3337807655334
+phase=final_finetune, const=1.0, lr=1.0e-05, iters=3000, eval_loss=1.510e+01, eval_y0=-8.061, elapsed_sec=1597.6932215690613
+phase=final_finetune, const=1.0, lr=1.0e-06, iters=2400, eval_loss=3.153e+01, eval_y0=-8.076, elapsed_sec=1278.4801151752472
+total time= 8158.686487913132 s =  2.2663018021980923 h
+
