@@ -1,0 +1,502 @@
+Guida dettagliata al codice: T48_v2_script.py
+Percorso codice: notebook/T48_v2_script.py
+Percorso notebook equivalente: notebook/T48_v2.ipynb
+
+Obiettivo della guida
+- Spiegare la logica del codice in modo molto chiaro.
+- Collegare ogni scelta implementativa al problema numerico (FBSDE con orizzonte lungo T=48).
+- Fornire una traccia utile per una discussione tecnica con un collega.
+
+Nota importante
+- Il file ha 1154 linee. Invece di commentare 1154 righe isolate una per una, la guida segue i blocchi di linee in ordine, con riferimenti puntuali alle righe chiave.
+- Questo approccio e piu utile dal punto di vista tecnico: mantiene il filo logico e la motivazione matematica.
+
+====================================================================
+1) Panorama generale del file
+====================================================================
+
+Struttura principale (in ordine)
+- Linee 1-8: import e setup TensorFlow v1.
+- Linee 11-495: classe base FBSNN.
+- Linee 498-566: classe concreta NN (dinamica specifica del problema).
+- Linee 569-771: funzioni numpy per simulazione forward e costruzione blocchi.
+- Linee 772-956: routine di training ricorsivo backward in time.
+- Linee 959-973: funzioni esatte u e z per confronto.
+- Linee 976-1154: main (config, train, log e plotting finale).
+
+Idea architetturale
+- Una rete approssima u(t,x). Da u si ricava Du e quindi Z.
+- La loss combina:
+  1) coerenza lungo il path (equazione backward discretizzata),
+  2) condizione terminale su Y,
+  3) condizione terminale su Z.
+- Per T lungo, il training monolitico e fragile: si usa schema ricorsivo per blocchi temporali backward.
+- Ogni blocco usa warm-start dal blocco successivo e target terminale esterno dove disponibile.
+
+====================================================================
+2) Import e bootstrap (linee 1-8)
+====================================================================
+
+Linee 1-2
+- Import di time e astrazione ABC/abstractmethod.
+- Motivazione: separare implementazione base da definizione del problema specifico.
+
+Linee 4-6
+- Import matplotlib, numpy, tensorflow.compat.v1.
+- Motivazione:
+  - numpy per simulazione e manipolazione batch.
+  - TF v1 per coerenza con codice esistente e graph statico.
+  - matplotlib per diagnostica finale.
+
+Linea 8
+- tf.disable_v2_behavior().
+- Motivazione: forzare API TF1 (placeholder, session, graph), gia usata nel progetto.
+
+====================================================================
+3) Classe base FBSNN (linee 11-495)
+====================================================================
+
+--------------------------------------------------------------------
+3.1) Costruttore __init__ (linee 12-80)
+--------------------------------------------------------------------
+
+Parametri (linee 14-27)
+- Xi, T, M, N, D, layers: definizione base del problema.
+- t_start: inizio assoluto del blocco temporale (fondamentale nel ricorsivo).
+- activation: tipo di attivazione MLP.
+- clip_grad_norm: clipping globale dei gradienti.
+- use_antithetic_sampling: riduzione varianza nel campionamento Browniano.
+- path_loss_weight, terminal_y_loss_weight, terminal_z_loss_weight: pesi loss.
+
+Linee 28-33
+- Casting e salvataggio attributi strutturali.
+- Motivazione: tipi coerenti evitano mismatch nelle placeholder e nelle shape.
+
+Linee 35-40
+- Salvataggio iperparametri di stabilita.
+- Motivazione:
+  - clipping: evita esplosione gradiente su orizzonte lungo.
+  - antithetic: riduce rumore Monte Carlo.
+  - pesi loss: permette enfatizzare il terminale, spesso il pezzo piu duro.
+
+Linea 42
+- self.Xi = self._prepare_Xi(Xi).
+- Motivazione: normalizza Xi a shape (M,D) per evitare logica speciale durante train/predict.
+
+Linea 44
+- Inizializzazione pesi e bias.
+
+Linee 46-48
+- Session TF con allow_soft_placement e log_device_placement.
+- Motivazione:
+  - soft placement evita crash se alcuni op non sono su GPU.
+  - log device utile per debug performance.
+
+Linee 50-54
+- Placeholder principali:
+  - learning_rate scalare,
+  - t_tf (M, N+1, 1),
+  - W_tf (M, N+1, D),
+  - Xi_tf (M, D),
+  - const_tf (scalare, tenuto per compatibilita con codice precedente).
+
+Linee 56-62
+- Placeholder opzionali per target terminale esterno:
+  - use_external_terminal_tf,
+  - Y_terminal_tf,
+  - Z_terminal_tf.
+- Motivazione: nei blocchi non terminali la condizione finale non e g(X_T), ma il blocco successivo.
+
+Linee 64-66
+- Costruzione graph della loss e dei tensori predetti.
+
+Linee 68-78
+- Adam + clipping gradienti global norm.
+- Dettaglio:
+  - compute_gradients(self.loss)
+  - filtra gradienti None
+  - tf.clip_by_global_norm
+  - apply_gradients
+- Motivazione: su T lungo evita aggiornamenti instabili e salti numerici.
+
+Linea 80
+- Inizializzazione variabili TF.
+
+--------------------------------------------------------------------
+3.2) initialize_NN e xavier_init (linee 82-99)
+--------------------------------------------------------------------
+
+initialize_NN (82-91)
+- Crea lista pesi/bias layer by layer.
+- Bias a zero, pesi con Xavier.
+
+xavier_init (93-99)
+- stddev = sqrt(2/(in+out)).
+- Motivazione: scala iniziale stabile per propagazione forward/backward.
+
+--------------------------------------------------------------------
+3.3) Validatori input (linee 101-128)
+--------------------------------------------------------------------
+
+_prepare_Xi (101-112)
+- Accetta Xi shape (1,D) o (M,D).
+- Se (1,D) la replica a (M,D).
+- Motivazione: facilita uso sia in setup singolo punto che in blocchi ricorsivi con Xi variabile per traiettoria.
+
+_prepare_terminal_targets (114-128)
+- Valida shape di Y_terminal e Z_terminal.
+- Motivazione: intercetta subito bug di shape che altrimenti emergono in session.run con errori poco leggibili.
+
+--------------------------------------------------------------------
+3.4) Rete neurale e derivata spaziale (linee 130-160)
+--------------------------------------------------------------------
+
+neural_net (130-152)
+- MLP fully-connected.
+- Attivazioni supportate: sin, tanh, swish.
+- Ultimo layer lineare.
+
+Motivazione della sin (default)
+- In diversi problemi PDE/FBSDE la sin puo catturare meglio pattern non lineari rispetto a tanh in certi regimi.
+- E comunque parametrizzabile da config.
+
+net_u (154-157)
+- Calcola u(t,x) e Du = grad_x u.
+- Motivazione: Z viene costruito da Du e sigma.
+
+Dg_tf (159-160)
+- Gradiente terminale di g(X).
+- Serve come target di Z al terminale quando non si usa target esterno.
+
+--------------------------------------------------------------------
+3.5) Loss principale (linee 162-230)
+--------------------------------------------------------------------
+
+Idea numerica
+- Discretizzazione Euler-Maruyama su X e backward su Y.
+- Si impone coerenza tra Y1 e Y1_tilde ad ogni step.
+- Si impone condizione finale su Y e Z.
+
+Dettaglio linee chiave
+- 168-173: stato iniziale blocco, rete su (t0, X0), calcolo sigma0 e Z0.
+- 179-206: loop temporale.
+  - 183-185: costruzione X1 forward con drift+diffusion.
+  - 187-189: Y1_tilde dalla dinamica backward discretizzata.
+  - 191-193: Y1 e Z1 predetti dalla rete al nuovo stato.
+  - 195: accumulo errore path.
+- 208: normalizzazione path_loss per N.
+- 210-216: target terminale standard o esterno (blend via alpha).
+- 218-219: terminal losses per Y e Z.
+- 221-225: loss pesata finale.
+
+Motivazioni progettuali
+- Uso di tf.reduce_mean (non sum): rende scala loss meno dipendente da M e N.
+- Pesi separati (path vs terminal): su T lungo il terminale e spesso il collo di bottiglia.
+- Target esterno opzionale: abilita schema ricorsivo consistente.
+
+Output della funzione
+- loss scalare,
+- X, Y, Z su tutta la griglia,
+- Y0 vettoriale batch-wise (Y[:,0,:]).
+
+--------------------------------------------------------------------
+3.6) Minibatch Browniano con antithetic (linee 232-255)
+--------------------------------------------------------------------
+
+Cosa fa
+- Genera incrementi dW con dt = T/N.
+- Se antithetic attivo:
+  - meta batch con dW,
+  - meta batch con -dW.
+- Converte in processo W tramite cumsum.
+
+Motivazione
+- Riduzione varianza Monte Carlo della loss e dei gradienti.
+- Migliore stabilita dell'ottimizzazione senza aumentare troppo M.
+
+--------------------------------------------------------------------
+3.7) Utility feed/batch (linee 257-301)
+--------------------------------------------------------------------
+
+_check_batch_entry
+- Controlla entry del batch_pool (Xi,t,W,terminal_targets).
+- Motivazione: robustezza e debug rapido.
+
+_build_feed_dict
+- Costruisce tf_dict unico per train/eval.
+- Gestisce target esterno se presente.
+- Motivazione: evitare duplicazione e divergenza tra train/eval path.
+
+--------------------------------------------------------------------
+3.8) Train (linee 303-384)
+--------------------------------------------------------------------
+
+Modalita supportate
+1) batch_pool multi-scenario (preferita su T lungo).
+2) fixed_batch (compatibilita).
+3) minibatch random standard (fallback).
+
+Passi principali
+- 313: Xi default (self.Xi) o Xi_batch custom.
+- 317-327: validazione fixed_batch.
+- 329-333: validazione pool.
+- 340-351: scelta del batch corrente.
+- 353-360: feed dict.
+- 362: passo di ottimizzazione.
+- 364-375: log ogni 10 iter con mean/std di Y0.
+
+Motivazione batch_pool
+- Evita overfit su un solo scenario Browniano per blocco.
+- Aumenta generalizzazione del blocco e stabilita del ricorsivo.
+
+--------------------------------------------------------------------
+3.9) Evaluate (linee 386-452)
+--------------------------------------------------------------------
+
+Cosa cambia rispetto a train
+- Nessun aggiornamento pesi.
+- Usa stesso meccanismo di sampling del train.
+- Se batch_pool presente, valuta su tutto il pool.
+
+Motivazione
+- Mettere train/eval sullo stesso schema dati evita metriche fuorvianti.
+
+--------------------------------------------------------------------
+3.10) Predict, export/import e metodi astratti (linee 454-495)
+--------------------------------------------------------------------
+
+predict
+- Inferenzia X,Y,Z per input Xi,t,W.
+
+export_parameters / import_parameters
+- Salvataggio/caricamento pesi tra blocchi (warm-start).
+
+Metodi astratti
+- phi_tf, g_tf, mu_tf, sigma_tf.
+- Motivazione: separare framework FBSNN dalla dinamica specifica del problema.
+
+====================================================================
+4) Classe NN concreta (linee 498-566)
+====================================================================
+
+Linee 499-513
+- Carica parametri del modello fisico e chiama super().__init__.
+
+psi (515-519)
+- Funzione di clipping/saturazione in [0,1] con limiti su X.
+- Motivazione: controllare termini non lineari di drift V in regime fisicamente consistente.
+
+mu_tf (521-535)
+- Drift dello stato (S,H,V,X_state).
+- dS e dH mean-reverting.
+- dV usa psi in due regioni di saturazione.
+- dX = V.
+
+g_tf (537-541)
+- Condizione terminale: -gamma * exp(S) * X_state.
+
+phi_tf (543-551)
+- Driver backward coerente con soluzione analitica del problema.
+
+sigma_tf (553-566)
+- Matrice diffusione diagonale su S,H,V; nulla su X_state.
+
+Motivazione complessiva
+- La classe NN codifica la specifica FBSDE del problema; il resto del file e infrastruttura numerica.
+
+====================================================================
+5) Funzioni numpy di supporto (linee 569-771)
+====================================================================
+
+psi_np (569-570)
+- Versione numpy della psi per simulazione offline.
+
+make_antithetic_dW (573-584)
+- Genera incrementi Browniani antitetici.
+- Motivazione: coerenza con sampling del modello TF.
+
+simulate_forward_paths_np (587-639)
+- Simulazione forward completa X_paths su griglia globale.
+- Usa la stessa dinamica del mu_tf/sigma_tf.
+- Motivazione: nello schema ricorsivo ogni blocco riusa questi path per costruire dati locali.
+
+build_block_batch_from_forward (642-652)
+- Estrae batch locale del blocco [i0,i1].
+- W locale parte da zero nel blocco (cumsum locale).
+
+build_dummy_batch_for_model (655-665)
+- Batch deterministico per query di next_model al tempo iniziale del suo blocco.
+- Motivazione: ottenere target terminale esterno (Y,Z) in modo pulito.
+
+build_forward_scenarios (668-696)
+- Crea piu scenari forward con seed diversi.
+- Motivazione: costruire pool train/eval multi-scenario.
+
+build_block_pool (699-722)
+- Per ogni scenario costruisce una entry con:
+  - Xi del blocco,
+  - t e W locali,
+  - terminal_targets (se next_model esiste).
+- Motivazione: dataset locale robusto per il blocco.
+
+partition_blocks (725-769)
+- Partizione adattiva di N_total in blocchi.
+- Vincoli:
+  - target_block_steps,
+  - max_blocks,
+  - min_steps_per_block,
+  - terminal_min_steps.
+- Motivazione: blocchi non troppo lunghi (stabilita) e terminale non troppo corto (apprendimento terminale migliore).
+
+====================================================================
+6) Cuore ricorsivo: run_recursive_experiment (linee 772-956)
+====================================================================
+
+Pipeline in 9 passi
+1) Replica Xi su M traiettorie (773).
+2) Costruisci scenari forward train/eval (775-796).
+3) Partiziona timeline in blocchi (798-801).
+4) Cicla backward dai blocchi terminali ai primi (816-819).
+5) Crea block_model con t_start e iperparametri robusti (827-842).
+6) Warm-start da next_params (844-845).
+7) Crea train_pool/eval_pool del blocco (847-848).
+8) Allena (con eventuale due-stage sul terminale) (863-894).
+9) Valuta, logga, passa al blocco precedente (896-927).
+
+Scelte importanti
+- train_scen != eval_scen:
+  - riduce rischio di metriche troppo ottimistiche.
+- is_terminal_block:
+  - applica budget maggiore e LR diversa dove il problema e piu duro.
+- two-stage terminale:
+  - stage1 piu aggressivo, stage2 rifinitura.
+- exact_y0_block (901-907):
+  - metrica diagnostica diretta su qualita del blocco.
+
+Output
+- summary globale,
+- ordered_logs per blocco,
+- model_t0 finale (blocco iniziale).
+
+====================================================================
+7) Funzioni esatte e main (linee 959-1154)
+====================================================================
+
+u_exact_np / z_exact_np (959-973)
+- Ground truth analitico per confronto finale.
+
+Main setup (976-1002)
+- M=2048, D=4, T=48, dt target 0.1 quindi N=480.
+- Parametri problema e architettura rete.
+
+Config profili (1003-1058)
+- quick: test rapido robusto.
+- stable: default, piu costoso ma piu affidabile.
+
+Differenze principali stable
+- piu iterazioni per blocco,
+- terminale molto rinforzato,
+- piu scenari train/eval,
+- peso terminal_y piu alto, peso terminal_z piu basso.
+
+Motivazione terminal_z piu basso
+- Su orizzonte lungo, target Z esterno puo essere rumoroso.
+- Ridurre peso Z aiuta a non destabilizzare Y.
+
+Train + log (1060-1081)
+- Esegue ricorsivo e stampa log compatto con delta da exact_y0.
+
+Valutazione finale (1082-1151)
+- Predizioni su blocco iniziale,
+- confronto Y_pred vs Y_exact,
+- confronto errori Z con metrica mista rel/abs in scala log.
+
+====================================================================
+8) Ragione tecnica delle scelte principali
+====================================================================
+
+1) Gradient clipping
+- Problema: gradiente esplosivo su horizon lungo.
+- Soluzione: clip global norm.
+- Effetto: update piu regolari, meno divergenze.
+
+2) Antithetic sampling
+- Problema: varianza Monte Carlo alta nei gradienti.
+- Soluzione: coppie dW e -dW.
+- Effetto: stima piu stabile con stesso M.
+
+3) Loss pesata
+- Problema: obiettivi path e terminale competono.
+- Soluzione: pesi separati.
+- Effetto: puoi focalizzare il terminale quando e il collo di bottiglia.
+
+4) Batch-pool multi-scenario
+- Problema: overfit su singolo path fisso di blocco.
+- Soluzione: pool scenari con seed diversi.
+- Effetto: blocchi piu generalizzabili e ricorsivo piu sano.
+
+5) Two-stage sul terminal block
+- Problema: terminale difficile, apprendimento lento.
+- Soluzione: fase iniziale piu aggressiva + fase di rifinitura.
+- Effetto: convergenza terminale migliore senza oscillazioni finali eccessive.
+
+6) Partizione adattiva blocchi
+- Problema: blocchi troppo lunghi o terminale troppo corto.
+- Soluzione: vincoli su min_steps, target_block_steps e terminal_min_steps.
+- Effetto: migliore compromesso stabilita/costo.
+
+====================================================================
+9) Come discutere il codice domani con il collega
+====================================================================
+
+Sequenza consigliata
+1) Spiega il perche del ricorsivo su T=48.
+2) Spiega la loss (path + terminal Y + terminal Z) e i pesi.
+3) Spiega perche clipping + antithetic + pool sono stati introdotti.
+4) Spiega warm-start e target esterni blocco-per-blocco.
+5) Mostra log per blocco con delta rispetto a exact_y0.
+6) Mostra grafici finali Y e Z.
+
+Messaggio chiave
+- Il passaggio da un setup fragile a uno robusto non e un singolo trucco.
+- E una combinazione coerente di:
+  - stabilizzazione ottimizzazione,
+  - riduzione varianza campionamento,
+  - decomposizione temporale controllata,
+  - metriche diagnostiche corrette.
+
+====================================================================
+10) Checklist rapida tuning se il run non converge bene
+====================================================================
+
+Se il terminal block resta dominante
+- Aumenta terminal_iters_multiplier.
+- Aumenta terminal_y_loss_weight.
+- Valuta un leggero aumento n_forward_train.
+
+Se loss oscilla troppo
+- Abbassa lr_per_block.
+- Riduci terminal_stage1_lr_boost.
+- Valuta clip_grad_norm piu severo (es. 0.7).
+
+Se Y0 e corretto ma Z rumoroso
+- Riduci ancora terminal_z_loss_weight.
+- Aumenta n_forward_eval per metrica piu stabile.
+
+Se training troppo lento
+- Usa profilo quick o riduci n_forward_train.
+- Riduci iters_per_block mantenendo terminale rinforzato.
+
+====================================================================
+11) Mini glossario operativo
+====================================================================
+
+- Xi: stato iniziale del blocco.
+- M: numero traiettorie Monte Carlo per batch.
+- N: numero passi temporali del blocco.
+- t_start: tempo assoluto iniziale del blocco.
+- batch_pool: insieme di scenari per train/eval del blocco.
+- terminal_targets: target (Y,Z) dal blocco successivo.
+- warm-start: inizializzazione pesi del blocco corrente con quelli del blocco successivo.
+
+Fine guida.

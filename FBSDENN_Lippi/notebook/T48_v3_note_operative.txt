@@ -1,0 +1,46 @@
+T48_v3 - Nota Operativa Rapida
+
+Obiettivo principale della v3
+- Rendere il blocco terminale molto piu robusto (era il collo di bottiglia principale).
+- Ridurre la propagazione all'indietro di un boundary condition sbagliato.
+
+Modifiche chiave implementate
+- Normalizzazione input per blocco (stato X) + normalizzazione locale del tempo in [-1, 1].
+- Loss weights dinamici per fase (path / terminal_y / terminal_z).
+- Schedule terminale aggressivo a due fasi.
+- Refinement automatico del blocco terminale se la distanza relativa dal valore esatto resta alta.
+- Profilo di default: terminal_first.
+
+Cosa guardare nei log
+1) Blocco terminale (ultimo blocco)
+- Cerca questi marker nel log:
+  - [TerminalSchedule]
+  - [TerminalRefine] (se attivato)
+- Obiettivo pratico: rel_delta terminale in discesa netta.
+- Nel compact log, controlla:
+  - rel_delta del blocco terminale
+  - eval_y0 vs exact_y0 del blocco terminale
+
+2) Blocchi backward
+- Delta e rel_delta dovrebbero rimanere piu controllati rispetto alla v2.
+- Se il terminale migliora ma i primi blocchi restano molto distanti, aumentare n_forward_train.
+
+3) Valore finale al tempo 0
+- Predicted Y0 mean deve avvicinarsi a Exact Y0 = -8.
+- Errore assoluto target (prima soglia utile): <= 2.0
+- Errore assoluto buono: <= 1.0
+
+Soglie di allarme
+- rel_delta terminale > 0.35 dopo refine: ancora instabile.
+- Predicted Y0 con segno sbagliato: boundary ancora propagato male.
+
+Leve rapide da toccare (in notebook/T48_v3_script.py)
+- terminal_refine_rounds
+- terminal_refine_terminal_y_loss_weight
+- terminal_stage1_terminal_y_loss_weight
+- n_forward_train
+- clip_grad_norm
+
+Regola pratica
+- Se il terminale non scende: aumentare peso terminale e round di refine.
+- Se diverge/oscilla: ridurre lr_per_block o terminal_stage1_lr_boost, oppure aumentare clip_grad_norm in modo moderato.
