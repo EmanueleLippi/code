@@ -1,0 +1,6 @@
+Idea per prossimo step:
+1. Divide l'intervallo massimo (T) in sottointervalli più piccoli (t_i, t_{i+1}), dove in ogni blocco si sa che si riesce a risolvere con un errore accettabile.
+2. Partiamo da l'ultimo blocco e lo risolviamo con il dato finale vero (g(X_T)) del modello e come distribuzione iniziale (alpha) dei punti in t_{T-1} diamo una distribuzione che ci siamo scelti.
+3. Iterativamente risolviamo il problema sul blocco precedente con il medesimo dato iniziale ma con il dato finale che è la predizione della u della del blocco successivo, calcolata nel tempo del blocco finale del blocco attuale
+
+Nota: Ogni blocco deve essere allenato con la stessa precisione
