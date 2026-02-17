@@ -1,0 +1,9 @@
+[(2400, 0.001), (2400, 0.0005), (2400, 0.0001)]
+[(2400, 1e-05), (2400, 1e-06)]
+=== Curriculum Log (compact) ===
+phase=curriculum, const=1.0, lr=1.0e-03, iters=2400, eval_loss=6.849e+00, eval_y0=-6.645, elapsed_sec=2147.8507754802704
+phase=curriculum, const=1.0, lr=5.0e-04, iters=2400, eval_loss=5.700e+00, eval_y0=-6.660, elapsed_sec=2027.3381419181824
+phase=curriculum, const=1.0, lr=1.0e-04, iters=2400, eval_loss=6.153e+00, eval_y0=-6.642, elapsed_sec=2028.0276210308075
+phase=final_finetune, const=1.0, lr=1.0e-05, iters=2400, eval_loss=5.785e+00, eval_y0=-6.604, elapsed_sec=2032.8630304336548
+phase=final_finetune, const=1.0, lr=1.0e-06, iters=2400, eval_loss=5.893e+00, eval_y0=-6.608, elapsed_sec=2027.5882036685944
+total time= 10263.66777253151 s =  2.851018825703197 h
