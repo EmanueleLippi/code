@@ -1292,11 +1292,17 @@ def run_recursive_training(
     rollout_M=2000,
     save_tf_checkpoints=True,
     training_plan_rules: Optional[List[Dict]] = None,
+    pass1_warm_start_from_next=False,
 ):
     blocks = build_blocks(T_total=T_total, block_size=block_size)
     print(f"[Recursive] blocks={len(blocks)} -> {[ (b['t_start'], b['t_end']) for b in blocks ]}")
 
-    def _run_pass(pass_id, generators_per_block, warm_start_blobs=None):
+    def _run_pass(
+        pass_id,
+        generators_per_block,
+        warm_start_blobs=None,
+        warm_start_from_next=False,
+    ):
         pass_dir = os.path.join(output_dir, f"pass_{pass_id}")
         os.makedirs(pass_dir, exist_ok=True)
 
@@ -1332,6 +1338,10 @@ def run_recursive_training(
                 x_norm_mean=x_mean,
                 x_norm_std=x_std,
             )
+
+            # Opzione: nella passata 1 inizializza il blocco i coi pesi del blocco i+1.
+            if warm_start_from_next and next_blob is not None:
+                model.import_parameter_blob(next_blob, strict=False)
 
             if warm_start_blobs is not None and warm_start_blobs[b] is not None:
                 model.import_parameter_blob(warm_start_blobs[b], strict=False)
@@ -1407,7 +1417,10 @@ def run_recursive_training(
     # Pass 1: bootstrap (generator di partenza uguale per tutti i blocchi)
     generators_pass1 = [Xi_generator for _ in blocks]
     blobs_pass1, logs_pass1, ref_loss_pass1 = _run_pass(
-        pass_id=1, generators_per_block=generators_pass1, warm_start_blobs=None
+        pass_id=1,
+        generators_per_block=generators_pass1,
+        warm_start_blobs=None,
+        warm_start_from_next=bool(pass1_warm_start_from_next),
     )
 
     # Stima boundary empirici da rollout stitched
@@ -1429,7 +1442,10 @@ def run_recursive_training(
         generators_pass2.append(make_empirical_generator(boundary_samples[b], jitter_scale=0.02))
 
     blobs_pass2, logs_pass2, ref_loss_pass2 = _run_pass(
-        pass_id=2, generators_per_block=generators_pass2, warm_start_blobs=blobs_pass1
+        pass_id=2,
+        generators_per_block=generators_pass2,
+        warm_start_blobs=blobs_pass1,
+        warm_start_from_next=False,
     )
 
     return {
@@ -1463,6 +1479,14 @@ def main():
             "CSV opzionale con piano training per blocco/pass. "
             "Colonne richieste: pass_scope,block_scope,phase,n_iter,lr "
             "(opzionali: order,enabled)."
+        ),
+    )
+    parser.add_argument(
+        "--pass1_warm_start_from_next",
+        action="store_true",
+        help=(
+            "Se attivo, in pass1 il blocco i viene inizializzato coi pesi del blocco i+1 "
+            "(quando disponibile). Pass2 resta invariato."
         ),
     )
     args = parser.parse_args()
@@ -1520,6 +1544,7 @@ def main():
         "training_plan_csv": args.training_plan_csv,
         "training_plan_rules_count": len(training_plan_rules),
         "training_plan_rules": training_plan_rules,
+        "pass1_warm_start_from_next": bool(args.pass1_warm_start_from_next),
         "params": params,
         "plotting_available": _PLOTTING_AVAILABLE,
     }
@@ -1588,6 +1613,7 @@ def main():
             rollout_M=max(2000, M),
             save_tf_checkpoints=True,
             training_plan_rules=training_plan_rules,
+            pass1_warm_start_from_next=bool(args.pass1_warm_start_from_next),
         )
 
         print("\n=== Recursive Log pass2 (compact) ===")
