@@ -9,6 +9,7 @@ Questa nota descrive la versione corrente del codice, inclusi:
 - salvataggio completo degli artefatti (config, metriche, modelli),
 - riduzione dei log su stdout,
 - warm-start aggiornato,
+- warm-start opzionale tra blocchi nella passata 1,
 - piano di training configurabile via CSV.
 
 
@@ -87,7 +88,8 @@ Correzioni e funzionalita aggiunte
 
 5) Warm-start attuale (stato corrente)
 - Pass 1:
-  - nessun warm-start da pass precedente.
+  - di default nessun warm-start da pass precedente.
+  - opzionale: se attivi --pass1_warm_start_from_next, il blocco i parte dai pesi del blocco i+1.
 - Pass 2:
   - warm-start corretto dallo stesso blocco del Pass 1.
   - cioe blocco b in pass2 parte da pesi di blocco b in pass1.
@@ -174,6 +176,7 @@ Argomenti principali:
 - --block_size
 - --output_dir
 - --training_plan_csv
+- --pass1_warm_start_from_next
 
 
 Comandi utili
@@ -188,7 +191,10 @@ python3 recursive/recursive1.py --mode recursive --T_total 48 --block_size 12 --
 3) Ricorsivo con piano CSV
 python3 recursive/recursive1.py --mode recursive --T_total 48 --block_size 12 --M 100 --N 100 --training_plan_csv recursive/training_plan_example.csv
 
-4) Entrambi
+4) Ricorsivo con warm-start tra blocchi nella passata 1
+python3 recursive/recursive1.py --mode recursive --T_total 48 --block_size 12 --M 100 --N 100 --pass1_warm_start_from_next
+
+5) Entrambi
 python3 recursive/recursive1.py --mode both --T_standard 24 --T_total 48 --block_size 12 --M 100 --N 100
 
 
