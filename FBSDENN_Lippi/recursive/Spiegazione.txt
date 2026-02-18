@@ -1,0 +1,216 @@
+Spiegazione dettagliata di recursive1.py
+======================================
+
+File di riferimento:
+/Users/emanuelelippi/Library/Mobile Documents/com~apple~CloudDocs/Universita/Tirocinio/code/FBSDENN_Lippi/TensorFlow/recursive1.py
+
+Obiettivo del file
+------------------
+Questo script implementa due modalita:
+1) Metodo standard (single-block) per baseline.
+2) Metodo ricorsivo a blocchi temporali (time-stitching) per estendere l'orizzonte T totale (esempio: T=48).
+
+L'idea e:
+- suddividere [0, T_totale] in blocchi [t_i, t_{i+1}],
+- allenare i blocchi all'indietro (dall'ultimo al primo),
+- usare come condizione terminale di un blocco intermedio la predizione u del blocco successivo.
+
+Vincolo richiesto:
+- non stravolgere la classe madre FBSNN e la prima figlia NN_Quadratic_Coupled.
+- mantenere un main confrontabile con il metodo standard.
+
+
+Struttura logica dello script
+-----------------------------
+
+1) Classe madre FBSNN
+   - E' mantenuta nello stesso stile della versione usata nel notebook avanzato:
+     - Xi_generator come input (non Xi fisso),
+     - placeholders t_tf, W_tf, Xi_tf, const_tf,
+     - clipping gradiente globale,
+     - antithetic sampling opzionale,
+     - train/evaluate/predict con early stopping e restore_best.
+   - La loss resta quella BSDE:
+     - path loss su Y1 - Y1_tilde,
+     - terminal loss su Y(T) - g(X(T)),
+     - terminal loss su Z(T) - Dg(X(T))*sigma(T).
+
+2) Classe figlia NN_Quadratic_Coupled
+   - E' riportata con la stessa formulazione del tuo modello:
+     - psi, psi3, psi4,
+     - f(X, Z),
+     - mu_tf, phi_tf, g_tf, sigma_tf.
+   - Quindi il comportamento base resta confrontabile con il tuo setup attuale.
+
+3) Estensione ricorsiva: NN_Quadratic_Coupled_Recursive
+   - E' una sottoclasse separata, non modifica la logica delle classi sopra.
+   - Aggiunge funzionalita per il training a blocchi:
+     a) tempo assoluto per blocco:
+        - fetch_minibatch genera t in [t_start, t_end], non in [0, T_block].
+     b) normalizzazione input della rete:
+        - tempo normalizzato su T_total: tau = 2*(t/T_total)-1
+        - stato X normalizzato con mean/std del blocco.
+     c) stitching terminale:
+        - ultimo blocco: usa g_tf analitica.
+        - blocchi intermedi: g_tf(X) = u_next(t_end, X), dove u_next e' rete congelata del blocco successivo.
+     d) Dg_tf per blocchi intermedi:
+        - gradiente automatico rispetto a X di g_tf(X), quindi coerente con la terminal loss su Z.
+
+4) Export/import robusto pesi via NPZ
+   - Motivazione: in TF1 il restore per nome variabile puo essere fragile.
+   - Soluzione usata:
+     - export_parameter_blob() salva W_i, b_i e metadati in dict.
+     - save_blob_npz() salva su disco in .npz.
+     - import_parameter_blob() ricarica i tensori nel modello.
+   - Metadati salvati:
+     - layers, T_total, normalize_time_input, x_norm_mean, x_norm_std, t_start, t_end.
+
+5) Utility principali
+   - Xi_generator_default: distribuzione iniziale standard (D=4).
+   - make_empirical_generator: campionatore da distribuzione empirica (boundary del rollout).
+   - estimate_generator_stats: stima mean/std del generatore del blocco.
+   - build_blocks: partiziona [0, T_total] in blocchi di block_size.
+   - train_with_standard_schedule:
+     - riusa lo stesso schema stage/final del metodo standard,
+     - opzionalmente applica refine rounds se mean_loss supera un target di precisione.
+
+6) Pipeline ricorsiva completa (run_recursive_training)
+   - Esegue 2 pass:
+
+   Pass 1 (bootstrap):
+   - tutti i blocchi usano il generatore iniziale di base.
+   - training backward: blocchi da ultimo a primo.
+   - ogni blocco salva un blob NPZ.
+
+   Rollout boundary:
+   - esegue forward stitched usando i blob del Pass 1,
+   - raccoglie campioni ai tempi di confine t_i.
+
+   Pass 2 (refinement):
+   - per ogni blocco usa un generatore empirico costruito dai campioni al boundary (con piccolo jitter),
+   - ri-allena backward come nel Pass 1.
+
+   Uniformita di precisione:
+   - il blocco terminale fissa una reference_loss (mean_loss terminale).
+   - per i blocchi precedenti: target = reference_loss * (1 + precision_margin).
+   - se un blocco non raggiunge il target, fa refine rounds aggiuntivi.
+
+7) Main comparabile
+   - mode=standard: allena un solo modello NN_Quadratic_Coupled.
+   - mode=recursive: esegue pipeline ricorsiva a blocchi.
+   - mode=both: esegue entrambi in sequenza per confronto diretto.
+   - stage_plan e final_plan sono gli stessi pattern del tuo main (iter e learning rate).
+
+
+Parametri CLI
+-------------
+
+Argomenti principali:
+- --mode: standard | recursive | both
+- --M: numero traiettorie per minibatch (default 100)
+- --N: numero step temporali per blocco (default 100)
+- --D: dimensione stato (default 4)
+- --T_standard: orizzonte per baseline standard (default 12.0)
+- --T_total: orizzonte totale per metodo ricorsivo (default 48.0)
+- --block_size: lunghezza blocco (default 12.0)
+- --output_dir: cartella output NPZ ricorsivi (default recursive1_outputs)
+
+
+Comandi di run consigliati
+--------------------------
+
+1) Solo baseline standard:
+python3 TensorFlow/recursive1.py --mode standard --T_standard 24 --M 100 --N 100
+
+2) Solo ricorsivo (T=48 in 4 blocchi da 12):
+python3 TensorFlow/recursive1.py --mode recursive --T_total 48 --block_size 12 --M 100 --N 100
+
+3) Confronto diretto nello stesso run:
+python3 TensorFlow/recursive1.py --mode both --T_standard 24 --T_total 48 --block_size 12 --M 100 --N 100
+
+Nota pratica HTC:
+- Lanciare il comando da cartella root progetto:
+  /Users/emanuelelippi/Library/Mobile Documents/com~apple~CloudDocs/Universita/Tirocinio/code/FBSDENN_Lippi
+- Se il cluster usa job scheduler, usare questo comando come comando principale del job.
+- Salvare stdout/stderr su file per analizzare loss e log blocchi.
+
+
+Output prodotti
+---------------
+
+Output ricorsivo in output_dir:
+- output_dir/pass_1/block_00.npz ... block_K.npz
+- output_dir/pass_2/block_00.npz ... block_K.npz
+
+Ogni NPZ contiene:
+- W_i, b_i (pesi rete),
+- metadati di normalizzazione e tempo.
+
+Output console:
+- StageSummary e FinalSummary per ogni blocco.
+- Log compatto pass2 con:
+  block, intervallo temporale, eval_loss, eval_y0, target precisione, refine rounds.
+
+
+Confronto standard vs ricorsivo
+-------------------------------
+
+Strategia di confronto consigliata:
+1) Fissare stesso seed (gia fissato nello script: np=1234, tf=1234).
+2) Confrontare:
+   - mean_loss finale standard vs blocco 0 pass2 ricorsivo,
+   - stabilita della loss per blocco (varianza e refine necessari),
+   - tempo totale run.
+3) Ripetere con M/N diversi per studiare trade-off accuratezza/tempo.
+
+
+Modifiche introdotte rispetto al flusso standard
+------------------------------------------------
+
+1) Nuova classe NN_Quadratic_Coupled_Recursive:
+   - tempo assoluto nel blocco,
+   - normalizzazione t e X,
+   - terminal stitching con modello successivo congelato.
+
+2) Nuove utility per robustezza TF1:
+   - export/import pesi in NPZ al posto del restore per nomi variabili.
+
+3) Nuova pipeline a due pass:
+   - bootstrap + refinement con distribuzioni empiriche ai boundary.
+
+4) Main esteso con switch mode:
+   - permette confronto standard/ricorsivo senza alterare il comportamento standard.
+
+
+Assunzioni e limiti noti
+------------------------
+
+1) Dipendenze:
+   - Python con TensorFlow compat.v1 disponibile.
+   - Se TensorFlow non e' installato, lo script non parte.
+
+2) Costo computazionale:
+   - Il metodo ricorsivo richiede piu run (blocchi x pass), quindi tempo totale puo crescere.
+   - Il vantaggio atteso e' maggiore stabilita per T lunghi.
+
+3) Precisione uniforme:
+   - E' implementata tramite soglia su mean_loss relativa al blocco terminale.
+   - Se serve un criterio diverso (es. assoluto fisso), basta cambiare precision_target logic.
+
+4) Compatibilita:
+   - D deve restare 4 per il modello quadratico attuale.
+   - Le formule di mu/phi/sigma/g sono quelle del modello corrente.
+
+
+Checklist rapida
+------------------------------------------
+
+1) Verificare ambiente TF1 funzionante.
+2) Eseguire prima:
+   python3 TensorFlow/recursive1.py --mode standard
+   per test base veloce.
+3) Eseguire poi:
+   python3 TensorFlow/recursive1.py --mode recursive --T_total 48 --block_size 12
+4) Controllare che vengano creati i file NPZ in output_dir.
+5) Leggere i log pass2 e confrontare block 0 con baseline standard.
+
