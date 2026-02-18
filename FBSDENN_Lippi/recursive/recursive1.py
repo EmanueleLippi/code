@@ -1,10 +1,25 @@
 import os
 import time
 import argparse
+import json
+import csv
+from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Union
 
 import numpy as np
+
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
 import tensorflow.compat.v1 as tf
+try:
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    _PLOTTING_AVAILABLE = True
+except Exception:
+    plt = None
+    _PLOTTING_AVAILABLE = False
 
 tf.disable_v2_behavior()
 
@@ -27,6 +42,7 @@ class FBSNN(ABC):  # Forward-Backward Stochastic Neural Network
         layers,
         clip_grad_norm=1.0,
         use_antithetic_sampling=True,
+        log_device_placement=False,
     ):
         self.Xi_generator = Xi_generator  # initial data generator
         self.T = T  # terminal time
@@ -39,11 +55,15 @@ class FBSNN(ABC):  # Forward-Backward Stochastic Neural Network
 
         self.clip_grad_norm = clip_grad_norm
         self.use_antithetic_sampling = bool(use_antithetic_sampling)
+        self.log_device_placement = bool(log_device_placement)
 
         self.weights, self.biases = self.initialize_NN(layers)
 
         self.sess = tf.Session(
-            config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=True)
+            config=tf.ConfigProto(
+                allow_soft_placement=True,
+                log_device_placement=self.log_device_placement,
+            )
         )
 
         self.learning_rate = tf.placeholder(tf.float32, shape=[])
@@ -498,6 +518,157 @@ def save_blob_npz(blob: Dict[str, np.ndarray], path: str) -> None:
     np.savez(path, **blob)
 
 
+def _to_serializable(obj):
+    if isinstance(obj, dict):
+        return {str(k): _to_serializable(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_to_serializable(v) for v in obj]
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    if isinstance(obj, (np.floating,)):
+        return float(obj)
+    if isinstance(obj, (np.integer,)):
+        return int(obj)
+    if isinstance(obj, (np.bool_,)):
+        return bool(obj)
+    return obj
+
+
+def save_json(data, path: str) -> None:
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(_to_serializable(data), f, indent=2)
+
+
+def save_rows_csv(rows: List[Dict], path: str) -> None:
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    if rows is None or len(rows) == 0:
+        with open(path, "w", encoding="utf-8") as f:
+            f.write("")
+        return
+
+    keys = []
+    keys_set = set()
+    for row in rows:
+        for k in row.keys():
+            if k not in keys_set:
+                keys_set.add(k)
+                keys.append(k)
+
+    with open(path, "w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=keys)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow({k: _to_serializable(row.get(k, None)) for k in keys})
+
+
+def export_standard_parameter_blob(model: FBSNN) -> Dict[str, np.ndarray]:
+    values = model.sess.run(model.weights + model.biases)
+    n_layers = len(model.weights)
+    blob = {
+        "n_layers": np.array(n_layers, dtype=np.int32),
+        "layers": np.asarray(model.layers, dtype=np.int32),
+    }
+    for i in range(n_layers):
+        blob[f"W_{i}"] = values[i].astype(np.float32)
+        blob[f"b_{i}"] = values[n_layers + i].astype(np.float32)
+    return blob
+
+
+def plot_stage_logs(stage_logs: List[Dict], out_prefix: str, title: str) -> None:
+    if not _PLOTTING_AVAILABLE:
+        print("[Plot] matplotlib non disponibile: skip plot_stage_logs")
+        return
+    if stage_logs is None or len(stage_logs) == 0:
+        return
+
+    x = np.arange(len(stage_logs))
+    loss = np.array([row.get("eval_mean_loss", np.nan) for row in stage_logs], dtype=np.float64)
+    y0 = np.array([row.get("eval_mean_y0", np.nan) for row in stage_logs], dtype=np.float64)
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(x, loss, "b-o", markersize=3, linewidth=1.2, label="eval mean loss")
+    plt.yscale("log")
+    plt.title(f"{title} - Eval Mean Loss")
+    plt.xlabel("Stage index")
+    plt.ylabel("Loss (log scale)")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(f"{out_prefix}_eval_loss.png", dpi=160)
+    plt.close()
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(x, y0, "g-o", markersize=3, linewidth=1.2, label="eval mean y0")
+    plt.title(f"{title} - Eval Mean Y0")
+    plt.xlabel("Stage index")
+    plt.ylabel("Mean Y0")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(f"{out_prefix}_eval_y0.png", dpi=160)
+    plt.close()
+
+
+def plot_recursive_pass_logs(pass1_logs: List[Dict], pass2_logs: List[Dict], out_dir: str) -> None:
+    if not _PLOTTING_AVAILABLE:
+        print("[Plot] matplotlib non disponibile: skip plot_recursive_pass_logs")
+        return
+    if (pass1_logs is None or len(pass1_logs) == 0) and (pass2_logs is None or len(pass2_logs) == 0):
+        return
+
+    os.makedirs(out_dir, exist_ok=True)
+
+    p1 = sorted(pass1_logs or [], key=lambda r: r["block"])
+    p2 = sorted(pass2_logs or [], key=lambda r: r["block"])
+
+    if len(p1) > 0:
+        b1 = np.array([r["block"] for r in p1], dtype=np.int32)
+        l1 = np.array([r["eval_mean_loss"] for r in p1], dtype=np.float64)
+        y1 = np.array([r["eval_mean_y0"] for r in p1], dtype=np.float64)
+    else:
+        b1 = np.array([], dtype=np.int32)
+        l1 = np.array([], dtype=np.float64)
+        y1 = np.array([], dtype=np.float64)
+
+    if len(p2) > 0:
+        b2 = np.array([r["block"] for r in p2], dtype=np.int32)
+        l2 = np.array([r["eval_mean_loss"] for r in p2], dtype=np.float64)
+        y2 = np.array([r["eval_mean_y0"] for r in p2], dtype=np.float64)
+    else:
+        b2 = np.array([], dtype=np.int32)
+        l2 = np.array([], dtype=np.float64)
+        y2 = np.array([], dtype=np.float64)
+
+    plt.figure(figsize=(10, 6))
+    if len(b1) > 0:
+        plt.plot(b1, l1, "b-o", label="pass1 loss")
+    if len(b2) > 0:
+        plt.plot(b2, l2, "r-o", label="pass2 loss")
+    plt.yscale("log")
+    plt.title("Recursive blocks - Eval Mean Loss")
+    plt.xlabel("Block index")
+    plt.ylabel("Loss (log scale)")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, "recursive_blocks_eval_loss.png"), dpi=160)
+    plt.close()
+
+    plt.figure(figsize=(10, 6))
+    if len(b1) > 0:
+        plt.plot(b1, y1, "b-o", label="pass1 y0")
+    if len(b2) > 0:
+        plt.plot(b2, y2, "r-o", label="pass2 y0")
+    plt.title("Recursive blocks - Eval Mean Y0")
+    plt.xlabel("Block index")
+    plt.ylabel("Mean Y0")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, "recursive_blocks_eval_y0.png"), dpi=160)
+    plt.close()
+
 class NN_Quadratic_Coupled_Recursive(NN_Quadratic_Coupled):
     """
     Wrapper per training a blocchi:
@@ -683,6 +854,12 @@ class NN_Quadratic_Coupled_Recursive(NN_Quadratic_Coupled):
             elif strict:
                 raise KeyError(f"Missing key {b_key} in blob")
 
+    def save_parameter_blob(self, path: str) -> None:
+        save_blob_npz(self.export_parameter_blob(), path)
+
+    def load_parameter_blob(self, path: str, strict=True) -> None:
+        self.import_parameter_blob(path, strict=strict)
+
 
 ###############################################################################
 # Utilità training standard + ricorsivo
@@ -735,6 +912,180 @@ def build_blocks(T_total: float, block_size: float) -> List[Dict[str, float]]:
         t1 = float(edges[i + 1])
         blocks.append({"idx": i, "t_start": t0, "t_end": t1, "T_block": (t1 - t0)})
     return blocks
+
+
+def load_training_plan_csv(csv_path: Optional[str]) -> List[Dict]:
+    if csv_path is None or str(csv_path).strip() == "":
+        return []
+    if not os.path.exists(csv_path):
+        raise FileNotFoundError(f"Training plan CSV not found: {csv_path}")
+
+    rules = []
+    required = {"pass_scope", "block_scope", "phase", "n_iter", "lr"}
+    with open(csv_path, "r", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        if reader.fieldnames is None:
+            raise ValueError("Training plan CSV is empty or has no header")
+        missing = required - set(reader.fieldnames)
+        if missing:
+            raise ValueError(f"Training plan CSV missing required columns: {sorted(missing)}")
+
+        for i_row, row in enumerate(reader, start=2):
+            if row is None:
+                continue
+            pass_scope = str(row.get("pass_scope", "")).strip()
+            block_scope = str(row.get("block_scope", "")).strip().lower()
+            phase = str(row.get("phase", "")).strip().lower()
+            if pass_scope == "" or block_scope == "" or phase == "":
+                continue
+            if phase not in ("stage", "final", "refine"):
+                raise ValueError(
+                    f"Invalid phase '{phase}' in {csv_path}:{i_row} (allowed: stage, final, refine)"
+                )
+
+            enabled_raw = str(row.get("enabled", "1")).strip().lower()
+            enabled = enabled_raw not in ("0", "false", "no", "off", "")
+            if not enabled:
+                continue
+
+            order_raw = str(row.get("order", "0")).strip()
+            order = int(order_raw) if order_raw != "" else 0
+
+            n_iter = int(str(row.get("n_iter", "")).strip())
+            lr = float(str(row.get("lr", "")).strip())
+            if n_iter <= 0:
+                raise ValueError(f"n_iter must be > 0 in {csv_path}:{i_row}")
+            if lr <= 0:
+                raise ValueError(f"lr must be > 0 in {csv_path}:{i_row}")
+
+            rules.append(
+                {
+                    "pass_scope": pass_scope,
+                    "block_scope": block_scope,
+                    "phase": phase,
+                    "order": int(order),
+                    "n_iter": int(n_iter),
+                    "lr": float(lr),
+                    "source_row": int(i_row),
+                }
+            )
+
+    return rules
+
+
+def _pass_scope_priority(pass_scope: str, pass_id: int) -> int:
+    ps = str(pass_scope).strip().lower()
+    if ps in ("*", "all"):
+        return 1
+
+    if ps.endswith("+"):
+        base = ps[:-1].strip()
+        if base.isdigit() and pass_id >= int(base):
+            return 2
+
+    if ps.startswith(">="):
+        base = ps[2:].strip()
+        if base.isdigit() and pass_id >= int(base):
+            return 2
+
+    if ps.isdigit() and pass_id == int(ps):
+        return 3
+
+    return -1
+
+
+def _block_scope_priority(block_scope: str, block_idx: int, n_blocks: int) -> int:
+    bs = str(block_scope).strip().lower()
+    is_terminal = block_idx == (n_blocks - 1)
+
+    if bs in ("*", "all"):
+        return 1
+    if bs == "terminal" and is_terminal:
+        return 2
+    if bs == "other" and (not is_terminal):
+        return 2
+
+    if bs.startswith("block:"):
+        token = bs.split(":", 1)[1].strip()
+        if token.isdigit() and block_idx == int(token):
+            return 3
+    if bs.startswith("idx:"):
+        token = bs.split(":", 1)[1].strip()
+        if token.isdigit() and block_idx == int(token):
+            return 3
+
+    if bs.isdigit() and block_idx == int(bs):
+        return 3
+
+    return -1
+
+
+def _resolve_phase_plan(
+    rules: List[Dict],
+    phase: str,
+    pass_id: int,
+    block_idx: int,
+    n_blocks: int,
+    default_plan: List[Tuple[int, float]],
+) -> List[Tuple[int, float]]:
+    matched = []
+    for r in rules:
+        if r["phase"] != phase:
+            continue
+        p_prio = _pass_scope_priority(r["pass_scope"], pass_id)
+        if p_prio < 0:
+            continue
+        b_prio = _block_scope_priority(r["block_scope"], block_idx, n_blocks)
+        if b_prio < 0:
+            continue
+        matched.append((p_prio, b_prio, r["order"], r))
+
+    if len(matched) == 0:
+        return list(default_plan)
+
+    best_scope = max((x[0], x[1]) for x in matched)
+    selected = [x for x in matched if (x[0], x[1]) == best_scope]
+    selected.sort(key=lambda x: x[2])
+    return [(int(x[3]["n_iter"]), float(x[3]["lr"])) for x in selected]
+
+
+def resolve_training_plan_for_block(
+    rules: List[Dict],
+    pass_id: int,
+    block_idx: int,
+    n_blocks: int,
+    default_stage: List[Tuple[int, float]],
+    default_final: List[Tuple[int, float]],
+    default_refine: List[Tuple[int, float]],
+) -> Dict[str, List[Tuple[int, float]]]:
+    if rules is None:
+        rules = []
+    return {
+        "stage_plan": _resolve_phase_plan(
+            rules=rules,
+            phase="stage",
+            pass_id=pass_id,
+            block_idx=block_idx,
+            n_blocks=n_blocks,
+            default_plan=default_stage,
+        ),
+        "final_plan": _resolve_phase_plan(
+            rules=rules,
+            phase="final",
+            pass_id=pass_id,
+            block_idx=block_idx,
+            n_blocks=n_blocks,
+            default_plan=default_final,
+        ),
+        "refine_plan": _resolve_phase_plan(
+            rules=rules,
+            phase="refine",
+            pass_id=pass_id,
+            block_idx=block_idx,
+            n_blocks=n_blocks,
+            default_plan=default_refine,
+        ),
+    }
 
 
 def train_with_standard_schedule(
@@ -939,6 +1290,8 @@ def run_recursive_training(
     precision_margin=0.10,
     max_refine_rounds=3,
     rollout_M=2000,
+    save_tf_checkpoints=True,
+    training_plan_rules: Optional[List[Dict]] = None,
 ):
     blocks = build_blocks(T_total=T_total, block_size=block_size)
     print(f"[Recursive] blocks={len(blocks)} -> {[ (b['t_start'], b['t_end']) for b in blocks ]}")
@@ -987,14 +1340,25 @@ def run_recursive_training(
             if reference_loss is not None:
                 precision_target = reference_loss * (1.0 + precision_margin)
 
+            default_refine_plan = [(50, 1e-5), (50, 5e-6)]
+            resolved_plan = resolve_training_plan_for_block(
+                rules=training_plan_rules or [],
+                pass_id=pass_id,
+                block_idx=b,
+                n_blocks=len(blocks),
+                default_stage=stage_plan,
+                default_final=final_plan,
+                default_refine=default_refine_plan,
+            )
+
             block_stats = train_with_standard_schedule(
                 model=model,
-                stage_plan=stage_plan,
-                final_plan=final_plan,
+                stage_plan=resolved_plan["stage_plan"],
+                final_plan=resolved_plan["final_plan"],
                 eval_batches=5,
                 precision_target=precision_target,
                 max_refine_rounds=max_refine_rounds,
-                refine_plan=[(50, 1e-5), (50, 5e-6)],
+                refine_plan=resolved_plan["refine_plan"],
                 label=label,
             )
 
@@ -1006,6 +1370,10 @@ def run_recursive_training(
             blob = model.export_parameter_blob()
             blob_path = os.path.join(pass_dir, f"block_{b:02d}.npz")
             save_blob_npz(blob, blob_path)
+            ckpt_path = None
+            if save_tf_checkpoints:
+                ckpt_path = os.path.join(pass_dir, f"block_{b:02d}.ckpt")
+                model.save_model(ckpt_path)
 
             log_row = {
                 "pass": int(pass_id),
@@ -1020,7 +1388,11 @@ def run_recursive_training(
                 if block_stats["precision_target"] is None
                 else float(block_stats["precision_target"]),
                 "refine_rounds": int(block_stats["refine_rounds"]),
+                "stage_plan_used": resolved_plan["stage_plan"],
+                "final_plan_used": resolved_plan["final_plan"],
+                "refine_plan_used": resolved_plan["refine_plan"],
                 "blob_path": blob_path,
+                "ckpt_path": ckpt_path,
             }
             logs.append(log_row)
 
@@ -1083,6 +1455,16 @@ def main():
     parser.add_argument("--T_total", type=float, default=48.0)
     parser.add_argument("--block_size", type=float, default=12.0)
     parser.add_argument("--output_dir", type=str, default="recursive1_outputs")
+    parser.add_argument(
+        "--training_plan_csv",
+        type=str,
+        default="",
+        help=(
+            "CSV opzionale con piano training per blocco/pass. "
+            "Colonne richieste: pass_scope,block_scope,phase,n_iter,lr "
+            "(opzionali: order,enabled)."
+        ),
+    )
     args = parser.parse_args()
 
     np.random.seed(1234)
@@ -1113,9 +1495,41 @@ def main():
     layers = [D + 1] + 4 * [256] + [1]
     stage_plan = [(5000, 1e-3), (5000, 5e-4), (5000, 1e-4), (5000, 5e-5)]
     final_plan = [(5000, 1e-5), (5000, 5e-6)]
+    training_plan_rules = load_training_plan_csv(args.training_plan_csv)
+    if len(training_plan_rules) > 0:
+        print(
+            f"[TrainingPlan] loaded {len(training_plan_rules)} rules from {args.training_plan_csv}"
+        )
+
+    run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+    run_root = os.path.join(args.output_dir, f"run_{run_id}")
+    os.makedirs(run_root, exist_ok=True)
+
+    run_config = {
+        "timestamp": run_id,
+        "mode": args.mode,
+        "M": M,
+        "N": N,
+        "D": D,
+        "T_standard": args.T_standard,
+        "T_total": args.T_total,
+        "block_size": args.block_size,
+        "layers": layers,
+        "stage_plan": stage_plan,
+        "final_plan": final_plan,
+        "training_plan_csv": args.training_plan_csv,
+        "training_plan_rules_count": len(training_plan_rules),
+        "training_plan_rules": training_plan_rules,
+        "params": params,
+        "plotting_available": _PLOTTING_AVAILABLE,
+    }
+    save_json(run_config, os.path.join(run_root, "run_config.json"))
+    print(f"[Artifacts] run directory: {run_root}")
 
     if args.mode in ("standard", "both"):
         print("\n==================== STANDARD ====================")
+        std_dir = os.path.join(run_root, "standard")
+        os.makedirs(std_dir, exist_ok=True)
         model_std, logs_std = run_standard_reference(
             Xi_generator=Xi_generator_default,
             params=params,
@@ -1127,11 +1541,36 @@ def main():
             stage_plan=stage_plan,
             final_plan=final_plan,
         )
+
+        std_ckpt_path = os.path.join(std_dir, "model.ckpt")
+        model_std.save_model(std_ckpt_path)
+
+        std_blob = export_standard_parameter_blob(model_std)
+        std_blob_path = os.path.join(std_dir, "model_weights.npz")
+        save_blob_npz(std_blob, std_blob_path)
+
+        save_rows_csv(logs_std.get("stage_logs", []), os.path.join(std_dir, "stage_logs.csv"))
+        plot_stage_logs(
+            logs_std.get("stage_logs", []),
+            out_prefix=os.path.join(std_dir, "standard"),
+            title="Standard",
+        )
+
+        std_summary = {
+            "final_eval": logs_std.get("eval_stats", {}),
+            "refine_rounds": logs_std.get("refine_rounds", 0),
+            "checkpoint_path": std_ckpt_path,
+            "weights_npz_path": std_blob_path,
+        }
+        save_json(std_summary, os.path.join(std_dir, "results.json"))
+
         print(f"[STANDARD] final eval: {logs_std['eval_stats']}")
         model_std.sess.close()
 
     if args.mode in ("recursive", "both"):
         print("\n==================== RECURSIVE ====================")
+        rec_dir = os.path.join(run_root, "recursive")
+        os.makedirs(rec_dir, exist_ok=True)
         rec = run_recursive_training(
             Xi_generator=Xi_generator_default,
             params=params,
@@ -1143,10 +1582,12 @@ def main():
             layers=layers,
             stage_plan=stage_plan,
             final_plan=final_plan,
-            output_dir=args.output_dir,
+            output_dir=os.path.join(rec_dir, "models"),
             precision_margin=0.10,
             max_refine_rounds=3,
             rollout_M=max(2000, M),
+            save_tf_checkpoints=True,
+            training_plan_rules=training_plan_rules,
         )
 
         print("\n=== Recursive Log pass2 (compact) ===")
@@ -1156,6 +1597,40 @@ def main():
                 f"eval_loss={row['eval_mean_loss']:.3e}, eval_y0={row['eval_mean_y0']:.3f}, "
                 f"target={row['precision_target']}, refine={row['refine_rounds']}"
             )
+
+        pass1_logs = rec["pass1"]["logs"]
+        pass2_logs = rec["pass2"]["logs"]
+        save_rows_csv(pass1_logs, os.path.join(rec_dir, "pass1_logs.csv"))
+        save_rows_csv(pass2_logs, os.path.join(rec_dir, "pass2_logs.csv"))
+        plot_recursive_pass_logs(pass1_logs, pass2_logs, os.path.join(rec_dir, "plots"))
+
+        boundary_stats = []
+        for i, arr in enumerate(rec.get("boundary_samples", [])):
+            boundary_stats.append(
+                {
+                    "boundary_idx": int(i),
+                    "n_samples": int(arr.shape[0]),
+                    "mean": np.mean(arr, axis=0),
+                    "std": np.std(arr, axis=0),
+                    "min": np.min(arr, axis=0),
+                    "max": np.max(arr, axis=0),
+                }
+            )
+
+        rec_summary = {
+            "blocks": rec["blocks"],
+            "pass1": {
+                "reference_loss": rec["pass1"]["reference_loss"],
+                "logs": pass1_logs,
+            },
+            "pass2": {
+                "reference_loss": rec["pass2"]["reference_loss"],
+                "logs": pass2_logs,
+            },
+            "boundary_stats": boundary_stats,
+            "models_dir": os.path.join(rec_dir, "models"),
+        }
+        save_json(rec_summary, os.path.join(rec_dir, "results.json"))
 
 
 if __name__ == "__main__":
