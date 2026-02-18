@@ -943,12 +943,11 @@ def run_recursive_training(
     blocks = build_blocks(T_total=T_total, block_size=block_size)
     print(f"[Recursive] blocks={len(blocks)} -> {[ (b['t_start'], b['t_end']) for b in blocks ]}")
 
-    def _run_pass(pass_id, generators_per_block, warm_start=False):
+    def _run_pass(pass_id, generators_per_block, warm_start_blobs=None):
         pass_dir = os.path.join(output_dir, f"pass_{pass_id}")
         os.makedirs(pass_dir, exist_ok=True)
 
         next_blob = None
-        next_blob_for_warm = None
         block_blobs = [None] * len(blocks)
         logs = []
         reference_loss = None
@@ -981,8 +980,8 @@ def run_recursive_training(
                 x_norm_std=x_std,
             )
 
-            if warm_start and next_blob_for_warm is not None:
-                model.import_parameter_blob(next_blob_for_warm, strict=False)
+            if warm_start_blobs is not None and warm_start_blobs[b] is not None:
+                model.import_parameter_blob(warm_start_blobs[b], strict=False)
 
             precision_target = None
             if reference_loss is not None:
@@ -1027,7 +1026,6 @@ def run_recursive_training(
 
             block_blobs[b] = blob
             next_blob = blob
-            next_blob_for_warm = blob
 
             model.sess.close()
 
@@ -1037,7 +1035,7 @@ def run_recursive_training(
     # Pass 1: bootstrap (generator di partenza uguale per tutti i blocchi)
     generators_pass1 = [Xi_generator for _ in blocks]
     blobs_pass1, logs_pass1, ref_loss_pass1 = _run_pass(
-        pass_id=1, generators_per_block=generators_pass1, warm_start=True
+        pass_id=1, generators_per_block=generators_pass1, warm_start_blobs=None
     )
 
     # Stima boundary empirici da rollout stitched
@@ -1059,7 +1057,7 @@ def run_recursive_training(
         generators_pass2.append(make_empirical_generator(boundary_samples[b], jitter_scale=0.02))
 
     blobs_pass2, logs_pass2, ref_loss_pass2 = _run_pass(
-        pass_id=2, generators_per_block=generators_pass2, warm_start=True
+        pass_id=2, generators_per_block=generators_pass2, warm_start_blobs=blobs_pass1
     )
 
     return {
