@@ -610,41 +610,31 @@ def plot_stage_logs(stage_logs: List[Dict], out_prefix: str, title: str) -> None
     plt.close()
 
 
-def plot_recursive_pass_logs(pass1_logs: List[Dict], pass2_logs: List[Dict], out_dir: str) -> None:
+def plot_recursive_pass_logs_multi(pass_logs_by_pass: Dict[int, List[Dict]], out_dir: str) -> None:
     if not _PLOTTING_AVAILABLE:
-        print("[Plot] matplotlib non disponibile: skip plot_recursive_pass_logs")
+        print("[Plot] matplotlib non disponibile: skip plot_recursive_pass_logs_multi")
         return
-    if (pass1_logs is None or len(pass1_logs) == 0) and (pass2_logs is None or len(pass2_logs) == 0):
+    if pass_logs_by_pass is None or len(pass_logs_by_pass) == 0:
+        return
+
+    normalized = {}
+    for pass_id, rows in pass_logs_by_pass.items():
+        rows_sorted = sorted(rows or [], key=lambda r: r["block"])
+        if len(rows_sorted) > 0:
+            normalized[int(pass_id)] = rows_sorted
+    if len(normalized) == 0:
         return
 
     os.makedirs(out_dir, exist_ok=True)
-
-    p1 = sorted(pass1_logs or [], key=lambda r: r["block"])
-    p2 = sorted(pass2_logs or [], key=lambda r: r["block"])
-
-    if len(p1) > 0:
-        b1 = np.array([r["block"] for r in p1], dtype=np.int32)
-        l1 = np.array([r["eval_mean_loss"] for r in p1], dtype=np.float64)
-        y1 = np.array([r["eval_mean_y0"] for r in p1], dtype=np.float64)
-    else:
-        b1 = np.array([], dtype=np.int32)
-        l1 = np.array([], dtype=np.float64)
-        y1 = np.array([], dtype=np.float64)
-
-    if len(p2) > 0:
-        b2 = np.array([r["block"] for r in p2], dtype=np.int32)
-        l2 = np.array([r["eval_mean_loss"] for r in p2], dtype=np.float64)
-        y2 = np.array([r["eval_mean_y0"] for r in p2], dtype=np.float64)
-    else:
-        b2 = np.array([], dtype=np.int32)
-        l2 = np.array([], dtype=np.float64)
-        y2 = np.array([], dtype=np.float64)
+    pass_ids = sorted(normalized.keys())
+    colors = plt.cm.tab20(np.linspace(0.0, 1.0, max(len(pass_ids), 2)))
 
     plt.figure(figsize=(10, 6))
-    if len(b1) > 0:
-        plt.plot(b1, l1, "b-o", label="pass1 loss")
-    if len(b2) > 0:
-        plt.plot(b2, l2, "r-o", label="pass2 loss")
+    for i, pass_id in enumerate(pass_ids):
+        rows = normalized[pass_id]
+        b = np.array([r["block"] for r in rows], dtype=np.int32)
+        l = np.array([r["eval_mean_loss"] for r in rows], dtype=np.float64)
+        plt.plot(b, l, marker="o", linewidth=1.5, color=colors[i], label=f"pass{pass_id} loss")
     plt.yscale("log")
     plt.title("Recursive blocks - Eval Mean Loss")
     plt.xlabel("Block index")
@@ -656,10 +646,11 @@ def plot_recursive_pass_logs(pass1_logs: List[Dict], pass2_logs: List[Dict], out
     plt.close()
 
     plt.figure(figsize=(10, 6))
-    if len(b1) > 0:
-        plt.plot(b1, y1, "b-o", label="pass1 y0")
-    if len(b2) > 0:
-        plt.plot(b2, y2, "r-o", label="pass2 y0")
+    for i, pass_id in enumerate(pass_ids):
+        rows = normalized[pass_id]
+        b = np.array([r["block"] for r in rows], dtype=np.int32)
+        y = np.array([r["eval_mean_y0"] for r in rows], dtype=np.float64)
+        plt.plot(b, y, marker="o", linewidth=1.5, color=colors[i], label=f"pass{pass_id} y0")
     plt.title("Recursive blocks - Eval Mean Y0")
     plt.xlabel("Block index")
     plt.ylabel("Mean Y0")
@@ -668,6 +659,47 @@ def plot_recursive_pass_logs(pass1_logs: List[Dict], pass2_logs: List[Dict], out
     plt.tight_layout()
     plt.savefig(os.path.join(out_dir, "recursive_blocks_eval_y0.png"), dpi=160)
     plt.close()
+
+
+def plot_recursive_pass_logs(pass1_logs: List[Dict], pass2_logs: List[Dict], out_dir: str) -> None:
+    plot_recursive_pass_logs_multi(
+        pass_logs_by_pass={
+            1: pass1_logs or [],
+            2: pass2_logs or [],
+        },
+        out_dir=out_dir,
+    )
+
+
+def build_stitched_rollout_inputs(
+    blocks: List[Dict[str, float]],
+    M: int,
+    N_per_block: int,
+    D: int,
+    seed: int = 1234,
+) -> List[Tuple[np.ndarray, np.ndarray]]:
+    rng = np.random.RandomState(seed)
+    rollout_inputs = []
+    for block in blocks:
+        dt = float(block["T_block"]) / float(N_per_block)
+        Dt = np.zeros((M, N_per_block + 1, 1), dtype=np.float32)
+        DW = np.zeros((M, N_per_block + 1, D), dtype=np.float32)
+        Dt[:, 1:, :] = dt
+
+        if M > 1:
+            half_M = M // 2
+            DW_half = np.sqrt(dt) * rng.normal(size=(half_M, N_per_block, D))
+            DW[:half_M, 1:, :] = DW_half
+            DW[half_M : 2 * half_M, 1:, :] = -DW_half
+            if M % 2 == 1:
+                DW[-1, 1:, :] = np.sqrt(dt) * rng.normal(size=(N_per_block, D))
+        else:
+            DW[:, 1:, :] = np.sqrt(dt) * rng.normal(size=(M, N_per_block, D))
+
+        t_abs = float(block["t_start"]) + np.cumsum(Dt, axis=1)
+        W = np.cumsum(DW, axis=1)
+        rollout_inputs.append((t_abs.astype(np.float32), W.astype(np.float32)))
+    return rollout_inputs
 
 
 def predict_recursive_stitched(
@@ -679,11 +711,14 @@ def predict_recursive_stitched(
     D: int,
     layers: List[int],
     T_total: float,
+    rollout_inputs: Optional[List[Tuple[np.ndarray, np.ndarray]]] = None,
 ) -> Dict[str, np.ndarray]:
     if len(blocks) == 0:
         raise ValueError("blocks must contain at least one block")
     if Xi_initial.ndim != 2 or Xi_initial.shape[1] != D:
         raise ValueError(f"Xi_initial must have shape [M, {D}]")
+    if rollout_inputs is not None and len(rollout_inputs) != len(blocks):
+        raise ValueError("rollout_inputs must have one (t, W) pair per block")
 
     Xi_curr = Xi_initial.astype(np.float32)
     t_segments = []
@@ -714,7 +749,10 @@ def predict_recursive_stitched(
 
         try:
             model.import_parameter_blob(blob, strict=True)
-            t_b, W_b, _ = model.fetch_minibatch()
+            if rollout_inputs is None:
+                t_b, W_b, _ = model.fetch_minibatch()
+            else:
+                t_b, W_b = rollout_inputs[b]
             X_b, Y_b, Z_b = model.predict(Xi_curr, t_b, W_b, const_value=1.0)
 
             start_idx = 0 if b == 0 else 1
@@ -740,6 +778,7 @@ def plot_recursive_stitched_predictions(
     blocks: List[Dict[str, float]],
     out_dir: str,
     sample_paths: int = 5,
+    file_suffix: str = "",
 ) -> None:
     if not _PLOTTING_AVAILABLE:
         print("[Plot] matplotlib non disponibile: skip plot_recursive_stitched_predictions")
@@ -774,7 +813,10 @@ def plot_recursive_stitched_predictions(
     plt.grid(True, alpha=0.3)
     plt.legend()
     plt.tight_layout()
-    plt.savefig(os.path.join(out_dir, "recursive_stitched_state_path.png"), dpi=160)
+    plt.savefig(
+        os.path.join(out_dir, f"recursive_stitched_state_path{file_suffix}.png"),
+        dpi=160,
+    )
     plt.close()
 
     plt.figure(figsize=(12, 6))
@@ -792,7 +834,59 @@ def plot_recursive_stitched_predictions(
     if n_paths > 0:
         plt.legend()
     plt.tight_layout()
-    plt.savefig(os.path.join(out_dir, "recursive_stitched_Y_pred.png"), dpi=160)
+    plt.savefig(
+        os.path.join(out_dir, f"recursive_stitched_Y_pred{file_suffix}.png"),
+        dpi=160,
+    )
+    plt.close()
+
+
+def plot_recursive_stitched_y_convergence(
+    stitched_by_pass: Dict[int, Dict[str, np.ndarray]],
+    blocks: List[Dict[str, float]],
+    out_dir: str,
+    sample_paths: int = 8,
+) -> None:
+    if not _PLOTTING_AVAILABLE:
+        print("[Plot] matplotlib non disponibile: skip plot_recursive_stitched_y_convergence")
+        return
+    if stitched_by_pass is None or len(stitched_by_pass) == 0:
+        return
+
+    pass_ids = sorted(stitched_by_pass.keys())
+    os.makedirs(out_dir, exist_ok=True)
+    colors = plt.cm.viridis(np.linspace(0.05, 0.95, len(pass_ids)))
+
+    plt.figure(figsize=(12, 6))
+    for i, pass_id in enumerate(pass_ids):
+        stitched = stitched_by_pass[pass_id]
+        t_all = stitched.get("t", None)
+        Y_all = stitched.get("Y", None)
+        if t_all is None or Y_all is None or t_all.size == 0 or Y_all.size == 0:
+            continue
+        n_paths = max(1, min(int(sample_paths), int(t_all.shape[0])))
+        t_flat = t_all[:n_paths, :, 0].reshape(-1)
+        y_flat = Y_all[:n_paths, :, 0].reshape(-1)
+        plt.scatter(t_flat, y_flat, s=2, color=colors[i], alpha=0.06)
+        y_mean = np.mean(Y_all[:n_paths, :, 0], axis=0)
+        plt.plot(
+            t_all[0, :, 0],
+            y_mean,
+            color=colors[i],
+            linewidth=1.8,
+            label=f"pass{pass_id} mean Y",
+        )
+
+    for block in blocks[:-1]:
+        plt.axvline(float(block["t_end"]), color="k", linestyle="--", linewidth=0.8, alpha=0.25)
+
+    plt.title("Recursive stitched prediction - Y convergence across passes")
+    plt.xlabel("Time")
+    plt.ylabel("Y")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, "recursive_stitched_Y_convergence.png"), dpi=160)
     plt.close()
 
 
@@ -1359,6 +1453,134 @@ def run_standard_reference(
     return model, logs
 
 
+def _validate_loaded_blob_for_block(
+    blob: Dict[str, np.ndarray],
+    block: Dict[str, float],
+    layers: List[int],
+    D: int,
+    T_total: float,
+    pass_id: int,
+    block_idx: int,
+) -> None:
+    if blob is None:
+        raise ValueError(f"Empty blob for pass={pass_id}, block={block_idx}")
+
+    model_n_layers = len(layers) - 1
+    if "n_layers" in blob and int(blob["n_layers"]) != int(model_n_layers):
+        raise ValueError(
+            f"n_layers mismatch for pass={pass_id}, block={block_idx}: "
+            f"blob={int(blob['n_layers'])}, expected={model_n_layers}"
+        )
+
+    if "layers" in blob:
+        expected_layers = np.asarray(layers, dtype=np.int32)
+        blob_layers = np.asarray(blob["layers"], dtype=np.int32)
+        if expected_layers.shape != blob_layers.shape or not np.all(expected_layers == blob_layers):
+            raise ValueError(
+                f"layers mismatch for pass={pass_id}, block={block_idx}: "
+                f"blob={blob_layers.tolist()}, expected={expected_layers.tolist()}"
+            )
+
+    if "T_total" in blob:
+        blob_t_total = float(np.asarray(blob["T_total"]).reshape(-1)[0])
+        if abs(blob_t_total - float(T_total)) > 1.0e-5:
+            raise ValueError(
+                f"T_total mismatch for pass={pass_id}, block={block_idx}: "
+                f"blob={blob_t_total}, expected={float(T_total)}"
+            )
+
+    if "t_start" in blob:
+        blob_t_start = float(np.asarray(blob["t_start"]).reshape(-1)[0])
+        if abs(blob_t_start - float(block["t_start"])) > 1.0e-5:
+            raise ValueError(
+                f"t_start mismatch for pass={pass_id}, block={block_idx}: "
+                f"blob={blob_t_start}, expected={float(block['t_start'])}"
+            )
+    if "t_end" in blob:
+        blob_t_end = float(np.asarray(blob["t_end"]).reshape(-1)[0])
+        if abs(blob_t_end - float(block["t_end"])) > 1.0e-5:
+            raise ValueError(
+                f"t_end mismatch for pass={pass_id}, block={block_idx}: "
+                f"blob={blob_t_end}, expected={float(block['t_end'])}"
+            )
+
+    if "x_norm_mean" in blob:
+        x_mean = np.asarray(blob["x_norm_mean"])
+        if x_mean.ndim != 2 or x_mean.shape[1] != int(D):
+            raise ValueError(
+                f"x_norm_mean shape mismatch for pass={pass_id}, block={block_idx}: "
+                f"blob={list(x_mean.shape)}, expected=[1,{int(D)}]"
+            )
+    if "x_norm_std" in blob:
+        x_std = np.asarray(blob["x_norm_std"])
+        if x_std.ndim != 2 or x_std.shape[1] != int(D):
+            raise ValueError(
+                f"x_norm_std shape mismatch for pass={pass_id}, block={block_idx}: "
+                f"blob={list(x_std.shape)}, expected=[1,{int(D)}]"
+            )
+
+
+def detect_available_recursive_passes(models_dir: str) -> List[int]:
+    if not os.path.isdir(models_dir):
+        return []
+    pass_ids = []
+    for name in os.listdir(models_dir):
+        full = os.path.join(models_dir, name)
+        if not os.path.isdir(full):
+            continue
+        if not name.startswith("pass_"):
+            continue
+        token = name.split("pass_", 1)[1]
+        if token.isdigit():
+            pass_ids.append(int(token))
+    return sorted(pass_ids)
+
+
+def resolve_resume_models_dir(resume_path: str) -> str:
+    candidate_paths = [
+        resume_path,
+        os.path.join(resume_path, "models"),
+        os.path.join(resume_path, "recursive", "models"),
+    ]
+    for c in candidate_paths:
+        if len(detect_available_recursive_passes(c)) > 0:
+            return c
+    return resume_path
+
+
+def load_pass_blobs_from_models_dir(
+    models_dir: str,
+    pass_id: int,
+    blocks: List[Dict[str, float]],
+    layers: List[int],
+    D: int,
+    T_total: float,
+) -> List[Dict[str, np.ndarray]]:
+    pass_dir = os.path.join(models_dir, f"pass_{pass_id}")
+    if not os.path.isdir(pass_dir):
+        raise FileNotFoundError(f"Missing directory for pass={pass_id}: {pass_dir}")
+
+    loaded = []
+    for b, block in enumerate(blocks):
+        blob_path = os.path.join(pass_dir, f"block_{b:02d}.npz")
+        if not os.path.exists(blob_path):
+            raise FileNotFoundError(
+                f"Missing blob for pass={pass_id}, block={b}: {blob_path}"
+            )
+        blob = _as_blob_dict(blob_path)
+        _validate_loaded_blob_for_block(
+            blob=blob,
+            block=block,
+            layers=layers,
+            D=D,
+            T_total=T_total,
+            pass_id=pass_id,
+            block_idx=b,
+        )
+        loaded.append(blob)
+    return loaded
+
+
 def rollout_boundaries(
     block_blobs: List[Dict[str, np.ndarray]],
     blocks: List[Dict[str, float]],
@@ -1420,9 +1642,21 @@ def run_recursive_training(
     save_tf_checkpoints=True,
     training_plan_rules: Optional[List[Dict]] = None,
     pass1_warm_start_from_next=False,
+    n_passes: int = 2,
+    resume_models_dir: str = "",
+    resume_from_pass: int = 0,
+    empirical_jitter_scale: float = 0.02,
 ):
+    if int(n_passes) < 1:
+        raise ValueError("n_passes must be >= 1")
+    if int(resume_from_pass) < 0:
+        raise ValueError("resume_from_pass must be >= 0")
+
     blocks = build_blocks(T_total=T_total, block_size=block_size)
-    print(f"[Recursive] blocks={len(blocks)} -> {[ (b['t_start'], b['t_end']) for b in blocks ]}")
+    print(
+        f"[Recursive] blocks={len(blocks)} -> {[ (b['t_start'], b['t_end']) for b in blocks ]}, "
+        f"n_passes={int(n_passes)}"
+    )
 
     def _run_pass(
         pass_id,
@@ -1539,48 +1773,148 @@ def run_recursive_training(
             model.sess.close()
 
         logs = sorted(logs, key=lambda x: x["block"])
-        return block_blobs, logs, float(reference_loss)
+        return block_blobs, logs, float(reference_loss), pass_dir
 
-    # Pass 1: bootstrap (generator di partenza uguale per tutti i blocchi)
-    generators_pass1 = [Xi_generator for _ in blocks]
-    blobs_pass1, logs_pass1, ref_loss_pass1 = _run_pass(
-        pass_id=1,
-        generators_per_block=generators_pass1,
-        warm_start_blobs=None,
-        warm_start_from_next=bool(pass1_warm_start_from_next),
-    )
+    pass_results = []
+    prev_blobs = None
+    prev_boundary_samples = None
+    resumed_from = None
+    start_pass_id = 1
 
-    # Stima boundary empirici da rollout stitched
-    boundary_samples = rollout_boundaries(
-        block_blobs=blobs_pass1,
-        blocks=blocks,
-        Xi_generator=Xi_generator,
-        params=params,
-        M_rollout=rollout_M,
-        N_per_block=N_per_block,
-        D=D,
-        layers=layers,
-        T_total=T_total,
-    )
+    resume_models_dir = str(resume_models_dir or "").strip()
+    if resume_models_dir != "":
+        resume_models_dir = resolve_resume_models_dir(resume_models_dir)
+        available_passes = detect_available_recursive_passes(resume_models_dir)
+        if len(available_passes) == 0:
+            raise FileNotFoundError(
+                f"No pass_* directories found in resume_models_dir: {resume_models_dir}"
+            )
 
-    # Pass 2: retraining con generatori empirici per blocco
-    generators_pass2 = []
-    for b in range(len(blocks)):
-        generators_pass2.append(make_empirical_generator(boundary_samples[b], jitter_scale=0.02))
+        if int(resume_from_pass) > 0:
+            loaded_pass_id = int(resume_from_pass)
+            if loaded_pass_id not in available_passes:
+                raise ValueError(
+                    f"Requested resume_from_pass={loaded_pass_id} not found in "
+                    f"{resume_models_dir}. Available: {available_passes}"
+                )
+        else:
+            loaded_pass_id = int(max(available_passes))
 
-    blobs_pass2, logs_pass2, ref_loss_pass2 = _run_pass(
-        pass_id=2,
-        generators_per_block=generators_pass2,
-        warm_start_blobs=blobs_pass1,
-        warm_start_from_next=False,
-    )
+        if loaded_pass_id >= int(n_passes):
+            raise ValueError(
+                f"Loaded pass={loaded_pass_id} but n_passes={int(n_passes)}. "
+                "Set n_passes > loaded pass to continue training."
+            )
 
-    return {
+        prev_blobs = load_pass_blobs_from_models_dir(
+            models_dir=resume_models_dir,
+            pass_id=loaded_pass_id,
+            blocks=blocks,
+            layers=layers,
+            D=D,
+            T_total=T_total,
+        )
+        prev_boundary_samples = rollout_boundaries(
+            block_blobs=prev_blobs,
+            blocks=blocks,
+            Xi_generator=Xi_generator,
+            params=params,
+            M_rollout=rollout_M,
+            N_per_block=N_per_block,
+            D=D,
+            layers=layers,
+            T_total=T_total,
+        )
+        start_pass_id = loaded_pass_id + 1
+        resumed_from = {
+            "models_dir": resume_models_dir,
+            "loaded_pass_id": int(loaded_pass_id),
+            "available_passes": available_passes,
+        }
+        print(
+            f"[Resume] loaded pass={loaded_pass_id} from {resume_models_dir}, "
+            f"continuing from pass={start_pass_id}"
+        )
+
+    for pass_id in range(start_pass_id, int(n_passes) + 1):
+        if pass_id == 1:
+            generators = [Xi_generator for _ in blocks]
+            warm_start = None
+            warm_from_next = bool(pass1_warm_start_from_next)
+        else:
+            if prev_boundary_samples is None:
+                if prev_blobs is None:
+                    raise RuntimeError("Internal error: missing previous blobs for pass>=2")
+                prev_boundary_samples = rollout_boundaries(
+                    block_blobs=prev_blobs,
+                    blocks=blocks,
+                    Xi_generator=Xi_generator,
+                    params=params,
+                    M_rollout=rollout_M,
+                    N_per_block=N_per_block,
+                    D=D,
+                    layers=layers,
+                    T_total=T_total,
+                )
+            generators = [
+                make_empirical_generator(prev_boundary_samples[b], jitter_scale=empirical_jitter_scale)
+                for b in range(len(blocks))
+            ]
+            warm_start = prev_blobs
+            warm_from_next = False
+
+        blobs_i, logs_i, ref_loss_i, pass_dir_i = _run_pass(
+            pass_id=pass_id,
+            generators_per_block=generators,
+            warm_start_blobs=warm_start,
+            warm_start_from_next=warm_from_next,
+        )
+
+        prev_blobs = blobs_i
+        prev_boundary_samples = rollout_boundaries(
+            block_blobs=blobs_i,
+            blocks=blocks,
+            Xi_generator=Xi_generator,
+            params=params,
+            M_rollout=rollout_M,
+            N_per_block=N_per_block,
+            D=D,
+            layers=layers,
+            T_total=T_total,
+        )
+
+        pass_results.append(
+            {
+                "pass_id": int(pass_id),
+                "reference_loss": float(ref_loss_i),
+                "logs": logs_i,
+                "blobs": blobs_i,
+                "models_dir": pass_dir_i,
+            }
+        )
+
+    result = {
         "blocks": blocks,
-        "pass1": {"logs": logs_pass1, "reference_loss": ref_loss_pass1, "blobs": blobs_pass1},
-        "pass2": {"logs": logs_pass2, "reference_loss": ref_loss_pass2, "blobs": blobs_pass2},
-        "boundary_samples": boundary_samples,
+        "passes": pass_results,
+        "boundary_samples": prev_boundary_samples if prev_boundary_samples is not None else [],
+        "resumed_from": resumed_from,
     }
+
+    for item in pass_results:
+        if item["pass_id"] == 1:
+            result["pass1"] = {
+                "logs": item["logs"],
+                "reference_loss": item["reference_loss"],
+                "blobs": item["blobs"],
+            }
+        if item["pass_id"] == 2:
+            result["pass2"] = {
+                "logs": item["logs"],
+                "reference_loss": item["reference_loss"],
+                "blobs": item["blobs"],
+            }
+
+    return result
 
 
 ###############################################################################
@@ -1599,6 +1933,33 @@ def main():
     parser.add_argument("--block_size", type=float, default=12.0)
     parser.add_argument("--output_dir", type=str, default="recursive1_outputs")
     parser.add_argument(
+        "--passes",
+        type=int,
+        default=2,
+        help="Numero totale di pass ricorsive da eseguire (>=1).",
+    )
+    parser.add_argument(
+        "--resume_models_dir",
+        type=str,
+        default="",
+        help=(
+            "Directory con pass_*/block_XX.npz di una run precedente "
+            "da cui riprendere (es. .../recursive/models)."
+        ),
+    )
+    parser.add_argument(
+        "--resume_from_pass",
+        type=int,
+        default=0,
+        help="Pass di partenza nel resume. 0=auto (massima disponibile in resume_models_dir).",
+    )
+    parser.add_argument(
+        "--empirical_jitter_scale",
+        type=float,
+        default=0.02,
+        help="Rumore relativo usato nel generatore empirico per pass >= 2.",
+    )
+    parser.add_argument(
         "--training_plan_csv",
         type=str,
         default="",
@@ -1613,7 +1974,7 @@ def main():
         action="store_true",
         help=(
             "Se attivo, in pass1 il blocco i viene inizializzato coi pesi del blocco i+1 "
-            "(quando disponibile). Pass2 resta invariato."
+            "(quando disponibile). Le passate successive usano warm-start dal pass precedente."
         ),
     )
     args = parser.parse_args()
@@ -1665,6 +2026,10 @@ def main():
         "T_standard": args.T_standard,
         "T_total": args.T_total,
         "block_size": args.block_size,
+        "passes": int(args.passes),
+        "resume_models_dir": args.resume_models_dir,
+        "resume_from_pass": int(args.resume_from_pass),
+        "empirical_jitter_scale": float(args.empirical_jitter_scale),
         "layers": layers,
         "stage_plan": stage_plan,
         "final_plan": final_plan,
@@ -1741,42 +2106,104 @@ def main():
             save_tf_checkpoints=True,
             training_plan_rules=training_plan_rules,
             pass1_warm_start_from_next=bool(args.pass1_warm_start_from_next),
+            n_passes=int(args.passes),
+            resume_models_dir=args.resume_models_dir,
+            resume_from_pass=int(args.resume_from_pass),
+            empirical_jitter_scale=float(args.empirical_jitter_scale),
         )
 
-        print("\n=== Recursive Log pass2 (compact) ===")
-        for row in rec["pass2"]["logs"]:
-            print(
-                f"block={row['block']}, t=[{row['t_start']:.1f},{row['t_end']:.1f}], "
-                f"eval_loss={row['eval_mean_loss']:.3e}, eval_y0={row['eval_mean_y0']:.3f}, "
-                f"target={row['precision_target']}, refine={row['refine_rounds']}"
-            )
+        pass_entries = sorted(rec.get("passes", []), key=lambda x: int(x["pass_id"]))
+        if len(pass_entries) == 0:
+            raise RuntimeError("No pass results available after recursive training")
 
-        pass1_logs = rec["pass1"]["logs"]
-        pass2_logs = rec["pass2"]["logs"]
-        save_rows_csv(pass1_logs, os.path.join(rec_dir, "pass1_logs.csv"))
-        save_rows_csv(pass2_logs, os.path.join(rec_dir, "pass2_logs.csv"))
-        plot_recursive_pass_logs(pass1_logs, pass2_logs, os.path.join(rec_dir, "plots"))
+        pass_logs_by_pass = {}
+        for p in pass_entries:
+            pass_id = int(p["pass_id"])
+            logs = p.get("logs", [])
+            pass_logs_by_pass[pass_id] = logs
+
+            print(f"\n=== Recursive Log pass{pass_id} (compact) ===")
+            for row in logs:
+                print(
+                    f"block={row['block']}, t=[{row['t_start']:.1f},{row['t_end']:.1f}], "
+                    f"eval_loss={row['eval_mean_loss']:.3e}, eval_y0={row['eval_mean_y0']:.3f}, "
+                    f"target={row['precision_target']}, refine={row['refine_rounds']}"
+                )
+
+            save_rows_csv(logs, os.path.join(rec_dir, f"pass_{pass_id:02d}_logs.csv"))
+            if pass_id == 1:
+                save_rows_csv(logs, os.path.join(rec_dir, "pass1_logs.csv"))
+            if pass_id == 2:
+                save_rows_csv(logs, os.path.join(rec_dir, "pass2_logs.csv"))
+
+        plot_recursive_pass_logs_multi(pass_logs_by_pass, os.path.join(rec_dir, "plots"))
 
         Xi_stitched = Xi_generator_default(max(64, M), D).astype(np.float32)
-        stitched_pred = predict_recursive_stitched(
-            block_blobs=rec["pass2"]["blobs"],
+        rollout_inputs = build_stitched_rollout_inputs(
             blocks=rec["blocks"],
-            Xi_initial=Xi_stitched,
-            params=params,
+            M=Xi_stitched.shape[0],
             N_per_block=N,
             D=D,
-            layers=layers,
-            T_total=args.T_total,
+            seed=1234,
         )
-        np.savez(
-            os.path.join(rec_dir, "stitched_predictions_pass2.npz"),
-            t=stitched_pred["t"],
-            X=stitched_pred["X"],
-            Y=stitched_pred["Y"],
-            Z=stitched_pred["Z"],
-        )
-        plot_recursive_stitched_predictions(
-            stitched=stitched_pred,
+        stitched_by_pass = {}
+        final_pass_id = int(pass_entries[-1]["pass_id"])
+        for p in pass_entries:
+            pass_id = int(p["pass_id"])
+            stitched_pred = predict_recursive_stitched(
+                block_blobs=p["blobs"],
+                blocks=rec["blocks"],
+                Xi_initial=Xi_stitched,
+                params=params,
+                N_per_block=N,
+                D=D,
+                layers=layers,
+                T_total=args.T_total,
+                rollout_inputs=rollout_inputs,
+            )
+            stitched_by_pass[pass_id] = stitched_pred
+
+            np.savez(
+                os.path.join(rec_dir, f"stitched_predictions_pass{pass_id:02d}.npz"),
+                t=stitched_pred["t"],
+                X=stitched_pred["X"],
+                Y=stitched_pred["Y"],
+                Z=stitched_pred["Z"],
+            )
+            plot_recursive_stitched_predictions(
+                stitched=stitched_pred,
+                blocks=rec["blocks"],
+                out_dir=os.path.join(rec_dir, "plots"),
+                sample_paths=8,
+                file_suffix=f"_pass{pass_id:02d}",
+            )
+
+            if pass_id == final_pass_id:
+                np.savez(
+                    os.path.join(rec_dir, "stitched_predictions_final.npz"),
+                    t=stitched_pred["t"],
+                    X=stitched_pred["X"],
+                    Y=stitched_pred["Y"],
+                    Z=stitched_pred["Z"],
+                )
+                plot_recursive_stitched_predictions(
+                    stitched=stitched_pred,
+                    blocks=rec["blocks"],
+                    out_dir=os.path.join(rec_dir, "plots"),
+                    sample_paths=8,
+                    file_suffix="",
+                )
+                if pass_id == 2:
+                    np.savez(
+                        os.path.join(rec_dir, "stitched_predictions_pass2.npz"),
+                        t=stitched_pred["t"],
+                        X=stitched_pred["X"],
+                        Y=stitched_pred["Y"],
+                        Z=stitched_pred["Z"],
+                    )
+
+        plot_recursive_stitched_y_convergence(
+            stitched_by_pass=stitched_by_pass,
             blocks=rec["blocks"],
             out_dir=os.path.join(rec_dir, "plots"),
             sample_paths=8,
@@ -1795,19 +2222,35 @@ def main():
                 }
             )
 
+        passes_summary = []
+        for p in pass_entries:
+            passes_summary.append(
+                {
+                    "pass_id": int(p["pass_id"]),
+                    "reference_loss": float(p["reference_loss"]),
+                    "logs": p.get("logs", []),
+                    "models_dir": p.get("models_dir", None),
+                }
+            )
+        pass_summary_by_id = {int(p["pass_id"]): p for p in passes_summary}
+
         rec_summary = {
             "blocks": rec["blocks"],
-            "pass1": {
-                "reference_loss": rec["pass1"]["reference_loss"],
-                "logs": pass1_logs,
-            },
-            "pass2": {
-                "reference_loss": rec["pass2"]["reference_loss"],
-                "logs": pass2_logs,
-            },
+            "passes": passes_summary,
+            "resumed_from": rec.get("resumed_from", None),
             "boundary_stats": boundary_stats,
             "models_dir": os.path.join(rec_dir, "models"),
         }
+        if 1 in pass_summary_by_id:
+            rec_summary["pass1"] = {
+                "reference_loss": pass_summary_by_id[1]["reference_loss"],
+                "logs": pass_summary_by_id[1]["logs"],
+            }
+        if 2 in pass_summary_by_id:
+            rec_summary["pass2"] = {
+                "reference_loss": pass_summary_by_id[2]["reference_loss"],
+                "logs": pass_summary_by_id[2]["logs"],
+            }
         save_json(rec_summary, os.path.join(rec_dir, "results.json"))
 
 

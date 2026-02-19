@@ -6,10 +6,10 @@ File di riferimento
 /Users/emanuelelippi/Library/Mobile Documents/com~apple~CloudDocs/Universita/Tirocinio/code/FBSDENN_Lippi/recursive/recursive1.py
 
 Questa nota descrive la versione corrente del codice, inclusi:
-- salvataggio completo degli artefatti (config, metriche, modelli),
-- riduzione dei log su stdout,
-- warm-start aggiornato,
-- warm-start opzionale tra blocchi nella passata 1,
+- pipeline ricorsiva generalizzata a N passate (`--passes`),
+- resume da run precedente (`--resume_models_dir`, `--resume_from_pass`),
+- salvataggio completo degli artefatti (config, metriche, modelli, stitched predictions),
+- plotting multi-pass (loss/y0 per blocco e convergenza su Y stitched),
 - piano di training configurabile via CSV.
 
 
@@ -19,25 +19,26 @@ Lo script supporta due modalita:
 1) standard: training classico su singolo intervallo temporale.
 2) recursive: time-stitching a blocchi per orizzonti lunghi (es. T=48).
 
-L'idea del ricorsivo e:
+Idea del ricorsivo:
 - dividere [0, T_totale] in blocchi [t_i, t_{i+1}],
 - allenare backward dall'ultimo blocco al primo,
-- usare la rete del blocco successivo come condizione terminale del blocco corrente.
+- usare la rete del blocco successivo come condizione terminale del blocco corrente,
+- ripetere il processo per piu passate, aggiornando i generatori empirici a ogni pass.
 
 
 Struttura del codice
 --------------------
 1) FBSNN (classe madre)
-- Mantiene struttura compatibile con la tua base:
+- struttura compatibile con la base:
   - Xi_generator, placeholders, loss BSDE, Adam, clipping, evaluate/predict.
-- Funzioni importanti:
+- funzioni importanti:
   - save_model(path) / load_model(path) per checkpoint TF (.ckpt).
 
 2) NN_Quadratic_Coupled (prima figlia)
-- Mantiene mu_tf, phi_tf, g_tf, sigma_tf della formulazione quadratica 4D.
+- mantiene mu_tf, phi_tf, g_tf, sigma_tf della formulazione quadratica 4D.
 
 3) NN_Quadratic_Coupled_Recursive (estensione)
-- Aggiunge:
+- aggiunge:
   - tempi assoluti di blocco (t_start, t_end),
   - normalizzazione input tempo/stato,
   - terminal stitching da blob del blocco successivo,
@@ -48,62 +49,65 @@ Struttura del codice
     - load_parameter_blob(path)
 
 
-Correzioni e funzionalita aggiunte
-----------------------------------
+Funzionalita principali aggiunte
+--------------------------------
 
-1) Riduzione log che saturavano stdout
-- TF_CPP_MIN_LOG_LEVEL=2 impostato a inizio script.
-- log_device_placement disattivato di default in FBSNN.
-- Effetto: si evita il flood di messaggi tipo replica/gpu device placement.
+1) Passate ricorsive generalizzate (`--passes`)
+- prima: pipeline fissa pass1 -> pass2.
+- ora: pipeline parametrica pass1 -> pass2 -> ... -> passN.
+- `pass_scope` nel CSV (es. `2+`) viene applicato a tutte le passate >= 2.
 
-2) Salvataggio artefatti su disco (non solo stdout)
-- Ogni run crea una cartella timestamp:
-  output_dir/run_YYYYMMDD_HHMMSS/
-- File principali:
-  - run_config.json: configurazione completa usata.
-  - standard/results.json e recursive/results.json: riassunti finali.
-  - CSV con log:
-    - standard/stage_logs.csv
-    - recursive/pass1_logs.csv
-    - recursive/pass2_logs.csv
+2) Resume da run precedente
+- nuove opzioni:
+  - `--resume_models_dir`
+  - `--resume_from_pass`
+- il resume carica i blob `pass_<id>/block_XX.npz`, valida compatibilita
+  (layers, D, T_total, blocchi) e continua dal pass successivo.
+- `--resume_from_pass 0` seleziona automaticamente la passata massima disponibile.
+- il path di resume viene risolto automaticamente se punti a:
+  - `<run>/recursive/models`
+  - `<run>/recursive`
+  - `<run>`
 
-3) Salvataggio modelli in entrambi i casi
-- Standard:
-  - checkpoint TF: standard/model.ckpt
-  - pesi NPZ: standard/model_weights.npz
-- Ricorsivo:
-  - per ogni blocco e pass:
-    - pass_X/block_YY.npz
-    - pass_X/block_YY.ckpt
-
-4) Plot automatici su file
-- Standard:
-  - standard_eval_loss.png
-  - standard_eval_y0.png
-- Ricorsivo:
-  - recursive_blocks_eval_loss.png
-  - recursive_blocks_eval_y0.png
-- Se matplotlib non e disponibile:
-  - lo script non fallisce, salta i plot e continua.
-
-5) Warm-start attuale (stato corrente)
+3) Warm-start e generatori per passata
 - Pass 1:
-  - di default nessun warm-start da pass precedente.
-  - opzionale: se attivi --pass1_warm_start_from_next, il blocco i parte dai pesi del blocco i+1.
-- Pass 2:
-  - warm-start corretto dallo stesso blocco del Pass 1.
-  - cioe blocco b in pass2 parte da pesi di blocco b in pass1.
+  - generatori base (Xi_generator),
+  - opzionale warm-start intra-pass da blocco successivo con `--pass1_warm_start_from_next`.
+- Pass >= 2:
+  - generatori empirici dai boundary samples della passata precedente,
+  - warm-start dal blob dello stesso blocco della passata precedente.
+- ampiezza jitter generatore empirico controllata da `--empirical_jitter_scale`.
 
-6) Piano training da CSV
-- Nuova opzione CLI:
-  --training_plan_csv <file.csv>
-- Se non passato, usa i piani default hardcoded.
-- Se passato, ogni blocco/passata risolve stage/final/refine dal CSV.
+4) Plotting e diagnostica multi-pass
+- plot loss/y0 per blocco con una curva per ogni pass:
+  - `recursive_blocks_eval_loss.png`
+  - `recursive_blocks_eval_y0.png`
+- stitched prediction per ogni pass:
+  - `recursive_stitched_state_path_passXX.png`
+  - `recursive_stitched_Y_pred_passXX.png`
+- stitched prediction finale (ultima passata):
+  - `recursive_stitched_state_path.png`
+  - `recursive_stitched_Y_pred.png`
+- plot convergenza Y tra passate:
+  - `recursive_stitched_Y_convergence.png`
+- per confronto coerente tra passate, il rollout stitched usa input Browniani fissati.
+
+5) Artefatti e salvataggi estesi
+- per ogni passata:
+  - `pass_XX_logs.csv`
+  - `recursive/models/pass_<id>/block_YY.npz`
+  - `recursive/models/pass_<id>/block_YY.ckpt` (se attivo `save_tf_checkpoints`)
+  - `stitched_predictions_passXX.npz`
+- compatibilita mantenuta:
+  - se esistono pass1/pass2 vengono salvati anche `pass1_logs.csv` e `pass2_logs.csv`
+  - se l'ultima passata e pass2 viene salvato anche `stitched_predictions_pass2.npz`
+- summary:
+  - `recursive/results.json` contiene `passes`, `resumed_from`, `boundary_stats`
+  - campi `pass1` e `pass2` restano presenti se disponibili.
 
 
 Formato CSV del piano training
 ------------------------------
-
 Colonne richieste:
 - pass_scope
 - block_scope
@@ -146,26 +150,27 @@ Pipeline ricorsiva (dettaglio)
 Pass 1 (bootstrap):
 - usa generatori di partenza base su tutti i blocchi,
 - allena backward dall'ultimo al primo,
-- salva NPZ/CKPT per ogni blocco.
+- salva blob/checkpoint per ogni blocco.
 
-Boundary rollout:
-- usa i blob pass1 per propagare forward,
-- raccoglie campioni di boundary ai tempi t_i.
-
-Pass 2 (refinement):
-- costruisce generatori empirici per blocco dai boundary samples,
-- allena backward con warm-start dallo stesso blocco del pass1,
-- salva di nuovo NPZ/CKPT e log pass2.
+Pass k >= 2:
+- costruisce boundary samples con rollout stitched della passata k-1,
+- crea generatori empirici per blocco da quei boundary,
+- allena backward con warm-start dai blob della passata k-1,
+- salva blob/checkpoint e log della passata k.
 
 Precisione uniforme per blocco:
-- reference_loss = loss del blocco terminale,
+- reference_loss = loss del blocco terminale della passata corrente,
 - blocchi precedenti puntano a reference_loss * (1 + precision_margin),
 - se non raggiunta, scattano refine rounds (configurabili via piano/fallback).
+
+Resume:
+- se attivo, carica i blob della passata selezionata,
+- ricostruisce boundary samples da quei blob,
+- continua da pass = loaded_pass + 1 fino a `--passes`.
 
 
 CLI aggiornata
 --------------
-
 Argomenti principali:
 - --mode standard|recursive|both
 - --M
@@ -175,6 +180,10 @@ Argomenti principali:
 - --T_total
 - --block_size
 - --output_dir
+- --passes
+- --resume_models_dir
+- --resume_from_pass
+- --empirical_jitter_scale
 - --training_plan_csv
 - --pass1_warm_start_from_next
 
@@ -185,22 +194,27 @@ Comandi utili
 1) Standard
 python3 recursive/recursive1.py --mode standard --T_standard 24 --M 100 --N 100
 
-2) Ricorsivo base
-python3 recursive/recursive1.py --mode recursive --T_total 48 --block_size 12 --M 100 --N 100
+2) Ricorsivo base (2 pass)
+python3 recursive/recursive1.py --mode recursive --T_total 48 --block_size 12 --M 100 --N 100 --passes 2
 
-3) Ricorsivo con piano CSV
-python3 recursive/recursive1.py --mode recursive --T_total 48 --block_size 12 --M 100 --N 100 --training_plan_csv recursive/training_plan_example.csv
+3) Ricorsivo con 4 pass
+python3 recursive/recursive1.py --mode recursive --T_total 48 --block_size 12 --M 100 --N 100 --passes 4
 
-4) Ricorsivo con warm-start tra blocchi nella passata 1
-python3 recursive/recursive1.py --mode recursive --T_total 48 --block_size 12 --M 100 --N 100 --pass1_warm_start_from_next
+4) Ricorsivo con piano CSV
+python3 recursive/recursive1.py --mode recursive --T_total 48 --block_size 12 --M 100 --N 100 --passes 4 --training_plan_csv recursive/training_plan_example.csv
 
-5) Entrambi
-python3 recursive/recursive1.py --mode both --T_standard 24 --T_total 48 --block_size 12 --M 100 --N 100
+5) Ricorsivo con warm-start tra blocchi nella passata 1
+python3 recursive/recursive1.py --mode recursive --T_total 48 --block_size 12 --M 100 --N 100 --passes 4 --pass1_warm_start_from_next
+
+6) Resume da run precedente (continua da pass2 a pass4)
+python3 recursive/recursive1.py --mode recursive --T_total 48 --block_size 12 --M 100 --N 100 --passes 4 --resume_models_dir /path/to/run_xxx/recursive/models --resume_from_pass 2
+
+7) Entrambi
+python3 recursive/recursive1.py --mode both --T_standard 24 --T_total 48 --block_size 12 --M 100 --N 100 --passes 3
 
 
 Caricamento modelli in seguito (senza riaddestrare)
 ----------------------------------------------------
-
 Opzione A: checkpoint TF (.ckpt)
 - disponibile per standard e ricorsivo
 - metodi:
@@ -212,3 +226,4 @@ Opzione B: blob NPZ
 - metodi in NN_Quadratic_Coupled_Recursive:
   - save_parameter_blob(path)
   - load_parameter_blob(path, strict=True)
+
