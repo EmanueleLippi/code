@@ -669,6 +669,133 @@ def plot_recursive_pass_logs(pass1_logs: List[Dict], pass2_logs: List[Dict], out
     plt.savefig(os.path.join(out_dir, "recursive_blocks_eval_y0.png"), dpi=160)
     plt.close()
 
+
+def predict_recursive_stitched(
+    block_blobs: List[Dict[str, np.ndarray]],
+    blocks: List[Dict[str, float]],
+    Xi_initial: np.ndarray,
+    params: Dict[str, np.ndarray],
+    N_per_block: int,
+    D: int,
+    layers: List[int],
+    T_total: float,
+) -> Dict[str, np.ndarray]:
+    if len(blocks) == 0:
+        raise ValueError("blocks must contain at least one block")
+    if Xi_initial.ndim != 2 or Xi_initial.shape[1] != D:
+        raise ValueError(f"Xi_initial must have shape [M, {D}]")
+
+    Xi_curr = Xi_initial.astype(np.float32)
+    t_segments = []
+    X_segments = []
+    Y_segments = []
+    Z_segments = []
+
+    for b, block in enumerate(blocks):
+        blob = block_blobs[b]
+        tf.reset_default_graph()
+
+        model = NN_Quadratic_Coupled_Recursive(
+            Xi_generator=make_empirical_generator(Xi_curr, jitter_scale=0.0),
+            T=block["T_block"],
+            M=Xi_curr.shape[0],
+            N=N_per_block,
+            D=D,
+            layers=layers,
+            parameters=params,
+            t_start=block["t_start"],
+            t_end=block["t_end"],
+            T_total=T_total,
+            terminal_blob=None,
+            normalize_time_input=bool(int(blob.get("normalize_time_input", 1))),
+            x_norm_mean=blob.get("x_norm_mean", np.zeros((1, D), dtype=np.float32)),
+            x_norm_std=blob.get("x_norm_std", np.ones((1, D), dtype=np.float32)),
+        )
+
+        try:
+            model.import_parameter_blob(blob, strict=True)
+            t_b, W_b, _ = model.fetch_minibatch()
+            X_b, Y_b, Z_b = model.predict(Xi_curr, t_b, W_b, const_value=1.0)
+
+            start_idx = 0 if b == 0 else 1
+            t_segments.append(t_b[:, start_idx:, :].astype(np.float32))
+            X_segments.append(X_b[:, start_idx:, :].astype(np.float32))
+            Y_segments.append(Y_b[:, start_idx:, :].astype(np.float32))
+            Z_segments.append(Z_b[:, start_idx:, :].astype(np.float32))
+
+            Xi_curr = X_b[:, -1, :].astype(np.float32)
+        finally:
+            model.sess.close()
+
+    return {
+        "t": np.concatenate(t_segments, axis=1),
+        "X": np.concatenate(X_segments, axis=1),
+        "Y": np.concatenate(Y_segments, axis=1),
+        "Z": np.concatenate(Z_segments, axis=1),
+    }
+
+
+def plot_recursive_stitched_predictions(
+    stitched: Dict[str, np.ndarray],
+    blocks: List[Dict[str, float]],
+    out_dir: str,
+    sample_paths: int = 5,
+) -> None:
+    if not _PLOTTING_AVAILABLE:
+        print("[Plot] matplotlib non disponibile: skip plot_recursive_stitched_predictions")
+        return
+    if stitched is None:
+        return
+    if "t" not in stitched or "X" not in stitched or "Y" not in stitched:
+        return
+
+    t_all = stitched["t"]
+    X_all = stitched["X"]
+    Y_all = stitched["Y"]
+    if t_all.size == 0 or X_all.size == 0 or Y_all.size == 0:
+        return
+
+    os.makedirs(out_dir, exist_ok=True)
+    n_paths = max(1, min(int(sample_paths), int(t_all.shape[0])))
+
+    component_labels = ["S", "H", "V", "X"]
+    component_colors = ["b", "r", "y", "g"]
+
+    plt.figure(figsize=(12, 6))
+    for d in range(X_all.shape[2]):
+        label = component_labels[d] if d < len(component_labels) else f"X[{d}]"
+        color = component_colors[d % len(component_colors)]
+        plt.plot(t_all[0, :, 0], X_all[0, :, d], color=color, linewidth=1.5, label=label)
+    for block in blocks[:-1]:
+        plt.axvline(float(block["t_end"]), color="k", linestyle="--", linewidth=0.8, alpha=0.3)
+    plt.title("Recursive stitched prediction - State path (single continuous horizon)")
+    plt.xlabel("Time")
+    plt.ylabel("State value")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, "recursive_stitched_state_path.png"), dpi=160)
+    plt.close()
+
+    plt.figure(figsize=(12, 6))
+    for i in range(n_paths):
+        alpha = 0.95 if i == 0 else 0.35
+        width = 1.8 if i == 0 else 1.0
+        label = "Y pred (path 0)" if i == 0 else None
+        plt.plot(t_all[i, :, 0], Y_all[i, :, 0], color="tab:blue", alpha=alpha, linewidth=width, label=label)
+    for block in blocks[:-1]:
+        plt.axvline(float(block["t_end"]), color="k", linestyle="--", linewidth=0.8, alpha=0.3)
+    plt.title("Recursive stitched prediction - Y over full horizon")
+    plt.xlabel("Time")
+    plt.ylabel("Y")
+    plt.grid(True, alpha=0.3)
+    if n_paths > 0:
+        plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, "recursive_stitched_Y_pred.png"), dpi=160)
+    plt.close()
+
+
 class NN_Quadratic_Coupled_Recursive(NN_Quadratic_Coupled):
     """
     Wrapper per training a blocchi:
@@ -1629,6 +1756,31 @@ def main():
         save_rows_csv(pass1_logs, os.path.join(rec_dir, "pass1_logs.csv"))
         save_rows_csv(pass2_logs, os.path.join(rec_dir, "pass2_logs.csv"))
         plot_recursive_pass_logs(pass1_logs, pass2_logs, os.path.join(rec_dir, "plots"))
+
+        Xi_stitched = Xi_generator_default(max(64, M), D).astype(np.float32)
+        stitched_pred = predict_recursive_stitched(
+            block_blobs=rec["pass2"]["blobs"],
+            blocks=rec["blocks"],
+            Xi_initial=Xi_stitched,
+            params=params,
+            N_per_block=N,
+            D=D,
+            layers=layers,
+            T_total=args.T_total,
+        )
+        np.savez(
+            os.path.join(rec_dir, "stitched_predictions_pass2.npz"),
+            t=stitched_pred["t"],
+            X=stitched_pred["X"],
+            Y=stitched_pred["Y"],
+            Z=stitched_pred["Z"],
+        )
+        plot_recursive_stitched_predictions(
+            stitched=stitched_pred,
+            blocks=rec["blocks"],
+            out_dir=os.path.join(rec_dir, "plots"),
+            sample_paths=8,
+        )
 
         boundary_stats = []
         for i, arr in enumerate(rec.get("boundary_samples", [])):
