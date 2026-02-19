@@ -1,0 +1,419 @@
+{
+  "blocks": [
+    {
+      "idx": 0,
+      "t_start": 0.0,
+      "t_end": 12.0,
+      "T_block": 12.0
+    },
+    {
+      "idx": 1,
+      "t_start": 12.0,
+      "t_end": 24.0,
+      "T_block": 12.0
+    },
+    {
+      "idx": 2,
+      "t_start": 24.0,
+      "t_end": 36.0,
+      "T_block": 12.0
+    }
+  ],
+  "pass1": {
+    "reference_loss": 2700.3649169921873,
+    "logs": [
+      {
+        "pass": 1,
+        "block": 0,
+        "t_start": 0.0,
+        "t_end": 12.0,
+        "T_block": 12.0,
+        "eval_mean_loss": 2041.92060546875,
+        "eval_std_loss": 715.2189812868837,
+        "eval_mean_y0": -17.740434646606445,
+        "precision_target": 2970.4014086914062,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            3000,
+            0.0001
+          ],
+          [
+            3000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            2000,
+            1e-05
+          ],
+          [
+            2000,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            500,
+            1e-05
+          ],
+          [
+            500,
+            5e-06
+          ]
+        ],
+        "blob_path": "recursive1_outputs/run_20260218_181518/recursive/models/pass_1/block_00.npz",
+        "ckpt_path": "recursive1_outputs/run_20260218_181518/recursive/models/pass_1/block_00.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 1,
+        "t_start": 12.0,
+        "t_end": 24.0,
+        "T_block": 12.0,
+        "eval_mean_loss": 2707.721923828125,
+        "eval_std_loss": 994.6134111926895,
+        "eval_mean_y0": -18.76866340637207,
+        "precision_target": 2970.4014086914062,
+        "refine_rounds": 1,
+        "stage_plan_used": [
+          [
+            3000,
+            0.0001
+          ],
+          [
+            3000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            2000,
+            1e-05
+          ],
+          [
+            2000,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            500,
+            1e-05
+          ],
+          [
+            500,
+            5e-06
+          ]
+        ],
+        "blob_path": "recursive1_outputs/run_20260218_181518/recursive/models/pass_1/block_01.npz",
+        "ckpt_path": "recursive1_outputs/run_20260218_181518/recursive/models/pass_1/block_01.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 2,
+        "t_start": 24.0,
+        "t_end": 36.0,
+        "T_block": 12.0,
+        "eval_mean_loss": 2700.3649169921873,
+        "eval_std_loss": 1233.90073228843,
+        "eval_mean_y0": -19.558021545410156,
+        "precision_target": null,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            7000,
+            0.001
+          ],
+          [
+            5000,
+            0.0005
+          ],
+          [
+            5000,
+            0.0001
+          ],
+          [
+            5000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            5000,
+            1e-05
+          ],
+          [
+            5000,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            500,
+            1e-05
+          ],
+          [
+            500,
+            5e-06
+          ]
+        ],
+        "blob_path": "recursive1_outputs/run_20260218_181518/recursive/models/pass_1/block_02.npz",
+        "ckpt_path": "recursive1_outputs/run_20260218_181518/recursive/models/pass_1/block_02.ckpt"
+      }
+    ]
+  },
+  "pass2": {
+    "reference_loss": 616.6153686523437,
+    "logs": [
+      {
+        "pass": 2,
+        "block": 0,
+        "t_start": 0.0,
+        "t_end": 12.0,
+        "T_block": 12.0,
+        "eval_mean_loss": 1127.03017578125,
+        "eval_std_loss": 23.888393943529035,
+        "eval_mean_y0": -30.009231567382812,
+        "precision_target": 678.2769055175781,
+        "refine_rounds": 3,
+        "stage_plan_used": [
+          [
+            1500,
+            0.0001
+          ],
+          [
+            1500,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            1000,
+            1e-05
+          ],
+          [
+            1000,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            300,
+            1e-05
+          ],
+          [
+            300,
+            5e-06
+          ]
+        ],
+        "blob_path": "recursive1_outputs/run_20260218_181518/recursive/models/pass_2/block_00.npz",
+        "ckpt_path": "recursive1_outputs/run_20260218_181518/recursive/models/pass_2/block_00.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 1,
+        "t_start": 12.0,
+        "t_end": 24.0,
+        "T_block": 12.0,
+        "eval_mean_loss": 612.9801635742188,
+        "eval_std_loss": 9.507716236316773,
+        "eval_mean_y0": -18.234224319458008,
+        "precision_target": 678.2769055175781,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1500,
+            0.0001
+          ],
+          [
+            1500,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            1000,
+            1e-05
+          ],
+          [
+            1000,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            300,
+            1e-05
+          ],
+          [
+            300,
+            5e-06
+          ]
+        ],
+        "blob_path": "recursive1_outputs/run_20260218_181518/recursive/models/pass_2/block_01.npz",
+        "ckpt_path": "recursive1_outputs/run_20260218_181518/recursive/models/pass_2/block_01.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 2,
+        "t_start": 24.0,
+        "t_end": 36.0,
+        "T_block": 12.0,
+        "eval_mean_loss": 616.6153686523437,
+        "eval_std_loss": 3.04496189318695,
+        "eval_mean_y0": -14.939369201660156,
+        "precision_target": null,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1500,
+            0.0001
+          ],
+          [
+            1500,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            1000,
+            1e-05
+          ],
+          [
+            1000,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            300,
+            1e-05
+          ],
+          [
+            300,
+            5e-06
+          ]
+        ],
+        "blob_path": "recursive1_outputs/run_20260218_181518/recursive/models/pass_2/block_02.npz",
+        "ckpt_path": "recursive1_outputs/run_20260218_181518/recursive/models/pass_2/block_02.ckpt"
+      }
+    ]
+  },
+  "boundary_stats": [
+    {
+      "boundary_idx": 0,
+      "n_samples": 8000,
+      "mean": [
+        1.0032018423080444,
+        1.0038961172103882,
+        0.0018795339856296778,
+        5.037281513214111
+      ],
+      "std": [
+        0.9948522448539734,
+        0.9906858205795288,
+        1.0111650228500366,
+        2.308729887008667
+      ],
+      "min": [
+        -2.768827438354492,
+        -2.8092291355133057,
+        -4.004925727844238,
+        1.0013267993927002
+      ],
+      "max": [
+        4.287374019622803,
+        4.84323787689209,
+        4.00221586227417,
+        8.997313499450684
+      ]
+    },
+    {
+      "boundary_idx": 1,
+      "n_samples": 8000,
+      "mean": [
+        0.9999994039535522,
+        1.0000003576278687,
+        -0.01683414727449417,
+        4.763090133666992
+      ],
+      "std": [
+        0.3713522255420685,
+        0.36765992641448975,
+        0.6244542598724365,
+        2.5565268993377686
+      ],
+      "min": [
+        -0.45107197761535645,
+        -0.45266222953796387,
+        -2.6624155044555664,
+        -0.9460744261741638
+      ],
+      "max": [
+        2.4510672092437744,
+        2.4526591300964355,
+        2.4652767181396484,
+        10.7280912399292
+      ]
+    },
+    {
+      "boundary_idx": 2,
+      "n_samples": 8000,
+      "mean": [
+        1.0000011920928955,
+        0.9999993443489075,
+        -0.0032263309694826603,
+        4.666751384735107
+      ],
+      "std": [
+        0.3665260970592499,
+        0.362389475107193,
+        0.6246106028556824,
+        2.5499980449676514
+      ],
+      "min": [
+        -0.43079036474227905,
+        -0.30743110179901123,
+        -2.949861764907837,
+        -0.9136994481086731
+      ],
+      "max": [
+        2.430790424346924,
+        2.307431221008301,
+        2.9570400714874268,
+        10.951360702514648
+      ]
+    },
+    {
+      "boundary_idx": 3,
+      "n_samples": 8000,
+      "mean": [
+        0.999999463558197,
+        1.0000007152557373,
+        0.0015005187597125769,
+        4.654058456420898
+      ],
+      "std": [
+        0.3623187839984894,
+        0.36464959383010864,
+        0.6255819201469421,
+        2.584813356399536
+      ],
+      "min": [
+        -0.3069279193878174,
+        -0.3627912402153015,
+        -2.6012754440307617,
+        -0.8153414726257324
+      ],
+      "max": [
+        2.3069279193878174,
+        2.362791061401367,
+        2.3756072521209717,
+        10.87122631072998
+      ]
+    }
+  ],
+  "models_dir": "recursive1_outputs/run_20260218_181518/recursive/models"
+}
