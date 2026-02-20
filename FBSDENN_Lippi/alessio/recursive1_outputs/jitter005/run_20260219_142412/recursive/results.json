@@ -1,0 +1,636 @@
+{
+  "blocks": [
+    {
+      "idx": 0,
+      "t_start": 0.0,
+      "t_end": 12.0,
+      "T_block": 12.0
+    },
+    {
+      "idx": 1,
+      "t_start": 12.0,
+      "t_end": 24.0,
+      "T_block": 12.0
+    },
+    {
+      "idx": 2,
+      "t_start": 24.0,
+      "t_end": 36.0,
+      "T_block": 12.0
+    }
+  ],
+  "passes": [
+    {
+      "pass_id": 3,
+      "reference_loss": 7.493628692626953,
+      "logs": [
+        {
+          "pass": 3,
+          "block": 0,
+          "t_start": 0.0,
+          "t_end": 12.0,
+          "T_block": 12.0,
+          "eval_mean_loss": 11.689308166503906,
+          "eval_std_loss": 1.5981277826502993,
+          "eval_mean_y0": -32.565792083740234,
+          "precision_target": 8.24299156188965,
+          "refine_rounds": 3,
+          "stage_plan_used": [
+            [
+              3500,
+              0.001
+            ],
+            [
+              3000,
+              0.0001
+            ],
+            [
+              3000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              2000,
+              1e-05
+            ],
+            [
+              2000,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              800,
+              1e-05
+            ],
+            [
+              800,
+              5e-06
+            ],
+            [
+              800,
+              2e-06
+            ]
+          ],
+          "blob_path": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models/pass_3/block_00.npz",
+          "ckpt_path": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models/pass_3/block_00.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 1,
+          "t_start": 12.0,
+          "t_end": 24.0,
+          "T_block": 12.0,
+          "eval_mean_loss": 7.443513679504394,
+          "eval_std_loss": 0.7459410068890782,
+          "eval_mean_y0": -20.41660499572754,
+          "precision_target": 8.24299156188965,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              3500,
+              0.001
+            ],
+            [
+              3000,
+              0.0001
+            ],
+            [
+              3000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              2000,
+              1e-05
+            ],
+            [
+              2000,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              800,
+              1e-05
+            ],
+            [
+              800,
+              5e-06
+            ],
+            [
+              800,
+              2e-06
+            ]
+          ],
+          "blob_path": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models/pass_3/block_01.npz",
+          "ckpt_path": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models/pass_3/block_01.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 2,
+          "t_start": 24.0,
+          "t_end": 36.0,
+          "T_block": 12.0,
+          "eval_mean_loss": 7.493628692626953,
+          "eval_std_loss": 0.6575167219293843,
+          "eval_mean_y0": -15.540156364440918,
+          "precision_target": null,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              3500,
+              0.001
+            ],
+            [
+              3000,
+              0.0001
+            ],
+            [
+              3000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              2000,
+              1e-05
+            ],
+            [
+              2000,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              800,
+              1e-05
+            ],
+            [
+              800,
+              5e-06
+            ],
+            [
+              800,
+              2e-06
+            ]
+          ],
+          "blob_path": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models/pass_3/block_02.npz",
+          "ckpt_path": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models/pass_3/block_02.ckpt"
+        }
+      ],
+      "models_dir": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models/pass_3"
+    },
+    {
+      "pass_id": 4,
+      "reference_loss": 7.355123805999756,
+      "logs": [
+        {
+          "pass": 4,
+          "block": 0,
+          "t_start": 0.0,
+          "t_end": 12.0,
+          "T_block": 12.0,
+          "eval_mean_loss": 11.230254745483398,
+          "eval_std_loss": 0.7536298684400053,
+          "eval_mean_y0": -38.190425872802734,
+          "precision_target": 8.090636186599731,
+          "refine_rounds": 3,
+          "stage_plan_used": [
+            [
+              3500,
+              0.001
+            ],
+            [
+              3000,
+              0.0001
+            ],
+            [
+              3000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              2000,
+              1e-05
+            ],
+            [
+              2000,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              800,
+              1e-05
+            ],
+            [
+              800,
+              5e-06
+            ],
+            [
+              800,
+              2e-06
+            ]
+          ],
+          "blob_path": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models/pass_4/block_00.npz",
+          "ckpt_path": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models/pass_4/block_00.ckpt"
+        },
+        {
+          "pass": 4,
+          "block": 1,
+          "t_start": 12.0,
+          "t_end": 24.0,
+          "T_block": 12.0,
+          "eval_mean_loss": 7.521789264678955,
+          "eval_std_loss": 1.4370260656438338,
+          "eval_mean_y0": -22.016220092773438,
+          "precision_target": 8.090636186599731,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              3500,
+              0.001
+            ],
+            [
+              3000,
+              0.0001
+            ],
+            [
+              3000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              2000,
+              1e-05
+            ],
+            [
+              2000,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              800,
+              1e-05
+            ],
+            [
+              800,
+              5e-06
+            ],
+            [
+              800,
+              2e-06
+            ]
+          ],
+          "blob_path": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models/pass_4/block_01.npz",
+          "ckpt_path": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models/pass_4/block_01.ckpt"
+        },
+        {
+          "pass": 4,
+          "block": 2,
+          "t_start": 24.0,
+          "t_end": 36.0,
+          "T_block": 12.0,
+          "eval_mean_loss": 7.355123805999756,
+          "eval_std_loss": 0.6461543348448344,
+          "eval_mean_y0": -15.476168632507324,
+          "precision_target": null,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              3500,
+              0.001
+            ],
+            [
+              3000,
+              0.0001
+            ],
+            [
+              3000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              2000,
+              1e-05
+            ],
+            [
+              2000,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              800,
+              1e-05
+            ],
+            [
+              800,
+              5e-06
+            ],
+            [
+              800,
+              2e-06
+            ]
+          ],
+          "blob_path": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models/pass_4/block_02.npz",
+          "ckpt_path": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models/pass_4/block_02.ckpt"
+        }
+      ],
+      "models_dir": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models/pass_4"
+    },
+    {
+      "pass_id": 5,
+      "reference_loss": 7.1807201385498045,
+      "logs": [
+        {
+          "pass": 5,
+          "block": 0,
+          "t_start": 0.0,
+          "t_end": 12.0,
+          "T_block": 12.0,
+          "eval_mean_loss": 14.503172683715821,
+          "eval_std_loss": 4.871224731963065,
+          "eval_mean_y0": -42.92708206176758,
+          "precision_target": 7.898792152404786,
+          "refine_rounds": 3,
+          "stage_plan_used": [
+            [
+              3500,
+              0.001
+            ],
+            [
+              3000,
+              0.0001
+            ],
+            [
+              3000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              2000,
+              1e-05
+            ],
+            [
+              2000,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              800,
+              1e-05
+            ],
+            [
+              800,
+              5e-06
+            ],
+            [
+              800,
+              2e-06
+            ]
+          ],
+          "blob_path": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models/pass_5/block_00.npz",
+          "ckpt_path": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models/pass_5/block_00.ckpt"
+        },
+        {
+          "pass": 5,
+          "block": 1,
+          "t_start": 12.0,
+          "t_end": 24.0,
+          "T_block": 12.0,
+          "eval_mean_loss": 7.137577629089355,
+          "eval_std_loss": 0.6817694958120578,
+          "eval_mean_y0": -25.24365234375,
+          "precision_target": 7.898792152404786,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              3500,
+              0.001
+            ],
+            [
+              3000,
+              0.0001
+            ],
+            [
+              3000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              2000,
+              1e-05
+            ],
+            [
+              2000,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              800,
+              1e-05
+            ],
+            [
+              800,
+              5e-06
+            ],
+            [
+              800,
+              2e-06
+            ]
+          ],
+          "blob_path": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models/pass_5/block_01.npz",
+          "ckpt_path": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models/pass_5/block_01.ckpt"
+        },
+        {
+          "pass": 5,
+          "block": 2,
+          "t_start": 24.0,
+          "t_end": 36.0,
+          "T_block": 12.0,
+          "eval_mean_loss": 7.1807201385498045,
+          "eval_std_loss": 1.2411475077709502,
+          "eval_mean_y0": -15.36917781829834,
+          "precision_target": null,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              3500,
+              0.001
+            ],
+            [
+              3000,
+              0.0001
+            ],
+            [
+              3000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              2000,
+              1e-05
+            ],
+            [
+              2000,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              800,
+              1e-05
+            ],
+            [
+              800,
+              5e-06
+            ],
+            [
+              800,
+              2e-06
+            ]
+          ],
+          "blob_path": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models/pass_5/block_02.npz",
+          "ckpt_path": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models/pass_5/block_02.ckpt"
+        }
+      ],
+      "models_dir": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models/pass_5"
+    }
+  ],
+  "resumed_from": {
+    "models_dir": "recursive1_outputs/run_20260218_181518/recursive/models",
+    "loaded_pass_id": 2,
+    "available_passes": [
+      1,
+      2
+    ]
+  },
+  "boundary_stats": [
+    {
+      "boundary_idx": 0,
+      "n_samples": 2000,
+      "mean": [
+        1.0044949054718018,
+        1.0343047380447388,
+        -0.011433734558522701,
+        5.021866321563721
+      ],
+      "std": [
+        1.010320782661438,
+        0.9884124994277954,
+        1.001831293106079,
+        2.281877279281616
+      ],
+      "min": [
+        -2.8711540699005127,
+        -2.326230764389038,
+        -2.9514505863189697,
+        1.0021623373031616
+      ],
+      "max": [
+        4.3757100105285645,
+        5.355808258056641,
+        3.491126537322998,
+        8.99437141418457
+      ]
+    },
+    {
+      "boundary_idx": 1,
+      "n_samples": 2000,
+      "mean": [
+        1.0000007152557373,
+        1.0000001192092896,
+        -0.015593813732266426,
+        4.762732982635498
+      ],
+      "std": [
+        0.38072076439857483,
+        0.36372458934783936,
+        0.6321517825126648,
+        2.5861804485321045
+      ],
+      "min": [
+        -0.2737862467765808,
+        -0.35125410556793213,
+        -2.766226053237915,
+        -0.8131051659584045
+      ],
+      "max": [
+        2.273789167404175,
+        2.35125732421875,
+        2.3438165187835693,
+        11.0900239944458
+      ]
+    },
+    {
+      "boundary_idx": 2,
+      "n_samples": 2000,
+      "mean": [
+        0.9999995827674866,
+        1.0000001192092896,
+        0.005759752355515957,
+        4.633374214172363
+      ],
+      "std": [
+        0.36055079102516174,
+        0.3755102753639221,
+        0.6395701766014099,
+        2.538600206375122
+      ],
+      "min": [
+        -0.4508085250854492,
+        -0.09589281678199768,
+        -2.9659719467163086,
+        -0.6094483733177185
+      ],
+      "max": [
+        2.45080828666687,
+        2.095892906188965,
+        2.5349268913269043,
+        10.563343048095703
+      ]
+    },
+    {
+      "boundary_idx": 3,
+      "n_samples": 2000,
+      "mean": [
+        0.9999995827674866,
+        0.9999998211860657,
+        0.0023028431460261345,
+        4.663362979888916
+      ],
+      "std": [
+        0.36689698696136475,
+        0.3558213710784912,
+        0.6312720775604248,
+        2.552544593811035
+      ],
+      "min": [
+        -0.13936276733875275,
+        -0.1277071237564087,
+        -2.4220478534698486,
+        -0.5695099830627441
+      ],
+      "max": [
+        2.1393628120422363,
+        2.127707004547119,
+        2.3932342529296875,
+        10.63720417022705
+      ]
+    }
+  ],
+  "models_dir": "recursive1_outputs_ab/jitter005/run_20260219_142412/recursive/models"
+}

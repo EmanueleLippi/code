@@ -1,0 +1,253 @@
+{
+  "timestamp": "20260219_135435",
+  "mode": "recursive",
+  "M": 100,
+  "N": 100,
+  "D": 4,
+  "T_standard": 12.0,
+  "T_total": 36.0,
+  "block_size": 12.0,
+  "passes": 5,
+  "resume_models_dir": "recursive1_outputs/run_20260218_181518/recursive/models",
+  "resume_from_pass": 2,
+  "empirical_jitter_scale": 0.05,
+  "layers": [
+    5,
+    256,
+    256,
+    256,
+    256,
+    1
+  ],
+  "stage_plan": [
+    [
+      5000,
+      0.001
+    ],
+    [
+      5000,
+      0.0005
+    ],
+    [
+      5000,
+      0.0001
+    ],
+    [
+      5000,
+      5e-05
+    ]
+  ],
+  "final_plan": [
+    [
+      5000,
+      1e-05
+    ],
+    [
+      5000,
+      5e-06
+    ]
+  ],
+  "training_plan_csv": "training_plan_2.csv",
+  "training_plan_rules_count": 20,
+  "training_plan_rules": [
+    {
+      "pass_scope": "1",
+      "block_scope": "terminal",
+      "phase": "stage",
+      "order": 1,
+      "n_iter": 7000,
+      "lr": 0.001,
+      "source_row": 2
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "terminal",
+      "phase": "stage",
+      "order": 2,
+      "n_iter": 5000,
+      "lr": 0.0005,
+      "source_row": 3
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "terminal",
+      "phase": "stage",
+      "order": 3,
+      "n_iter": 5000,
+      "lr": 0.0001,
+      "source_row": 4
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "terminal",
+      "phase": "stage",
+      "order": 4,
+      "n_iter": 5000,
+      "lr": 5e-05,
+      "source_row": 5
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "terminal",
+      "phase": "final",
+      "order": 1,
+      "n_iter": 5000,
+      "lr": 1e-05,
+      "source_row": 6
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "terminal",
+      "phase": "final",
+      "order": 2,
+      "n_iter": 5000,
+      "lr": 5e-06,
+      "source_row": 7
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "other",
+      "phase": "stage",
+      "order": 1,
+      "n_iter": 3000,
+      "lr": 0.0001,
+      "source_row": 8
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "other",
+      "phase": "stage",
+      "order": 2,
+      "n_iter": 3000,
+      "lr": 5e-05,
+      "source_row": 9
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "other",
+      "phase": "final",
+      "order": 1,
+      "n_iter": 2000,
+      "lr": 1e-05,
+      "source_row": 10
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "other",
+      "phase": "final",
+      "order": 2,
+      "n_iter": 2000,
+      "lr": 5e-06,
+      "source_row": 11
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "all",
+      "phase": "refine",
+      "order": 1,
+      "n_iter": 500,
+      "lr": 1e-05,
+      "source_row": 12
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "all",
+      "phase": "refine",
+      "order": 2,
+      "n_iter": 500,
+      "lr": 5e-06,
+      "source_row": 13
+    },
+    {
+      "pass_scope": "2+",
+      "block_scope": "all",
+      "phase": "stage",
+      "order": 1,
+      "n_iter": 3500,
+      "lr": 0.001,
+      "source_row": 14
+    },
+    {
+      "pass_scope": "2+",
+      "block_scope": "all",
+      "phase": "stage",
+      "order": 1,
+      "n_iter": 3000,
+      "lr": 0.0001,
+      "source_row": 15
+    },
+    {
+      "pass_scope": "2+",
+      "block_scope": "all",
+      "phase": "stage",
+      "order": 2,
+      "n_iter": 3000,
+      "lr": 5e-05,
+      "source_row": 16
+    },
+    {
+      "pass_scope": "2+",
+      "block_scope": "all",
+      "phase": "final",
+      "order": 1,
+      "n_iter": 2000,
+      "lr": 1e-05,
+      "source_row": 17
+    },
+    {
+      "pass_scope": "2+",
+      "block_scope": "all",
+      "phase": "final",
+      "order": 2,
+      "n_iter": 2000,
+      "lr": 5e-06,
+      "source_row": 18
+    },
+    {
+      "pass_scope": "2+",
+      "block_scope": "all",
+      "phase": "refine",
+      "order": 1,
+      "n_iter": 800,
+      "lr": 1e-05,
+      "source_row": 19
+    },
+    {
+      "pass_scope": "2+",
+      "block_scope": "all",
+      "phase": "refine",
+      "order": 2,
+      "n_iter": 800,
+      "lr": 5e-06,
+      "source_row": 20
+    },
+    {
+      "pass_scope": "2+",
+      "block_scope": "all",
+      "phase": "refine",
+      "order": 3,
+      "n_iter": 800,
+      "lr": 2e-06,
+      "source_row": 21
+    }
+  ],
+  "pass1_warm_start_from_next": false,
+  "params": {
+    "mu1": 1.0,
+    "mu2": 1.0,
+    "c1": 1.0,
+    "c2": 1.0,
+    "c3": 10.0,
+    "c4": 10.0,
+    "gamma": 1.0,
+    "d": 1.0,
+    "x_max": 10.0,
+    "v_max": 2.0,
+    "v_min": -2.0,
+    "s1": 0.5,
+    "s2": 0.5,
+    "s3": 0.5,
+    "const": 0.0
+  },
+  "plotting_available": true
+}
