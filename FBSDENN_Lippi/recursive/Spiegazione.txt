@@ -10,6 +10,9 @@ Questa nota descrive la versione corrente del codice, inclusi:
 - resume da run precedente (`--resume_models_dir`, `--resume_from_pass`),
 - salvataggio completo degli artefatti (config, metriche, modelli, stitched predictions),
 - plotting multi-pass (loss/y0 per blocco e convergenza su Y stitched),
+- metriche loss normalizzate per sample (`loss / M`) propagate nei log,
+- selezione automatica della passata migliore (`best_pass`) per l'output finale stitched,
+- precision target per-blocco basato sullo storico del medesimo blocco al pass precedente,
 - piano di training configurabile via CSV.
 
 
@@ -82,10 +85,12 @@ Funzionalita principali aggiunte
 - plot loss/y0 per blocco con una curva per ogni pass:
   - `recursive_blocks_eval_loss.png`
   - `recursive_blocks_eval_y0.png`
+- il plot loss usa automaticamente `eval_mean_loss_per_sample` quando disponibile
+  (fallback su `eval_mean_loss` per backward compatibility).
 - stitched prediction per ogni pass:
   - `recursive_stitched_state_path_passXX.png`
   - `recursive_stitched_Y_pred_passXX.png`
-- stitched prediction finale (ultima passata):
+- stitched prediction finale (passata selezionata automaticamente):
   - `recursive_stitched_state_path.png`
   - `recursive_stitched_Y_pred.png`
 - plot convergenza Y tra passate:
@@ -98,11 +103,18 @@ Funzionalita principali aggiunte
   - `recursive/models/pass_<id>/block_YY.npz`
   - `recursive/models/pass_<id>/block_YY.ckpt` (se attivo `save_tf_checkpoints`)
   - `stitched_predictions_passXX.npz`
+- i log per blocco includono sia loss grezza sia loss normalizzata:
+  - `eval_mean_loss`, `eval_std_loss`
+  - `eval_mean_loss_per_sample`, `eval_std_loss_per_sample`
 - compatibilita mantenuta:
   - se esistono pass1/pass2 vengono salvati anche `pass1_logs.csv` e `pass2_logs.csv`
-  - se l'ultima passata e pass2 viene salvato anche `stitched_predictions_pass2.npz`
 - summary:
   - `recursive/results.json` contiene `passes`, `resumed_from`, `boundary_stats`
+  - include anche:
+    - `selected_pass_id`
+    - `selected_score_metric`
+    - `selected_score`
+    - `pass_scores`
   - campi `pass1` e `pass2` restano presenti se disponibili.
 
 
@@ -158,10 +170,17 @@ Pass k >= 2:
 - allena backward con warm-start dai blob della passata k-1,
 - salva blob/checkpoint e log della passata k.
 
-Precisione uniforme per blocco:
-- reference_loss = loss del blocco terminale della passata corrente,
-- blocchi precedenti puntano a reference_loss * (1 + precision_margin),
+Precision target per blocco (aggiornato):
+- per ogni blocco b, il target usa prima la sua loss nel pass precedente:
+  - `target_b = prev_pass_loss_by_block[b] * (1 + precision_margin)`
+- fallback (se storico non disponibile): usa `reference_loss` del blocco terminale.
 - se non raggiunta, scattano refine rounds (configurabili via piano/fallback).
+
+Selezione della passata finale:
+- al termine delle passate viene calcolato uno score per ogni pass:
+  - score = media loss blocchi + peso * worst-block-loss
+- metrica primaria: `eval_mean_loss_per_sample` (fallback: `eval_mean_loss`)
+- `stitched_predictions_final.npz` e i plot finali sono prodotti dalla passata con score migliore.
 
 Resume:
 - se attivo, carica i blob della passata selezionata,
@@ -226,4 +245,3 @@ Opzione B: blob NPZ
 - metodi in NN_Quadratic_Coupled_Recursive:
   - save_parameter_blob(path)
   - load_parameter_blob(path, strict=True)
-
