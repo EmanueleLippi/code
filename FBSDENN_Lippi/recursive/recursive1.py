@@ -320,6 +320,7 @@ class FBSNN(ABC):  # Forward-Backward Stochastic Neural Network
     def evaluate(self, const_value=None, n_batches=5):
         current_const = np.float32(self.const if const_value is None else const_value)
         losses = []
+        losses_per_sample = []
         y0s = []
 
         for _ in range(n_batches):
@@ -331,13 +332,17 @@ class FBSNN(ABC):  # Forward-Backward Stochastic Neural Network
                 self.const_tf: current_const,
             }
             loss_value, y_value = self.sess.run([self.loss, self.Y_pred], tf_dict)
-            losses.append(float(loss_value))
+            loss_value = float(loss_value)
+            losses.append(loss_value)
+            losses_per_sample.append(loss_value / float(self.M))
             y0s.append(list(y_value[:, 0, 0]))
 
         return {
             "const": float(current_const),
             "mean_loss": float(np.mean(losses)),
             "std_loss": float(np.std(losses)),
+            "mean_loss_per_sample": float(np.mean(losses_per_sample)),
+            "std_loss_per_sample": float(np.std(losses_per_sample)),
             "mean_y0": float(np.mean(y0s)),
             "std_y0": float(np.std(y0s)),
             "n_batches": int(n_batches),
@@ -628,17 +633,25 @@ def plot_recursive_pass_logs_multi(pass_logs_by_pass: Dict[int, List[Dict]], out
     os.makedirs(out_dir, exist_ok=True)
     pass_ids = sorted(normalized.keys())
     colors = plt.cm.tab20(np.linspace(0.0, 1.0, max(len(pass_ids), 2)))
+    use_per_sample_loss = all(
+        len(rows) > 0 and ("eval_mean_loss_per_sample" in rows[0]) for rows in normalized.values()
+    )
+    loss_key = "eval_mean_loss_per_sample" if use_per_sample_loss else "eval_mean_loss"
 
     plt.figure(figsize=(10, 6))
     for i, pass_id in enumerate(pass_ids):
         rows = normalized[pass_id]
         b = np.array([r["block"] for r in rows], dtype=np.int32)
-        l = np.array([r["eval_mean_loss"] for r in rows], dtype=np.float64)
+        l = np.array([r[loss_key] for r in rows], dtype=np.float64)
         plt.plot(b, l, marker="o", linewidth=1.5, color=colors[i], label=f"pass{pass_id} loss")
     plt.yscale("log")
-    plt.title("Recursive blocks - Eval Mean Loss")
+    if use_per_sample_loss:
+        plt.title("Recursive blocks - Eval Mean Loss per Sample")
+        plt.ylabel("Loss / M (log scale)")
+    else:
+        plt.title("Recursive blocks - Eval Mean Loss")
+        plt.ylabel("Loss (log scale)")
     plt.xlabel("Block index")
-    plt.ylabel("Loss (log scale)")
     plt.grid(True, alpha=0.3)
     plt.legend()
     plt.tight_layout()
@@ -669,6 +682,18 @@ def plot_recursive_pass_logs(pass1_logs: List[Dict], pass2_logs: List[Dict], out
         },
         out_dir=out_dir,
     )
+
+
+def score_pass_logs(
+    rows: List[Dict],
+    loss_key: str = "eval_mean_loss_per_sample",
+    worst_block_weight: float = 0.35,
+) -> float:
+    losses = np.array([float(r.get(loss_key, np.nan)) for r in (rows or [])], dtype=np.float64)
+    losses = losses[np.isfinite(losses)]
+    if losses.size == 0:
+        return float("inf")
+    return float(np.mean(losses) + worst_block_weight * np.max(losses))
 
 
 def build_stitched_rollout_inputs(
@@ -1341,6 +1366,8 @@ def train_with_standard_schedule(
                     "train_last_loss": train_stats["last_loss"],
                     "eval_mean_loss": eval_stats["mean_loss"],
                     "eval_std_loss": eval_stats["std_loss"],
+                    "eval_mean_loss_per_sample": eval_stats["mean_loss_per_sample"],
+                    "eval_std_loss_per_sample": eval_stats["std_loss_per_sample"],
                     "eval_mean_y0": eval_stats["mean_y0"],
                     "eval_std_y0": eval_stats["std_y0"],
                     "elapsed_sec": float(elapsed),
@@ -1381,6 +1408,8 @@ def train_with_standard_schedule(
                 "stopped_early": train_stats["stopped_early"],
                 "eval_mean_loss": eval_stats["mean_loss"],
                 "eval_std_loss": eval_stats["std_loss"],
+                "eval_mean_loss_per_sample": eval_stats["mean_loss_per_sample"],
+                "eval_std_loss_per_sample": eval_stats["std_loss_per_sample"],
                 "eval_mean_y0": eval_stats["mean_y0"],
                 "eval_std_y0": eval_stats["std_y0"],
                 "elapsed_sec": float(elapsed),
@@ -1663,6 +1692,7 @@ def run_recursive_training(
         generators_per_block,
         warm_start_blobs=None,
         warm_start_from_next=False,
+        prev_pass_loss_by_block=None,
     ):
         pass_dir = os.path.join(output_dir, f"pass_{pass_id}")
         os.makedirs(pass_dir, exist_ok=True)
@@ -1708,7 +1738,9 @@ def run_recursive_training(
                 model.import_parameter_blob(warm_start_blobs[b], strict=False)
 
             precision_target = None
-            if reference_loss is not None:
+            if prev_pass_loss_by_block is not None and b in prev_pass_loss_by_block:
+                precision_target = float(prev_pass_loss_by_block[b]) * (1.0 + precision_margin)
+            elif reference_loss is not None:
                 precision_target = reference_loss * (1.0 + precision_margin)
 
             default_refine_plan = [(50, 1e-5), (50, 5e-6)]
@@ -1754,6 +1786,8 @@ def run_recursive_training(
                 "T_block": float(block["T_block"]),
                 "eval_mean_loss": float(block_stats["eval_stats"]["mean_loss"]),
                 "eval_std_loss": float(block_stats["eval_stats"]["std_loss"]),
+                "eval_mean_loss_per_sample": float(block_stats["eval_stats"]["mean_loss_per_sample"]),
+                "eval_std_loss_per_sample": float(block_stats["eval_stats"]["std_loss_per_sample"]),
                 "eval_mean_y0": float(block_stats["eval_stats"]["mean_y0"]),
                 "precision_target": None
                 if block_stats["precision_target"] is None
@@ -1778,6 +1812,7 @@ def run_recursive_training(
     pass_results = []
     prev_blobs = None
     prev_boundary_samples = None
+    prev_pass_loss_by_block = None
     resumed_from = None
     start_pass_id = 1
 
@@ -1868,9 +1903,15 @@ def run_recursive_training(
             generators_per_block=generators,
             warm_start_blobs=warm_start,
             warm_start_from_next=warm_from_next,
+            prev_pass_loss_by_block=prev_pass_loss_by_block,
         )
 
         prev_blobs = blobs_i
+        prev_pass_loss_by_block = {
+            int(row["block"]): float(row["eval_mean_loss"])
+            for row in logs_i
+            if "eval_mean_loss" in row
+        }
         prev_boundary_samples = rollout_boundaries(
             block_blobs=blobs_i,
             blocks=blocks,
@@ -2124,9 +2165,12 @@ def main():
 
             print(f"\n=== Recursive Log pass{pass_id} (compact) ===")
             for row in logs:
+                norm_msg = ""
+                if "eval_mean_loss_per_sample" in row:
+                    norm_msg = f", eval_loss/M={row['eval_mean_loss_per_sample']:.3e}"
                 print(
                     f"block={row['block']}, t=[{row['t_start']:.1f},{row['t_end']:.1f}], "
-                    f"eval_loss={row['eval_mean_loss']:.3e}, eval_y0={row['eval_mean_y0']:.3f}, "
+                    f"eval_loss={row['eval_mean_loss']:.3e}{norm_msg}, eval_y0={row['eval_mean_y0']:.3f}, "
                     f"target={row['precision_target']}, refine={row['refine_rounds']}"
                 )
 
@@ -2138,6 +2182,23 @@ def main():
 
         plot_recursive_pass_logs_multi(pass_logs_by_pass, os.path.join(rec_dir, "plots"))
 
+        score_key = "eval_mean_loss_per_sample"
+        all_rows = [row for rows in pass_logs_by_pass.values() for row in rows]
+        if not all(score_key in row for row in all_rows):
+            score_key = "eval_mean_loss"
+        pass_scores = {
+            int(pass_id): score_pass_logs(rows, loss_key=score_key)
+            for pass_id, rows in pass_logs_by_pass.items()
+            if len(rows) > 0
+        }
+        if len(pass_scores) == 0:
+            raise RuntimeError("No pass logs available for pass selection")
+        best_pass_id = int(min(pass_scores, key=pass_scores.get))
+        print(
+            f"[Selection] metric={score_key}, best_pass={best_pass_id}, "
+            f"score={pass_scores[best_pass_id]:.6e}"
+        )
+
         Xi_stitched = Xi_generator_default(max(64, M), D).astype(np.float32)
         rollout_inputs = build_stitched_rollout_inputs(
             blocks=rec["blocks"],
@@ -2147,7 +2208,6 @@ def main():
             seed=1234,
         )
         stitched_by_pass = {}
-        final_pass_id = int(pass_entries[-1]["pass_id"])
         for p in pass_entries:
             pass_id = int(p["pass_id"])
             stitched_pred = predict_recursive_stitched(
@@ -2178,29 +2238,21 @@ def main():
                 file_suffix=f"_pass{pass_id:02d}",
             )
 
-            if pass_id == final_pass_id:
-                np.savez(
-                    os.path.join(rec_dir, "stitched_predictions_final.npz"),
-                    t=stitched_pred["t"],
-                    X=stitched_pred["X"],
-                    Y=stitched_pred["Y"],
-                    Z=stitched_pred["Z"],
-                )
-                plot_recursive_stitched_predictions(
-                    stitched=stitched_pred,
-                    blocks=rec["blocks"],
-                    out_dir=os.path.join(rec_dir, "plots"),
-                    sample_paths=8,
-                    file_suffix="",
-                )
-                if pass_id == 2:
-                    np.savez(
-                        os.path.join(rec_dir, "stitched_predictions_pass2.npz"),
-                        t=stitched_pred["t"],
-                        X=stitched_pred["X"],
-                        Y=stitched_pred["Y"],
-                        Z=stitched_pred["Z"],
-                    )
+        selected_stitched = stitched_by_pass[best_pass_id]
+        np.savez(
+            os.path.join(rec_dir, "stitched_predictions_final.npz"),
+            t=selected_stitched["t"],
+            X=selected_stitched["X"],
+            Y=selected_stitched["Y"],
+            Z=selected_stitched["Z"],
+        )
+        plot_recursive_stitched_predictions(
+            stitched=selected_stitched,
+            blocks=rec["blocks"],
+            out_dir=os.path.join(rec_dir, "plots"),
+            sample_paths=8,
+            file_suffix="",
+        )
 
         plot_recursive_stitched_y_convergence(
             stitched_by_pass=stitched_by_pass,
@@ -2240,6 +2292,10 @@ def main():
             "resumed_from": rec.get("resumed_from", None),
             "boundary_stats": boundary_stats,
             "models_dir": os.path.join(rec_dir, "models"),
+            "selected_pass_id": int(best_pass_id),
+            "selected_score_metric": score_key,
+            "selected_score": float(pass_scores[best_pass_id]),
+            "pass_scores": {str(k): float(v) for k, v in pass_scores.items()},
         }
         if 1 in pass_summary_by_id:
             rec_summary["pass1"] = {
