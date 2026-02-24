@@ -46,7 +46,7 @@ conda activate tf-gpu
 cd /export/home/alessio.rondelli2/python/recursive
 python "[TUO_PATH]/code/FBSDENN_Lippi/recursive/recursive1.py" \
   --mode recursive \
-  --M 500 \
+  --M 1000 \
   --N 100 \
   --D 4 \
   --T_total 36 \
