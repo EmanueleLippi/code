@@ -38,6 +38,7 @@ class TrainingConfig:
     empirical_jitter_scale: float = 0.02
     pass1_warm_start_from_next: bool = False
     exact_solution: str = "none"
+    training_plan_csv: str = ""
     
     # Plans
     stage_plan: List[Tuple[int, float]] = dataclasses.field(

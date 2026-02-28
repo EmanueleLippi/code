@@ -302,8 +302,17 @@ def plot_recursive_exact_comparison(
     plt.savefig(os.path.join(out_dir, f"recursive_stitched_Y_exact{file_suffix}.png"), dpi=160)
     plt.close()
 
-    rel_err_Z = np.abs((Z_pred - Z_exact) / (np.abs(Z_exact) + 1.0e-8))
-    mean_rel_err_Z = np.mean(rel_err_Z, axis=0)
+    abs_err_Z = np.abs(Z_pred - Z_exact)
+    valid_mask = np.abs(Z_exact) > 1.0e-8
+    rel_err_Z = np.zeros_like(abs_err_Z, dtype=np.float32)
+    np.divide(
+        abs_err_Z,
+        np.abs(Z_exact) + 1.0e-8,
+        out=rel_err_Z,
+        where=valid_mask,
+    )
+    valid_count_t = np.maximum(np.sum(valid_mask, axis=0), 1.0).astype(np.float32)
+    mean_rel_err_Z = np.sum(rel_err_Z, axis=0) / valid_count_t
 
     plt.figure(figsize=(12, 6))
     for d in range(Z_pred.shape[2]):
@@ -323,7 +332,7 @@ def plot_recursive_exact_comparison(
     plt.savefig(os.path.join(out_dir, f"recursive_stitched_Z_rel_error{file_suffix}.png"), dpi=160)
     plt.close()
 
-    abs_err_Z = np.mean(np.abs(Z_pred - Z_exact), axis=0)
+    abs_err_Z = np.mean(abs_err_Z, axis=0)
     abs_err_Y = np.mean(np.abs(Y_pred - Y_exact), axis=0)
 
     plt.figure(figsize=(12, 6))
@@ -355,4 +364,3 @@ def plot_recursive_exact_comparison(
     plt.tight_layout()
     plt.savefig(os.path.join(out_dir, f"recursive_stitched_abs_error{file_suffix}.png"), dpi=160)
     plt.close()
-

@@ -9,8 +9,18 @@ import numpy as np
 def setup_logger(name: str = "time_stitching", log_file: str = None) -> logging.Logger:
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
+    logger.propagate = False
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    
+
+    # Keep logger idempotent across repeated runs/imports.
+    if logger.handlers:
+        for h in list(logger.handlers):
+            logger.removeHandler(h)
+            try:
+                h.close()
+            except Exception:
+                pass
+
     ch = logging.StreamHandler()
     ch.setFormatter(formatter)
     logger.addHandler(ch)
@@ -212,14 +222,22 @@ def compute_stitched_exact_bundle(
 
     abs_err_Y = np.abs(Y_pred - Y_exact)
     abs_err_Z = np.abs(Z_pred - Z_exact)
-    rel_err_Z = abs_err_Z / (np.abs(Z_exact) + float(eps))
+
+    # Avoid exploding relative errors when exact Z is identically zero.
+    denom = np.abs(Z_exact) + float(eps)
+    valid_mask = np.abs(Z_exact) > float(eps)
+    rel_err_Z = np.zeros_like(abs_err_Z, dtype=np.float32)
+    np.divide(abs_err_Z, denom, out=rel_err_Z, where=valid_mask)
 
     y0_pred = Y_pred[:, 0, 0]
     y0_exact = Y_exact[:, 0, 0]
 
     mean_abs_err_Y_t = np.mean(abs_err_Y[:, :, 0], axis=0)
     mean_abs_err_Z_t = np.mean(abs_err_Z, axis=0)
-    mean_rel_err_Z_t = np.mean(rel_err_Z, axis=0)
+    valid_count_t = np.maximum(np.sum(valid_mask, axis=0), 1.0).astype(np.float32)
+    mean_rel_err_Z_t = (np.sum(rel_err_Z, axis=0) / valid_count_t).astype(np.float32)
+    valid_count_all = float(max(np.sum(valid_mask), 1.0))
+    valid_count_comp = np.maximum(np.sum(valid_mask, axis=(0, 1)), 1.0).astype(np.float32)
 
     summary = {
         "solution_name": exact_solution.get("name", "unknown"),
@@ -232,9 +250,12 @@ def compute_stitched_exact_bundle(
         "mean_abs_error_y": float(np.mean(abs_err_Y)),
         "rmse_y": float(np.sqrt(np.mean((Y_pred - Y_exact) ** 2))),
         "mean_abs_error_z": float(np.mean(abs_err_Z)),
-        "mean_rel_error_z": float(np.mean(rel_err_Z)),
+        "mean_rel_error_z": float(np.sum(rel_err_Z) / valid_count_all),
         "mean_abs_error_z_by_component": np.mean(abs_err_Z, axis=(0, 1)).astype(np.float32),
-        "mean_rel_error_z_by_component": np.mean(rel_err_Z, axis=(0, 1)).astype(np.float32),
+        "mean_rel_error_z_by_component": (np.sum(rel_err_Z, axis=(0, 1)) / valid_count_comp).astype(np.float32),
+        "valid_rel_error_fraction_z_by_component": (
+            np.mean(valid_mask.astype(np.float32), axis=(0, 1)).astype(np.float32)
+        ),
         "z_component_labels": _z_component_labels(D),
     }
 
