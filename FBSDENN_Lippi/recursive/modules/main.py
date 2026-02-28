@@ -5,11 +5,16 @@ import numpy as np
 import tensorflow as tf
 
 from config import ModelParams, TrainingConfig
-from utils import setup_logger, save_json, save_rows_csv, Xi_generator_default
+from utils import (
+    setup_logger, save_json, save_rows_csv, Xi_generator_default,
+    build_exact_solution_functions, compute_stitched_exact_bundle,
+    save_exact_error_timeseries_csv
+)
 from train import run_standard_reference, run_recursive_training, predict_recursive_stitched, build_stitched_rollout_inputs
 from visualization import (
     _PLOTTING_AVAILABLE, plot_stage_logs, plot_recursive_pass_logs_multi,
-    plot_recursive_stitched_predictions, plot_recursive_stitched_y_convergence
+    plot_recursive_stitched_predictions, plot_recursive_stitched_y_convergence,
+    plot_recursive_exact_comparison
 )
 
 def score_pass_logs(rows, loss_key="eval_mean_loss_per_sample", worst_block_weight=0.35):
@@ -35,6 +40,7 @@ def main():
     parser.add_argument("--resume_from_pass", type=int, default=0)
     parser.add_argument("--empirical_jitter_scale", type=float, default=0.02)
     parser.add_argument("--pass1_warm_start_from_next", action="store_true")
+    parser.add_argument("--exact_solution", type=str, default="none")
     
     args = parser.parse_args()
 
@@ -50,7 +56,8 @@ def main():
         block_size=args.block_size,
         passes=args.passes,
         empirical_jitter_scale=args.empirical_jitter_scale,
-        pass1_warm_start_from_next=args.pass1_warm_start_from_next
+        pass1_warm_start_from_next=args.pass1_warm_start_from_next,
+        exact_solution=args.exact_solution
     )
     
     params = ModelParams()
@@ -68,9 +75,20 @@ def main():
         "config": config.__dict__,
         "params": params.to_dict(),
         "plotting_available": _PLOTTING_AVAILABLE,
+        "exact_solution": config.exact_solution,
     }
     save_json(run_config, os.path.join(run_root, "run_config.json"))
     logger.info(f"[Artifacts] run directory: {run_root}")
+
+    exact_solution = build_exact_solution_functions(
+        solution_name=config.exact_solution,
+        params=params.to_dict(),
+        D=config.D,
+    )
+    if exact_solution is None:
+        logger.info("[ExactSolution] disabled")
+    else:
+        logger.info(f"[ExactSolution] enabled profile='{exact_solution['name']}'")
 
     if args.mode in ("standard", "both"):
         logger.info("\n==================== STANDARD ====================")
@@ -101,6 +119,55 @@ def main():
             "refine_rounds": logs_std.get("refine_rounds", 0),
             "weights_h5_path": std_blob_path,
         }
+
+        if exact_solution is not None:
+            t_test, W_test, Xi_test = model_std.fetch_minibatch()
+            X_pred, Y_pred, Z_pred = model_std.predict_model(Xi_test, t_test, W_test, const_value=1.0)
+            stitched_std = {
+                "t": np.array(t_test, dtype=np.float32),
+                "X": np.array(X_pred, dtype=np.float32),
+                "Y": np.array(Y_pred, dtype=np.float32),
+                "Z": np.array(Z_pred, dtype=np.float32),
+            }
+            exact_std = compute_stitched_exact_bundle(
+                stitched=stitched_std,
+                exact_solution=exact_solution,
+            )
+            logger.info(
+                "[Exact][Standard] "
+                f"mean_pred_Y0={exact_std['summary']['mean_pred_y0']:.6f}, "
+                f"mean_exact_Y0={exact_std['summary']['mean_exact_y0']:.6f}, "
+                f"abs_err_Y0={exact_std['summary']['abs_error_mean_y0']:.6e}"
+            )
+
+            save_json(
+                {
+                    "summary": exact_std["summary"],
+                    "timeseries": exact_std["timeseries"],
+                },
+                os.path.join(std_dir, "exact_metrics.json"),
+            )
+            save_exact_error_timeseries_csv(
+                exact_std["timeseries"],
+                os.path.join(std_dir, "exact_errors.csv"),
+            )
+            plot_recursive_exact_comparison(
+                stitched=stitched_std,
+                Y_exact=exact_std["Y_exact"],
+                Z_exact=exact_std["Z_exact"],
+                blocks=[{"t_start": 0.0, "t_end": float(config.T_standard), "T_block": float(config.T_standard)}],
+                out_dir=os.path.join(std_dir, "plots"),
+                sample_paths=8,
+                file_suffix="",
+            )
+            std_summary["exact_solution"] = {
+                "enabled": True,
+                "profile": exact_solution["name"],
+                "summary": exact_std["summary"],
+            }
+        else:
+            std_summary["exact_solution"] = {"enabled": False, "profile": "none"}
+
         save_json(std_summary, os.path.join(std_dir, "results.json"))
 
         logger.info(f"[STANDARD] final eval: {logs_std['eval_stats']}")
@@ -174,6 +241,73 @@ def main():
                      t=selected_stitched["t"], X=selected_stitched["X"], Y=selected_stitched["Y"], Z=selected_stitched["Z"])
             plot_recursive_stitched_predictions(selected_stitched, rec["blocks"], os.path.join(rec_dir, "plots"), file_suffix="")
 
+            if exact_solution is not None:
+                exact_summary_by_pass = {}
+                selected_exact_bundle = None
+                for p in pass_entries:
+                    pass_id_curr = int(p["pass_id"])
+                    stitched_curr = stitched_by_pass[pass_id_curr]
+                    exact_bundle = compute_stitched_exact_bundle(
+                        stitched=stitched_curr,
+                        exact_solution=exact_solution,
+                    )
+                    exact_summary = exact_bundle["summary"]
+                    exact_summary_by_pass[pass_id_curr] = exact_summary
+                    logger.info(
+                        f"[Exact] pass{pass_id_curr} "
+                        f"mean_pred_Y0={exact_summary['mean_pred_y0']:.6f}, "
+                        f"mean_exact_Y0={exact_summary['mean_exact_y0']:.6f}, "
+                        f"abs_err_Y0={exact_summary['abs_error_mean_y0']:.6e}, "
+                        f"mean_abs_err_Y={exact_summary['mean_abs_error_y']:.6e}, "
+                        f"mean_abs_err_Z={exact_summary['mean_abs_error_z']:.6e}"
+                    )
+
+                    save_json(
+                        {
+                            "summary": exact_summary,
+                            "timeseries": exact_bundle["timeseries"],
+                        },
+                        os.path.join(rec_dir, f"exact_metrics_pass{pass_id_curr:02d}.json"),
+                    )
+                    save_exact_error_timeseries_csv(
+                        exact_bundle["timeseries"],
+                        os.path.join(rec_dir, f"exact_errors_pass{pass_id_curr:02d}.csv"),
+                    )
+                    plot_recursive_exact_comparison(
+                        stitched=stitched_curr,
+                        Y_exact=exact_bundle["Y_exact"],
+                        Z_exact=exact_bundle["Z_exact"],
+                        blocks=rec["blocks"],
+                        out_dir=os.path.join(rec_dir, "plots"),
+                        sample_paths=8,
+                        file_suffix=f"_pass{pass_id_curr:02d}",
+                    )
+
+                    if pass_id_curr == best_pass_id:
+                        selected_exact_bundle = exact_bundle
+
+                if selected_exact_bundle is not None:
+                    save_json(
+                        {
+                            "summary": selected_exact_bundle["summary"],
+                            "timeseries": selected_exact_bundle["timeseries"],
+                        },
+                        os.path.join(rec_dir, "exact_metrics_final.json"),
+                    )
+                    save_exact_error_timeseries_csv(
+                        selected_exact_bundle["timeseries"],
+                        os.path.join(rec_dir, "exact_errors_final.csv"),
+                    )
+                    plot_recursive_exact_comparison(
+                        stitched=selected_stitched,
+                        Y_exact=selected_exact_bundle["Y_exact"],
+                        Z_exact=selected_exact_bundle["Z_exact"],
+                        blocks=rec["blocks"],
+                        out_dir=os.path.join(rec_dir, "plots"),
+                        sample_paths=8,
+                        file_suffix="",
+                    )
+                    
             plot_recursive_stitched_y_convergence(stitched_by_pass, rec["blocks"], os.path.join(rec_dir, "plots"))
 
 if __name__ == "__main__":

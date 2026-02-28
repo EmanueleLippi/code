@@ -2,7 +2,7 @@ import os
 import json
 import csv
 import logging
-from typing import Dict, List, Optional, Union, Tuple
+from typing import Dict, List, Optional, Union, Tuple, Any
 import numpy as np
 
 
@@ -128,3 +128,148 @@ def estimate_generator_stats(generator_fn, D, n_samples=4096):
     mean = np.mean(x, axis=0, keepdims=True).astype(np.float32)
     std = np.maximum(np.std(x, axis=0, keepdims=True), 1.0e-3).astype(np.float32)
     return mean, std
+
+
+def _z_component_labels(n_components: int) -> List[str]:
+    base = ["Z_S", "Z_H", "Z_V", "Z_X"]
+    labels = []
+    for i in range(int(n_components)):
+        labels.append(base[i] if i < len(base) else f"Z_{i}")
+    return labels
+
+
+def build_exact_solution_functions(
+    solution_name: str,
+    params: Dict,
+    D: int,
+) -> Optional[Dict[str, Any]]:
+    name = str(solution_name or "none").strip().lower()
+    if name in ("", "none", "off", "false", "0"):
+        return None
+
+    if name in ("quadratic_coupled", "quadratic", "qc4d"):
+        if int(D) != 4:
+            raise ValueError(
+                f"exact_solution='quadratic_coupled' requires D=4, found D={int(D)}"
+            )
+
+        gamma = float(params["gamma"])
+        s1 = float(params["s1"])
+        s3 = float(params["s3"])
+
+        def u_exact(t_arr: np.ndarray, Xi_arr: np.ndarray) -> np.ndarray:
+            _ = t_arr
+            Xi_arr = np.asarray(Xi_arr, dtype=np.float32)
+            S = Xi_arr[:, 0:1]
+            V = Xi_arr[:, 2:3]
+            X_state = Xi_arr[:, 3:4]
+            return (-gamma * np.exp(S) * X_state + V ** 2 + V * X_state).astype(np.float32)
+
+        def z_exact(t_arr: np.ndarray, Xi_arr: np.ndarray) -> np.ndarray:
+            _ = t_arr
+            Xi_arr = np.asarray(Xi_arr, dtype=np.float32)
+            S = Xi_arr[:, 0:1]
+            V = Xi_arr[:, 2:3]
+            X_state = Xi_arr[:, 3:4]
+
+            z_s = -gamma * np.exp(S) * X_state * s1
+            z_h = np.zeros_like(z_s)
+            z_v = (2.0 * V + X_state) * s3
+            z_x = np.zeros_like(z_s)
+            return np.concatenate([z_s, z_h, z_v, z_x], axis=1).astype(np.float32)
+
+        return {
+            "name": "quadratic_coupled",
+            "u_exact": u_exact,
+            "z_exact": z_exact,
+        }
+
+    raise ValueError(
+        "Unknown exact_solution profile "
+        f"'{solution_name}'. Supported: none, quadratic_coupled"
+    )
+
+
+def compute_stitched_exact_bundle(
+    stitched: Dict[str, np.ndarray],
+    exact_solution: Dict[str, Any],
+    eps: float = 1.0e-8,
+) -> Dict[str, Any]:
+    t_all = stitched["t"]
+    X_all = stitched["X"]
+    Y_pred = stitched["Y"]
+    Z_pred = stitched["Z"]
+
+    M_paths = int(X_all.shape[0])
+    T_points = int(X_all.shape[1])
+    D = int(X_all.shape[2])
+
+    X_flat = X_all.reshape(-1, D)
+    t_flat = t_all.reshape(-1, 1)
+
+    Y_exact = exact_solution["u_exact"](t_flat, X_flat).reshape(M_paths, T_points, 1).astype(np.float32)
+    Z_exact = exact_solution["z_exact"](t_flat, X_flat).reshape(M_paths, T_points, D).astype(np.float32)
+
+    abs_err_Y = np.abs(Y_pred - Y_exact)
+    abs_err_Z = np.abs(Z_pred - Z_exact)
+    rel_err_Z = abs_err_Z / (np.abs(Z_exact) + float(eps))
+
+    y0_pred = Y_pred[:, 0, 0]
+    y0_exact = Y_exact[:, 0, 0]
+
+    mean_abs_err_Y_t = np.mean(abs_err_Y[:, :, 0], axis=0)
+    mean_abs_err_Z_t = np.mean(abs_err_Z, axis=0)
+    mean_rel_err_Z_t = np.mean(rel_err_Z, axis=0)
+
+    summary = {
+        "solution_name": exact_solution.get("name", "unknown"),
+        "n_paths": int(M_paths),
+        "n_time_points": int(T_points),
+        "mean_pred_y0": float(np.mean(y0_pred)),
+        "mean_exact_y0": float(np.mean(y0_exact)),
+        "abs_error_mean_y0": float(np.mean(np.abs(y0_pred - y0_exact))),
+        "rmse_y0": float(np.sqrt(np.mean((y0_pred - y0_exact) ** 2))),
+        "mean_abs_error_y": float(np.mean(abs_err_Y)),
+        "rmse_y": float(np.sqrt(np.mean((Y_pred - Y_exact) ** 2))),
+        "mean_abs_error_z": float(np.mean(abs_err_Z)),
+        "mean_rel_error_z": float(np.mean(rel_err_Z)),
+        "mean_abs_error_z_by_component": np.mean(abs_err_Z, axis=(0, 1)).astype(np.float32),
+        "mean_rel_error_z_by_component": np.mean(rel_err_Z, axis=(0, 1)).astype(np.float32),
+        "z_component_labels": _z_component_labels(D),
+    }
+
+    timeseries = {
+        "t": t_all[0, :, 0].astype(np.float32),
+        "mean_abs_error_y": mean_abs_err_Y_t.astype(np.float32),
+        "mean_abs_error_z": mean_abs_err_Z_t.astype(np.float32),
+        "mean_rel_error_z": mean_rel_err_Z_t.astype(np.float32),
+        "z_component_labels": _z_component_labels(D),
+    }
+
+    return {
+        "summary": summary,
+        "timeseries": timeseries,
+        "Y_exact": Y_exact,
+        "Z_exact": Z_exact,
+    }
+
+
+def save_exact_error_timeseries_csv(timeseries: Dict[str, np.ndarray], path: str) -> None:
+    t = np.asarray(timeseries["t"])
+    abs_y = np.asarray(timeseries["mean_abs_error_y"])
+    abs_z = np.asarray(timeseries["mean_abs_error_z"])
+    rel_z = np.asarray(timeseries["mean_rel_error_z"])
+    labels = timeseries.get("z_component_labels", _z_component_labels(abs_z.shape[1]))
+
+    rows = []
+    for i in range(int(t.shape[0])):
+        row = {
+            "t": float(t[i]),
+            "mean_abs_error_y": float(abs_y[i]),
+        }
+        for d, label in enumerate(labels):
+            row[f"mean_abs_error_{label}"] = float(abs_z[i, d])
+            row[f"mean_rel_error_{label}"] = float(rel_z[i, d])
+        rows.append(row)
+
+    save_rows_csv(rows, path)

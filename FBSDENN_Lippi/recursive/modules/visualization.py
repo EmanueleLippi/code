@@ -235,3 +235,124 @@ def plot_recursive_stitched_y_convergence(
     plt.savefig(os.path.join(out_dir, "recursive_stitched_Y_convergence.png"), dpi=160)
     plt.close()
 
+
+def plot_recursive_exact_comparison(
+    stitched: Dict[str, np.ndarray],
+    Y_exact: np.ndarray,
+    Z_exact: np.ndarray,
+    blocks: List[Dict[str, float]],
+    out_dir: str,
+    sample_paths: int = 5,
+    file_suffix: str = "",
+) -> None:
+    if not _PLOTTING_AVAILABLE:
+        print("[Plot] matplotlib non disponibile: skip plot_recursive_exact_comparison")
+        return
+    if stitched is None:
+        return
+    if "t" not in stitched or "Y" not in stitched or "Z" not in stitched:
+        return
+
+    t_all = stitched["t"]
+    Y_pred = stitched["Y"]
+    Z_pred = stitched["Z"]
+    if t_all.size == 0 or Y_pred.size == 0 or Z_pred.size == 0:
+        return
+    if Y_exact.shape != Y_pred.shape or Z_exact.shape != Z_pred.shape:
+        return
+
+    from utils import _z_component_labels
+
+    os.makedirs(out_dir, exist_ok=True)
+    n_paths = max(1, min(int(sample_paths), int(t_all.shape[0])))
+    z_labels = _z_component_labels(int(Z_pred.shape[2]))
+    z_colors = ["b", "g", "r", "m", "c", "y", "k"]
+
+    plt.figure(figsize=(12, 6))
+    for i in range(n_paths):
+        alpha = 0.95 if i == 0 else 0.28
+        width = 1.8 if i == 0 else 0.9
+        pred_label = "Y pred" if i == 0 else None
+        exact_label = "Y exact" if i == 0 else None
+        plt.plot(
+            t_all[i, :, 0],
+            Y_pred[i, :, 0],
+            color="tab:blue",
+            alpha=alpha,
+            linewidth=width,
+            label=pred_label,
+        )
+        plt.plot(
+            t_all[i, :, 0],
+            Y_exact[i, :, 0],
+            color="tab:red",
+            alpha=alpha,
+            linewidth=width,
+            linestyle="--",
+            label=exact_label,
+        )
+    for block in blocks[:-1]:
+        plt.axvline(float(block["t_end"]), color="k", linestyle="--", linewidth=0.8, alpha=0.25)
+    plt.title("Recursive stitched prediction - Y predicted vs exact")
+    plt.xlabel("Time")
+    plt.ylabel("Y")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, f"recursive_stitched_Y_exact{file_suffix}.png"), dpi=160)
+    plt.close()
+
+    rel_err_Z = np.abs((Z_pred - Z_exact) / (np.abs(Z_exact) + 1.0e-8))
+    mean_rel_err_Z = np.mean(rel_err_Z, axis=0)
+
+    plt.figure(figsize=(12, 6))
+    for d in range(Z_pred.shape[2]):
+        color = z_colors[d % len(z_colors)]
+        label = z_labels[d] if d < len(z_labels) else f"Z[{d}]"
+        curve = np.maximum(mean_rel_err_Z[:, d], 1.0e-14)
+        plt.plot(t_all[0, :, 0], curve, color=color, linewidth=1.5, label=f"Mean rel err {label}")
+    for block in blocks[:-1]:
+        plt.axvline(float(block["t_end"]), color="k", linestyle="--", linewidth=0.8, alpha=0.25)
+    plt.yscale("log")
+    plt.title("Recursive stitched prediction - Mean relative error on Z")
+    plt.xlabel("Time")
+    plt.ylabel("Relative error (log scale)")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, f"recursive_stitched_Z_rel_error{file_suffix}.png"), dpi=160)
+    plt.close()
+
+    abs_err_Z = np.mean(np.abs(Z_pred - Z_exact), axis=0)
+    abs_err_Y = np.mean(np.abs(Y_pred - Y_exact), axis=0)
+
+    plt.figure(figsize=(12, 6))
+    plt.plot(
+        t_all[0, :, 0],
+        np.maximum(abs_err_Y[:, 0], 1.0e-14),
+        color="tab:orange",
+        linewidth=1.8,
+        label="Mean abs err Y",
+    )
+    for d in range(Z_pred.shape[2]):
+        color = z_colors[d % len(z_colors)]
+        label = z_labels[d] if d < len(z_labels) else f"Z[{d}]"
+        plt.plot(
+            t_all[0, :, 0],
+            np.maximum(abs_err_Z[:, d], 1.0e-14),
+            color=color,
+            linewidth=1.4,
+            label=f"Mean abs err {label}",
+        )
+    for block in blocks[:-1]:
+        plt.axvline(float(block["t_end"]), color="k", linestyle="--", linewidth=0.8, alpha=0.25)
+    plt.yscale("log")
+    plt.title("Recursive stitched prediction - Mean absolute error on Y and Z")
+    plt.xlabel("Time")
+    plt.ylabel("Absolute error (log scale)")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, f"recursive_stitched_abs_error{file_suffix}.png"), dpi=160)
+    plt.close()
+
