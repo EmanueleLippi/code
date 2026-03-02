@@ -4,7 +4,7 @@ import argparse
 import json
 import csv
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
 
@@ -796,6 +796,270 @@ def predict_recursive_stitched(
         "Y": np.concatenate(Y_segments, axis=1),
         "Z": np.concatenate(Z_segments, axis=1),
     }
+
+
+def _z_component_labels(n_components: int) -> List[str]:
+    base = ["Z_S", "Z_H", "Z_V", "Z_X"]
+    labels = []
+    for i in range(int(n_components)):
+        labels.append(base[i] if i < len(base) else f"Z_{i}")
+    return labels
+
+
+def build_exact_solution_functions(
+    solution_name: str,
+    params: Dict[str, np.ndarray],
+    D: int,
+) -> Optional[Dict[str, Any]]:
+    name = str(solution_name or "none").strip().lower()
+    if name in ("", "none", "off", "false", "0"):
+        return None
+
+    if name in ("quadratic_coupled", "quadratic", "qc4d"):
+        if int(D) != 4:
+            raise ValueError(
+                f"exact_solution='quadratic_coupled' requires D=4, found D={int(D)}"
+            )
+
+        gamma = float(params["gamma"])
+        s1 = float(params["s1"])
+        s3 = float(params["s3"])
+
+        def u_exact(t_arr: np.ndarray, Xi_arr: np.ndarray) -> np.ndarray:
+            _ = t_arr
+            Xi_arr = np.asarray(Xi_arr, dtype=np.float32)
+            S = Xi_arr[:, 0:1]
+            V = Xi_arr[:, 2:3]
+            X_state = Xi_arr[:, 3:4]
+            return (-gamma * np.exp(S) * X_state + V ** 2 + V * X_state).astype(np.float32)
+
+        def z_exact(t_arr: np.ndarray, Xi_arr: np.ndarray) -> np.ndarray:
+            _ = t_arr
+            Xi_arr = np.asarray(Xi_arr, dtype=np.float32)
+            S = Xi_arr[:, 0:1]
+            V = Xi_arr[:, 2:3]
+            X_state = Xi_arr[:, 3:4]
+
+            z_s = -gamma * np.exp(S) * X_state * s1
+            z_h = np.zeros_like(z_s)
+            z_v = (2.0 * V + X_state) * s3
+            z_x = np.zeros_like(z_s)
+            return np.concatenate([z_s, z_h, z_v, z_x], axis=1).astype(np.float32)
+
+        return {
+            "name": "quadratic_coupled",
+            "u_exact": u_exact,
+            "z_exact": z_exact,
+        }
+
+    raise ValueError(
+        "Unknown exact_solution profile "
+        f"'{solution_name}'. Supported: none, quadratic_coupled"
+    )
+
+
+def compute_stitched_exact_bundle(
+    stitched: Dict[str, np.ndarray],
+    exact_solution: Dict[str, Any],
+    eps: float = 1.0e-8,
+) -> Dict[str, Any]:
+    t_all = stitched["t"]
+    X_all = stitched["X"]
+    Y_pred = stitched["Y"]
+    Z_pred = stitched["Z"]
+
+    M_paths = int(X_all.shape[0])
+    T_points = int(X_all.shape[1])
+    D = int(X_all.shape[2])
+
+    X_flat = X_all.reshape(-1, D)
+    t_flat = t_all.reshape(-1, 1)
+
+    Y_exact = exact_solution["u_exact"](t_flat, X_flat).reshape(M_paths, T_points, 1).astype(np.float32)
+    Z_exact = exact_solution["z_exact"](t_flat, X_flat).reshape(M_paths, T_points, D).astype(np.float32)
+
+    abs_err_Y = np.abs(Y_pred - Y_exact)
+    abs_err_Z = np.abs(Z_pred - Z_exact)
+    rel_err_Z = abs_err_Z / (np.abs(Z_exact) + float(eps))
+
+    y0_pred = Y_pred[:, 0, 0]
+    y0_exact = Y_exact[:, 0, 0]
+
+    mean_abs_err_Y_t = np.mean(abs_err_Y[:, :, 0], axis=0)
+    mean_abs_err_Z_t = np.mean(abs_err_Z, axis=0)
+    mean_rel_err_Z_t = np.mean(rel_err_Z, axis=0)
+
+    summary = {
+        "solution_name": exact_solution.get("name", "unknown"),
+        "n_paths": int(M_paths),
+        "n_time_points": int(T_points),
+        "mean_pred_y0": float(np.mean(y0_pred)),
+        "mean_exact_y0": float(np.mean(y0_exact)),
+        "abs_error_mean_y0": float(np.mean(np.abs(y0_pred - y0_exact))),
+        "rmse_y0": float(np.sqrt(np.mean((y0_pred - y0_exact) ** 2))),
+        "mean_abs_error_y": float(np.mean(abs_err_Y)),
+        "rmse_y": float(np.sqrt(np.mean((Y_pred - Y_exact) ** 2))),
+        "mean_abs_error_z": float(np.mean(abs_err_Z)),
+        "mean_rel_error_z": float(np.mean(rel_err_Z)),
+        "mean_abs_error_z_by_component": np.mean(abs_err_Z, axis=(0, 1)).astype(np.float32),
+        "mean_rel_error_z_by_component": np.mean(rel_err_Z, axis=(0, 1)).astype(np.float32),
+        "z_component_labels": _z_component_labels(D),
+    }
+
+    timeseries = {
+        "t": t_all[0, :, 0].astype(np.float32),
+        "mean_abs_error_y": mean_abs_err_Y_t.astype(np.float32),
+        "mean_abs_error_z": mean_abs_err_Z_t.astype(np.float32),
+        "mean_rel_error_z": mean_rel_err_Z_t.astype(np.float32),
+        "z_component_labels": _z_component_labels(D),
+    }
+
+    return {
+        "summary": summary,
+        "timeseries": timeseries,
+        "Y_exact": Y_exact,
+        "Z_exact": Z_exact,
+    }
+
+
+def save_exact_error_timeseries_csv(timeseries: Dict[str, np.ndarray], path: str) -> None:
+    t = np.asarray(timeseries["t"])
+    abs_y = np.asarray(timeseries["mean_abs_error_y"])
+    abs_z = np.asarray(timeseries["mean_abs_error_z"])
+    rel_z = np.asarray(timeseries["mean_rel_error_z"])
+    labels = timeseries.get("z_component_labels", _z_component_labels(abs_z.shape[1]))
+
+    rows = []
+    for i in range(int(t.shape[0])):
+        row = {
+            "t": float(t[i]),
+            "mean_abs_error_y": float(abs_y[i]),
+        }
+        for d, label in enumerate(labels):
+            row[f"mean_abs_error_{label}"] = float(abs_z[i, d])
+            row[f"mean_rel_error_{label}"] = float(rel_z[i, d])
+        rows.append(row)
+
+    save_rows_csv(rows, path)
+
+
+def plot_recursive_exact_comparison(
+    stitched: Dict[str, np.ndarray],
+    Y_exact: np.ndarray,
+    Z_exact: np.ndarray,
+    blocks: List[Dict[str, float]],
+    out_dir: str,
+    sample_paths: int = 5,
+    file_suffix: str = "",
+) -> None:
+    if not _PLOTTING_AVAILABLE:
+        print("[Plot] matplotlib non disponibile: skip plot_recursive_exact_comparison")
+        return
+    if stitched is None:
+        return
+    if "t" not in stitched or "Y" not in stitched or "Z" not in stitched:
+        return
+
+    t_all = stitched["t"]
+    Y_pred = stitched["Y"]
+    Z_pred = stitched["Z"]
+    if t_all.size == 0 or Y_pred.size == 0 or Z_pred.size == 0:
+        return
+    if Y_exact.shape != Y_pred.shape or Z_exact.shape != Z_pred.shape:
+        return
+
+    os.makedirs(out_dir, exist_ok=True)
+    n_paths = max(1, min(int(sample_paths), int(t_all.shape[0])))
+    z_labels = _z_component_labels(int(Z_pred.shape[2]))
+    z_colors = ["b", "g", "r", "m", "c", "y", "k"]
+
+    plt.figure(figsize=(12, 6))
+    for i in range(n_paths):
+        alpha = 0.95 if i == 0 else 0.28
+        width = 1.8 if i == 0 else 0.9
+        pred_label = "Y pred" if i == 0 else None
+        exact_label = "Y exact" if i == 0 else None
+        plt.plot(
+            t_all[i, :, 0],
+            Y_pred[i, :, 0],
+            color="tab:blue",
+            alpha=alpha,
+            linewidth=width,
+            label=pred_label,
+        )
+        plt.plot(
+            t_all[i, :, 0],
+            Y_exact[i, :, 0],
+            color="tab:red",
+            alpha=alpha,
+            linewidth=width,
+            linestyle="--",
+            label=exact_label,
+        )
+    for block in blocks[:-1]:
+        plt.axvline(float(block["t_end"]), color="k", linestyle="--", linewidth=0.8, alpha=0.25)
+    plt.title("Recursive stitched prediction - Y predicted vs exact")
+    plt.xlabel("Time")
+    plt.ylabel("Y")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, f"recursive_stitched_Y_exact{file_suffix}.png"), dpi=160)
+    plt.close()
+
+    rel_err_Z = np.abs((Z_pred - Z_exact) / (np.abs(Z_exact) + 1.0e-8))
+    mean_rel_err_Z = np.mean(rel_err_Z, axis=0)
+
+    plt.figure(figsize=(12, 6))
+    for d in range(Z_pred.shape[2]):
+        color = z_colors[d % len(z_colors)]
+        label = z_labels[d] if d < len(z_labels) else f"Z[{d}]"
+        curve = np.maximum(mean_rel_err_Z[:, d], 1.0e-14)
+        plt.plot(t_all[0, :, 0], curve, color=color, linewidth=1.5, label=f"Mean rel err {label}")
+    for block in blocks[:-1]:
+        plt.axvline(float(block["t_end"]), color="k", linestyle="--", linewidth=0.8, alpha=0.25)
+    plt.yscale("log")
+    plt.title("Recursive stitched prediction - Mean relative error on Z")
+    plt.xlabel("Time")
+    plt.ylabel("Relative error (log scale)")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, f"recursive_stitched_Z_rel_error{file_suffix}.png"), dpi=160)
+    plt.close()
+
+    abs_err_Z = np.mean(np.abs(Z_pred - Z_exact), axis=0)
+    abs_err_Y = np.mean(np.abs(Y_pred - Y_exact), axis=0)
+
+    plt.figure(figsize=(12, 6))
+    plt.plot(
+        t_all[0, :, 0],
+        np.maximum(abs_err_Y[:, 0], 1.0e-14),
+        color="tab:orange",
+        linewidth=1.8,
+        label="Mean abs err Y",
+    )
+    for d in range(Z_pred.shape[2]):
+        color = z_colors[d % len(z_colors)]
+        label = z_labels[d] if d < len(z_labels) else f"Z[{d}]"
+        plt.plot(
+            t_all[0, :, 0],
+            np.maximum(abs_err_Z[:, d], 1.0e-14),
+            color=color,
+            linewidth=1.4,
+            label=f"Mean abs err {label}",
+        )
+    for block in blocks[:-1]:
+        plt.axvline(float(block["t_end"]), color="k", linestyle="--", linewidth=0.8, alpha=0.25)
+    plt.yscale("log")
+    plt.title("Recursive stitched prediction - Mean absolute error on Y and Z")
+    plt.xlabel("Time")
+    plt.ylabel("Absolute error (log scale)")
+    plt.grid(True, alpha=0.3)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, f"recursive_stitched_abs_error{file_suffix}.png"), dpi=160)
+    plt.close()
 
 
 def plot_recursive_stitched_predictions(
@@ -2018,6 +2282,15 @@ def main():
             "(quando disponibile). Le passate successive usano warm-start dal pass precedente."
         ),
     )
+    parser.add_argument(
+        "--exact_solution",
+        type=str,
+        default="none",
+        help=(
+            "Profilo opzionale per confronto con soluzione esatta. "
+            "Valori supportati: none, quadratic_coupled"
+        ),
+    )
     args = parser.parse_args()
 
     np.random.seed(1234)
@@ -2054,6 +2327,16 @@ def main():
             f"[TrainingPlan] loaded {len(training_plan_rules)} rules from {args.training_plan_csv}"
         )
 
+    exact_solution = build_exact_solution_functions(
+        solution_name=args.exact_solution,
+        params=params,
+        D=D,
+    )
+    if exact_solution is None:
+        print("[ExactSolution] disabled")
+    else:
+        print(f"[ExactSolution] enabled profile='{exact_solution['name']}'")
+
     run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
     run_root = os.path.join(args.output_dir, f"run_{run_id}")
     os.makedirs(run_root, exist_ok=True)
@@ -2078,6 +2361,7 @@ def main():
         "training_plan_rules_count": len(training_plan_rules),
         "training_plan_rules": training_plan_rules,
         "pass1_warm_start_from_next": bool(args.pass1_warm_start_from_next),
+        "exact_solution": "none" if exact_solution is None else exact_solution["name"],
         "params": params,
         "plotting_available": _PLOTTING_AVAILABLE,
     }
@@ -2120,6 +2404,53 @@ def main():
             "checkpoint_path": std_ckpt_path,
             "weights_npz_path": std_blob_path,
         }
+        if exact_solution is not None:
+            t_test, W_test, Xi_test = model_std.fetch_minibatch()
+            X_pred, Y_pred, Z_pred = model_std.predict(Xi_test, t_test, W_test, const_value=1.0)
+            stitched_std = {
+                "t": t_test.astype(np.float32),
+                "X": X_pred.astype(np.float32),
+                "Y": Y_pred.astype(np.float32),
+                "Z": Z_pred.astype(np.float32),
+            }
+            exact_std = compute_stitched_exact_bundle(
+                stitched=stitched_std,
+                exact_solution=exact_solution,
+            )
+            print(
+                "[Exact][Standard] "
+                f"mean_pred_Y0={exact_std['summary']['mean_pred_y0']:.6f}, "
+                f"mean_exact_Y0={exact_std['summary']['mean_exact_y0']:.6f}, "
+                f"abs_err_Y0={exact_std['summary']['abs_error_mean_y0']:.6e}"
+            )
+
+            save_json(
+                {
+                    "summary": exact_std["summary"],
+                    "timeseries": exact_std["timeseries"],
+                },
+                os.path.join(std_dir, "exact_metrics.json"),
+            )
+            save_exact_error_timeseries_csv(
+                exact_std["timeseries"],
+                os.path.join(std_dir, "exact_errors.csv"),
+            )
+            plot_recursive_exact_comparison(
+                stitched=stitched_std,
+                Y_exact=exact_std["Y_exact"],
+                Z_exact=exact_std["Z_exact"],
+                blocks=[{"t_start": 0.0, "t_end": float(args.T_standard), "T_block": float(args.T_standard)}],
+                out_dir=os.path.join(std_dir, "plots"),
+                sample_paths=8,
+                file_suffix="",
+            )
+            std_summary["exact_solution"] = {
+                "enabled": True,
+                "profile": exact_solution["name"],
+                "summary": exact_std["summary"],
+            }
+        else:
+            std_summary["exact_solution"] = {"enabled": False, "profile": "none"}
         save_json(std_summary, os.path.join(std_dir, "results.json"))
 
         print(f"[STANDARD] final eval: {logs_std['eval_stats']}")
@@ -2208,6 +2539,8 @@ def main():
             seed=1234,
         )
         stitched_by_pass = {}
+        exact_summary_by_pass = {}
+        selected_exact_bundle = None
         for p in pass_entries:
             pass_id = int(p["pass_id"])
             stitched_pred = predict_recursive_stitched(
@@ -2238,6 +2571,46 @@ def main():
                 file_suffix=f"_pass{pass_id:02d}",
             )
 
+            if exact_solution is not None:
+                exact_bundle = compute_stitched_exact_bundle(
+                    stitched=stitched_pred,
+                    exact_solution=exact_solution,
+                )
+                exact_summary = exact_bundle["summary"]
+                exact_summary_by_pass[pass_id] = exact_summary
+                print(
+                    f"[Exact] pass{pass_id} "
+                    f"mean_pred_Y0={exact_summary['mean_pred_y0']:.6f}, "
+                    f"mean_exact_Y0={exact_summary['mean_exact_y0']:.6f}, "
+                    f"abs_err_Y0={exact_summary['abs_error_mean_y0']:.6e}, "
+                    f"mean_abs_err_Y={exact_summary['mean_abs_error_y']:.6e}, "
+                    f"mean_abs_err_Z={exact_summary['mean_abs_error_z']:.6e}"
+                )
+
+                save_json(
+                    {
+                        "summary": exact_summary,
+                        "timeseries": exact_bundle["timeseries"],
+                    },
+                    os.path.join(rec_dir, f"exact_metrics_pass{pass_id:02d}.json"),
+                )
+                save_exact_error_timeseries_csv(
+                    exact_bundle["timeseries"],
+                    os.path.join(rec_dir, f"exact_errors_pass{pass_id:02d}.csv"),
+                )
+                plot_recursive_exact_comparison(
+                    stitched=stitched_pred,
+                    Y_exact=exact_bundle["Y_exact"],
+                    Z_exact=exact_bundle["Z_exact"],
+                    blocks=rec["blocks"],
+                    out_dir=os.path.join(rec_dir, "plots"),
+                    sample_paths=8,
+                    file_suffix=f"_pass{pass_id:02d}",
+                )
+
+                if pass_id == best_pass_id:
+                    selected_exact_bundle = exact_bundle
+
         selected_stitched = stitched_by_pass[best_pass_id]
         np.savez(
             os.path.join(rec_dir, "stitched_predictions_final.npz"),
@@ -2253,6 +2626,28 @@ def main():
             sample_paths=8,
             file_suffix="",
         )
+
+        if exact_solution is not None and selected_exact_bundle is not None:
+            save_json(
+                {
+                    "summary": selected_exact_bundle["summary"],
+                    "timeseries": selected_exact_bundle["timeseries"],
+                },
+                os.path.join(rec_dir, "exact_metrics_final.json"),
+            )
+            save_exact_error_timeseries_csv(
+                selected_exact_bundle["timeseries"],
+                os.path.join(rec_dir, "exact_errors_final.csv"),
+            )
+            plot_recursive_exact_comparison(
+                stitched=selected_stitched,
+                Y_exact=selected_exact_bundle["Y_exact"],
+                Z_exact=selected_exact_bundle["Z_exact"],
+                blocks=rec["blocks"],
+                out_dir=os.path.join(rec_dir, "plots"),
+                sample_paths=8,
+                file_suffix="",
+            )
 
         plot_recursive_stitched_y_convergence(
             stitched_by_pass=stitched_by_pass,
@@ -2297,6 +2692,15 @@ def main():
             "selected_score": float(pass_scores[best_pass_id]),
             "pass_scores": {str(k): float(v) for k, v in pass_scores.items()},
         }
+        if exact_solution is None:
+            rec_summary["exact_solution"] = {"enabled": False, "profile": "none"}
+        else:
+            rec_summary["exact_solution"] = {
+                "enabled": True,
+                "profile": exact_solution["name"],
+                "by_pass": {str(k): v for k, v in exact_summary_by_pass.items()},
+                "selected_pass_summary": exact_summary_by_pass.get(int(best_pass_id), None),
+            }
         if 1 in pass_summary_by_id:
             rec_summary["pass1"] = {
                 "reference_loss": pass_summary_by_id[1]["reference_loss"],
