@@ -2489,6 +2489,7 @@ def run_recursive_training(
     save_tf_checkpoints=True,
     training_plan_rules: Optional[List[Dict]] = None,
     pass1_warm_start_from_next=False,
+    cross_pass_warm_start: bool = True,
     n_passes: int = 2,
     resume_models_dir: str = "",
     resume_from_pass: int = 0,
@@ -2714,7 +2715,7 @@ def run_recursive_training(
                 make_empirical_generator(prev_boundary_samples[b], jitter_scale=empirical_jitter_scale)
                 for b in range(len(blocks))
             ]
-            warm_start = prev_blobs
+            warm_start = prev_blobs if bool(cross_pass_warm_start) else None
             warm_from_next = False
 
         blobs_i, logs_i, ref_loss_i, pass_dir_i = _run_pass(
@@ -2845,7 +2846,16 @@ def main():
         action="store_true",
         help=(
             "Se attivo, in pass1 il blocco i viene inizializzato coi pesi del blocco i+1 "
-            "(quando disponibile). Le passate successive usano warm-start dal pass precedente."
+            "(quando disponibile). Le passate successive possono usare warm-start dal pass "
+            "precedente (default attivo, disattivabile con --disable_cross_pass_warm_start)."
+        ),
+    )
+    parser.add_argument(
+        "--disable_cross_pass_warm_start",
+        action="store_true",
+        help=(
+            "Se attivo, disabilita il warm-start dalle passate precedenti "
+            "(warm_start=prev_blobs) per pass>=2."
         ),
     )
     parser.add_argument(
@@ -3016,6 +3026,7 @@ def main():
         "training_plan_inherited_run_config": training_plan_inherited_run_config,
         "training_plan_inherited_csv": training_plan_inherited_csv,
         "pass1_warm_start_from_next": bool(args.pass1_warm_start_from_next),
+        "cross_pass_warm_start": not bool(args.disable_cross_pass_warm_start),
         "selection_metric": str(args.selection_metric),
         "exact_regression_tolerance": float(args.exact_regression_tolerance),
         "exact_regression_action": str(args.exact_regression_action),
@@ -3182,6 +3193,7 @@ def main():
             save_tf_checkpoints=True,
             training_plan_rules=training_plan_rules,
             pass1_warm_start_from_next=bool(args.pass1_warm_start_from_next),
+            cross_pass_warm_start=not bool(args.disable_cross_pass_warm_start),
             n_passes=int(args.passes),
             resume_models_dir=resume_models_dir_resolved,
             resume_from_pass=int(args.resume_from_pass),
