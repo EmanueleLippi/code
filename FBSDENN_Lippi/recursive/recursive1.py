@@ -615,6 +615,19 @@ def plot_stage_logs(stage_logs: List[Dict], out_prefix: str, title: str) -> None
     plt.close()
 
 
+def _pass_index(pass_id: int) -> int:
+    pid = int(pass_id)
+    return pid - 1 if pid >= 1 else pid
+
+
+def _pass_label(pass_id: int) -> str:
+    return f"pass{_pass_index(pass_id)}"
+
+
+def _pass_tag(pass_id: int, width: int = 2) -> str:
+    return f"pass{_pass_index(pass_id):0{int(width)}d}"
+
+
 def plot_recursive_pass_logs_multi(pass_logs_by_pass: Dict[int, List[Dict]], out_dir: str) -> None:
     if not _PLOTTING_AVAILABLE:
         print("[Plot] matplotlib non disponibile: skip plot_recursive_pass_logs_multi")
@@ -643,7 +656,14 @@ def plot_recursive_pass_logs_multi(pass_logs_by_pass: Dict[int, List[Dict]], out
         rows = normalized[pass_id]
         b = np.array([r["block"] for r in rows], dtype=np.int32)
         l = np.array([r[loss_key] for r in rows], dtype=np.float64)
-        plt.plot(b, l, marker="o", linewidth=1.5, color=colors[i], label=f"pass{pass_id} loss")
+        plt.plot(
+            b,
+            l,
+            marker="o",
+            linewidth=1.5,
+            color=colors[i],
+            label=f"{_pass_label(pass_id)} loss",
+        )
     plt.yscale("log")
     if use_per_sample_loss:
         plt.title("Recursive blocks - Eval Mean Loss per Sample")
@@ -663,7 +683,14 @@ def plot_recursive_pass_logs_multi(pass_logs_by_pass: Dict[int, List[Dict]], out
         rows = normalized[pass_id]
         b = np.array([r["block"] for r in rows], dtype=np.int32)
         y = np.array([r["eval_mean_y0"] for r in rows], dtype=np.float64)
-        plt.plot(b, y, marker="o", linewidth=1.5, color=colors[i], label=f"pass{pass_id} y0")
+        plt.plot(
+            b,
+            y,
+            marker="o",
+            linewidth=1.5,
+            color=colors[i],
+            label=f"{_pass_label(pass_id)} y0",
+        )
     plt.title("Recursive blocks - Eval Mean Y0")
     plt.xlabel("Block index")
     plt.ylabel("Mean Y0")
@@ -725,6 +752,430 @@ def build_stitched_rollout_inputs(
         W = np.cumsum(DW, axis=1)
         rollout_inputs.append((t_abs.astype(np.float32), W.astype(np.float32)))
     return rollout_inputs
+
+def print_recursive_pass(
+    pass_entries: List[Dict[str, Any]],
+    blocks: List[Dict[str, float]],
+    rec_dir: str,
+    params: Dict[str, np.ndarray],
+    N_per_block: int,
+    D: int,
+    layers: List[int],
+    T_total: float,
+    exact_solution: Optional[Dict[str, Any]],
+    selection_metric: str = "auto",
+    exact_regression_tolerance: float = 0.20,
+    exact_regression_action: str = "warn",
+    eval_bundle_path: str = "",
+    eval_seed: int = 1234,
+    eval_min_paths: int = 64,
+    sample_paths: int = 8,
+    enforce_exact_regression_guardrail: bool = True,
+    print_compact_logs: bool = True,
+) -> Dict[str, Any]:
+    if pass_entries is None or len(pass_entries) == 0:
+        raise RuntimeError("print_recursive_pass called with empty pass_entries")
+
+    pass_entries = sorted(pass_entries, key=lambda x: int(x["pass_id"]))
+    os.makedirs(rec_dir, exist_ok=True)
+    plots_dir = os.path.join(rec_dir, "plots")
+    os.makedirs(plots_dir, exist_ok=True)
+
+    pass_logs_by_pass = {}
+    for p in pass_entries:
+        pass_id = int(p["pass_id"])
+        pass_idx = _pass_index(pass_id)
+        logs = p.get("logs", [])
+        pass_logs_by_pass[pass_id] = logs
+
+        if print_compact_logs:
+            print(f"\n=== Recursive Log {_pass_label(pass_id)} (compact) ===")
+            for row in logs:
+                norm_msg = ""
+                if "eval_mean_loss_per_sample" in row:
+                    norm_msg = f", eval_loss/M={row['eval_mean_loss_per_sample']:.3e}"
+                print(
+                    f"block={row['block']}, t=[{row['t_start']:.1f},{row['t_end']:.1f}], "
+                    f"eval_loss={row['eval_mean_loss']:.3e}{norm_msg}, eval_y0={row['eval_mean_y0']:.3f}, "
+                    f"target={row['precision_target']}, refine={row['refine_rounds']}"
+                )
+
+        save_rows_csv(logs, os.path.join(rec_dir, f"pass_{pass_idx:02d}_logs.csv"))
+        if pass_idx == 0:
+            save_rows_csv(logs, os.path.join(rec_dir, "pass0_logs.csv"))
+        if pass_idx == 1:
+            save_rows_csv(logs, os.path.join(rec_dir, "pass1_logs.csv"))
+
+    plot_recursive_pass_logs_multi(pass_logs_by_pass, plots_dir)
+
+    score_key = "eval_mean_loss_per_sample"
+    all_rows = [row for rows in pass_logs_by_pass.values() for row in rows]
+    if not all(score_key in row for row in all_rows):
+        score_key = "eval_mean_loss"
+    pass_scores_loss = {
+        int(pass_id): score_pass_logs(rows, loss_key=score_key)
+        for pass_id, rows in pass_logs_by_pass.items()
+        if len(rows) > 0
+    }
+    if len(pass_scores_loss) == 0:
+        raise RuntimeError("No pass logs available for pass selection")
+    best_pass_by_loss = int(min(pass_scores_loss, key=pass_scores_loss.get))
+    print(
+        f"[Selection:loss] metric={score_key}, best={_pass_label(best_pass_by_loss)}, "
+        f"score={pass_scores_loss[best_pass_by_loss]:.6e}"
+    )
+
+    eval_bundle_path = str(eval_bundle_path or "").strip()
+    if eval_bundle_path == "":
+        eval_bundle_path = os.path.join(rec_dir, "evaluation_bundle.npz")
+    eval_bundle_path = os.path.abspath(os.path.expanduser(eval_bundle_path))
+
+    if os.path.isfile(eval_bundle_path):
+        Xi_stitched, rollout_inputs = load_evaluation_bundle(
+            path=eval_bundle_path,
+            n_blocks_expected=len(blocks),
+            N_per_block_expected=N_per_block,
+            D_expected=D,
+        )
+        print(
+            f"[EvalBundle] loaded path={eval_bundle_path}, M={Xi_stitched.shape[0]}, "
+            f"blocks={len(rollout_inputs)}"
+        )
+    else:
+        Xi_stitched = make_deterministic_xi_default(
+            max(1, int(eval_min_paths)),
+            D,
+            seed=int(eval_seed),
+        )
+        rollout_inputs = build_stitched_rollout_inputs(
+            blocks=blocks,
+            M=Xi_stitched.shape[0],
+            N_per_block=N_per_block,
+            D=D,
+            seed=int(eval_seed),
+        )
+        save_evaluation_bundle(
+            path=eval_bundle_path,
+            Xi_initial=Xi_stitched,
+            rollout_inputs=rollout_inputs,
+            blocks=blocks,
+        )
+        print(
+            f"[EvalBundle] created path={eval_bundle_path}, M={Xi_stitched.shape[0]}, "
+            f"seed={int(eval_seed)}"
+        )
+
+    stitched_by_pass = {}
+    exact_summary_by_pass = {}
+    exact_bundle_by_pass = {}
+    for p in pass_entries:
+        pass_id = int(p["pass_id"])
+        pass_tag = _pass_tag(pass_id)
+        stitched_pred = predict_recursive_stitched(
+            block_blobs=p["blobs"],
+            blocks=blocks,
+            Xi_initial=Xi_stitched,
+            params=params,
+            N_per_block=N_per_block,
+            D=D,
+            layers=layers,
+            T_total=T_total,
+            rollout_inputs=rollout_inputs,
+        )
+        stitched_by_pass[pass_id] = stitched_pred
+
+        np.savez(
+            os.path.join(rec_dir, f"stitched_predictions_{pass_tag}.npz"),
+            t=stitched_pred["t"],
+            X=stitched_pred["X"],
+            Y=stitched_pred["Y"],
+            Z=stitched_pred["Z"],
+        )
+        plot_recursive_stitched_predictions(
+            stitched=stitched_pred,
+            blocks=blocks,
+            out_dir=plots_dir,
+            sample_paths=sample_paths,
+            file_suffix=f"_{pass_tag}",
+        )
+
+        if exact_solution is not None:
+            exact_bundle = compute_stitched_exact_bundle(
+                stitched=stitched_pred,
+                exact_solution=exact_solution,
+            )
+            exact_summary = exact_bundle["summary"]
+            exact_summary_by_pass[pass_id] = exact_summary
+            exact_bundle_by_pass[pass_id] = exact_bundle
+            print(
+                f"[Exact] {_pass_label(pass_id)} "
+                f"mean_pred_Y0={exact_summary['mean_pred_y0']:.6f}, "
+                f"mean_exact_Y0={exact_summary['mean_exact_y0']:.6f}, "
+                f"abs_err_Y0={exact_summary['abs_error_mean_y0']:.6e}, "
+                f"mean_abs_err_Y={exact_summary['mean_abs_error_y']:.6e}, "
+                f"mean_abs_err_Z={exact_summary['mean_abs_error_z']:.6e}"
+            )
+
+            save_json(
+                {
+                    "summary": exact_summary,
+                    "timeseries": exact_bundle["timeseries"],
+                },
+                os.path.join(rec_dir, f"exact_metrics_{pass_tag}.json"),
+            )
+            save_exact_error_timeseries_csv(
+                exact_bundle["timeseries"],
+                os.path.join(rec_dir, f"exact_errors_{pass_tag}.csv"),
+            )
+            plot_recursive_exact_comparison(
+                stitched=stitched_pred,
+                Y_exact=exact_bundle["Y_exact"],
+                Z_exact=exact_bundle["Z_exact"],
+                blocks=blocks,
+                out_dir=plots_dir,
+                sample_paths=sample_paths,
+                file_suffix=f"_{pass_tag}",
+            )
+
+    if (
+        enforce_exact_regression_guardrail
+        and exact_solution is not None
+        and len(exact_summary_by_pass) >= 2
+        and str(exact_regression_action) != "ignore"
+    ):
+        tol = float(exact_regression_tolerance)
+        if tol > 0.0:
+            sorted_pass_ids = sorted(exact_summary_by_pass.keys())
+            prev_id = sorted_pass_ids[0]
+            prev_val = float(exact_summary_by_pass[prev_id]["mean_abs_error_y"])
+            for pass_id in sorted_pass_ids[1:]:
+                curr_val = float(exact_summary_by_pass[pass_id]["mean_abs_error_y"])
+                if prev_val > 0.0 and curr_val > prev_val * (1.0 + tol):
+                    msg = (
+                        "[ExactGuardrail] Regression detected on mean_abs_error_y: "
+                        f"{_pass_label(prev_id)}={prev_val:.6e} -> {_pass_label(pass_id)}={curr_val:.6e} "
+                        f"(+{(curr_val / prev_val - 1.0) * 100.0:.2f}%, tol={tol * 100.0:.2f}%)"
+                    )
+                    if str(exact_regression_action) == "error":
+                        raise RuntimeError(msg)
+                    print(msg)
+                prev_id = pass_id
+                prev_val = curr_val
+
+    selected_pass_id, selected_score_metric, selected_score, selected_score_by_pass = resolve_pass_selection(
+        pass_scores_by_loss=pass_scores_loss,
+        exact_summary_by_pass=exact_summary_by_pass,
+        selection_metric=str(selection_metric),
+        loss_metric_label=score_key,
+    )
+    print(
+        f"[Selection:final] metric={selected_score_metric}, best={_pass_label(selected_pass_id)}, "
+        f"score={selected_score:.6e}"
+    )
+
+    selected_stitched = stitched_by_pass[selected_pass_id]
+    selected_exact_bundle = exact_bundle_by_pass.get(selected_pass_id, None)
+    np.savez(
+        os.path.join(rec_dir, "stitched_predictions_final.npz"),
+        t=selected_stitched["t"],
+        X=selected_stitched["X"],
+        Y=selected_stitched["Y"],
+        Z=selected_stitched["Z"],
+    )
+    plot_recursive_stitched_predictions(
+        stitched=selected_stitched,
+        blocks=blocks,
+        out_dir=plots_dir,
+        sample_paths=sample_paths,
+        file_suffix="",
+    )
+
+    if exact_solution is not None and selected_exact_bundle is not None:
+        save_json(
+            {
+                "summary": selected_exact_bundle["summary"],
+                "timeseries": selected_exact_bundle["timeseries"],
+            },
+            os.path.join(rec_dir, "exact_metrics_final.json"),
+        )
+        save_exact_error_timeseries_csv(
+            selected_exact_bundle["timeseries"],
+            os.path.join(rec_dir, "exact_errors_final.csv"),
+        )
+        plot_recursive_exact_comparison(
+            stitched=selected_stitched,
+            Y_exact=selected_exact_bundle["Y_exact"],
+            Z_exact=selected_exact_bundle["Z_exact"],
+            blocks=blocks,
+            out_dir=plots_dir,
+            sample_paths=sample_paths,
+            file_suffix="",
+        )
+
+    plot_recursive_stitched_y_convergence(
+        stitched_by_pass=stitched_by_pass,
+        blocks=blocks,
+        out_dir=plots_dir,
+        sample_paths=sample_paths,
+    )
+
+    return {
+        "processed_pass_ids": sorted(pass_logs_by_pass.keys()),
+        "processed_pass_indices": sorted(_pass_index(pid) for pid in pass_logs_by_pass.keys()),
+        "score_key": score_key,
+        "pass_scores_loss": pass_scores_loss,
+        "pass_scores_loss_by_index": {
+            str(_pass_index(k)): float(v) for k, v in pass_scores_loss.items()
+        },
+        "selected_pass_id": int(selected_pass_id),
+        "selected_pass_index": int(_pass_index(selected_pass_id)),
+        "selected_score_metric": selected_score_metric,
+        "selected_score": float(selected_score),
+        "selected_scores_by_pass": selected_score_by_pass,
+        "selected_scores_by_pass_index": {
+            str(_pass_index(int(k))): float(v)
+            for k, v in selected_score_by_pass.items()
+        },
+        "exact_summary_by_pass": exact_summary_by_pass,
+        "exact_summary_by_pass_index": {
+            str(_pass_index(k)): v for k, v in exact_summary_by_pass.items()
+        },
+        "eval_bundle_path": eval_bundle_path,
+        "evaluation_bundle_M": int(Xi_stitched.shape[0]),
+    }
+
+
+def make_deterministic_xi_default(M: int, D: int, seed: int = 1234) -> np.ndarray:
+    if int(D) != 4:
+        raise ValueError(f"make_deterministic_xi_default currently supports D=4, got D={int(D)}")
+    rng = np.random.RandomState(int(seed))
+    Xi = np.zeros((int(M), int(D)), dtype=np.float32)
+    Xi[:, 0] = rng.normal(1.0, 1.0, int(M))
+    Xi[:, 1] = rng.normal(1.0, 1.0, int(M))
+    Xi[:, 2] = rng.normal(0.0, 1.0, int(M))
+    Xi[:, 3] = rng.uniform(1.0, 9.0, int(M))
+    return Xi.astype(np.float32)
+
+
+def save_evaluation_bundle(
+    path: str,
+    Xi_initial: np.ndarray,
+    rollout_inputs: List[Tuple[np.ndarray, np.ndarray]],
+    blocks: List[Dict[str, float]],
+) -> None:
+    dir_name = os.path.dirname(path)
+    if dir_name != "":
+        os.makedirs(dir_name, exist_ok=True)
+    t_stack = np.stack([pair[0] for pair in rollout_inputs], axis=0).astype(np.float32)
+    w_stack = np.stack([pair[1] for pair in rollout_inputs], axis=0).astype(np.float32)
+    t_start = np.array([float(b["t_start"]) for b in blocks], dtype=np.float32)
+    t_end = np.array([float(b["t_end"]) for b in blocks], dtype=np.float32)
+    np.savez(
+        path,
+        Xi_initial=np.asarray(Xi_initial, dtype=np.float32),
+        t_bundle=t_stack,
+        W_bundle=w_stack,
+        block_t_start=t_start,
+        block_t_end=t_end,
+    )
+
+
+def load_evaluation_bundle(
+    path: str,
+    n_blocks_expected: int,
+    N_per_block_expected: int,
+    D_expected: int,
+) -> Tuple[np.ndarray, List[Tuple[np.ndarray, np.ndarray]]]:
+    with np.load(path, allow_pickle=False) as data:
+        Xi = np.asarray(data["Xi_initial"], dtype=np.float32)
+        t_bundle = np.asarray(data["t_bundle"], dtype=np.float32)
+        W_bundle = np.asarray(data["W_bundle"], dtype=np.float32)
+
+    if Xi.ndim != 2 or Xi.shape[1] != int(D_expected):
+        raise ValueError(
+            f"Invalid Xi_initial shape in evaluation bundle: {Xi.shape}, expected [M, {int(D_expected)}]"
+        )
+    if t_bundle.ndim != 4 or W_bundle.ndim != 4:
+        raise ValueError(
+            f"Invalid rollout bundle rank: t={t_bundle.shape}, W={W_bundle.shape}; expected rank-4"
+        )
+    if t_bundle.shape[0] != int(n_blocks_expected) or W_bundle.shape[0] != int(n_blocks_expected):
+        raise ValueError(
+            f"Evaluation bundle blocks mismatch: got {t_bundle.shape[0]}, expected {int(n_blocks_expected)}"
+        )
+    if t_bundle.shape[2] != int(N_per_block_expected) + 1:
+        raise ValueError(
+            "Evaluation bundle N_per_block mismatch: "
+            f"got {t_bundle.shape[2]-1}, expected {int(N_per_block_expected)}"
+        )
+    if W_bundle.shape[3] != int(D_expected):
+        raise ValueError(
+            f"Evaluation bundle D mismatch in W: got {W_bundle.shape[3]}, expected {int(D_expected)}"
+        )
+    if t_bundle.shape[1] != Xi.shape[0] or W_bundle.shape[1] != Xi.shape[0]:
+        raise ValueError(
+            "Evaluation bundle M mismatch between Xi and rollout tensors: "
+            f"Xi={Xi.shape[0]}, t_bundle={t_bundle.shape[1]}, W_bundle={W_bundle.shape[1]}"
+        )
+
+    rollout_inputs = []
+    for i in range(int(n_blocks_expected)):
+        rollout_inputs.append((t_bundle[i], W_bundle[i]))
+    return Xi, rollout_inputs
+
+
+def resolve_pass_selection(
+    pass_scores_by_loss: Dict[int, float],
+    exact_summary_by_pass: Dict[int, Dict[str, Any]],
+    selection_metric: str,
+    loss_metric_label: str = "eval_mean_loss_per_sample",
+) -> Tuple[int, str, float, Dict[str, float]]:
+    if len(pass_scores_by_loss) == 0:
+        raise RuntimeError("resolve_pass_selection called with empty pass_scores_by_loss")
+
+    metric = str(selection_metric or "auto").strip().lower()
+    selected_by_loss = int(min(pass_scores_by_loss, key=pass_scores_by_loss.get))
+
+    if metric in ("", "auto"):
+        if len(exact_summary_by_pass) > 0:
+            metric = "exact_mae_y"
+        else:
+            metric = "loss"
+
+    if metric == "loss":
+        return (
+            selected_by_loss,
+            f"{loss_metric_label}+0.35*worst_block",
+            float(pass_scores_by_loss[selected_by_loss]),
+            {str(k): float(v) for k, v in pass_scores_by_loss.items()},
+        )
+
+    metric_extractors = {
+        "exact_mae_y": ("exact.mean_abs_error_y", lambda s: float(s["mean_abs_error_y"])),
+        "exact_rmse_y": ("exact.rmse_y", lambda s: float(s["rmse_y"])),
+        "exact_abs_y0": ("exact.abs_error_mean_y0", lambda s: float(s["abs_error_mean_y0"])),
+    }
+    if metric not in metric_extractors:
+        raise ValueError(
+            f"Unsupported selection_metric='{selection_metric}'. "
+            "Supported: auto, loss, exact_mae_y, exact_rmse_y, exact_abs_y0"
+        )
+    if len(exact_summary_by_pass) == 0:
+        raise RuntimeError(
+            f"selection_metric='{metric}' requires exact_solution metrics, but none are available"
+        )
+
+    label, extractor = metric_extractors[metric]
+    scores = {}
+    for pass_id, summary in exact_summary_by_pass.items():
+        scores[int(pass_id)] = float(extractor(summary))
+    selected_pass = int(min(scores, key=scores.get))
+    return (
+        selected_pass,
+        label,
+        float(scores[selected_pass]),
+        {str(k): float(v) for k, v in scores.items()},
+    )
 
 
 def predict_recursive_stitched(
@@ -880,14 +1331,30 @@ def compute_stitched_exact_bundle(
 
     abs_err_Y = np.abs(Y_pred - Y_exact)
     abs_err_Z = np.abs(Z_pred - Z_exact)
-    rel_err_Z = abs_err_Z / (np.abs(Z_exact) + float(eps))
+
+    # Legacy relative error (kept for backward compatibility / diagnostics).
+    rel_err_Z_legacy = abs_err_Z / (np.abs(Z_exact) + float(eps))
+
+    # Robust relative error: ignore components where exact Z is (near) zero.
+    valid_mask = np.abs(Z_exact) > float(eps)
+    rel_err_Z = np.zeros_like(abs_err_Z, dtype=np.float32)
+    np.divide(
+        abs_err_Z,
+        np.abs(Z_exact) + float(eps),
+        out=rel_err_Z,
+        where=valid_mask,
+    )
 
     y0_pred = Y_pred[:, 0, 0]
     y0_exact = Y_exact[:, 0, 0]
 
     mean_abs_err_Y_t = np.mean(abs_err_Y[:, :, 0], axis=0)
     mean_abs_err_Z_t = np.mean(abs_err_Z, axis=0)
-    mean_rel_err_Z_t = np.mean(rel_err_Z, axis=0)
+    mean_rel_err_Z_legacy_t = np.mean(rel_err_Z_legacy, axis=0)
+    valid_count_t = np.maximum(np.sum(valid_mask, axis=0), 1.0).astype(np.float32)
+    mean_rel_err_Z_t = (np.sum(rel_err_Z, axis=0) / valid_count_t).astype(np.float32)
+    valid_count_all = float(max(np.sum(valid_mask), 1.0))
+    valid_count_comp = np.maximum(np.sum(valid_mask, axis=(0, 1)), 1.0).astype(np.float32)
 
     summary = {
         "solution_name": exact_solution.get("name", "unknown"),
@@ -900,9 +1367,12 @@ def compute_stitched_exact_bundle(
         "mean_abs_error_y": float(np.mean(abs_err_Y)),
         "rmse_y": float(np.sqrt(np.mean((Y_pred - Y_exact) ** 2))),
         "mean_abs_error_z": float(np.mean(abs_err_Z)),
-        "mean_rel_error_z": float(np.mean(rel_err_Z)),
+        "mean_rel_error_z": float(np.sum(rel_err_Z) / valid_count_all),
+        "mean_rel_error_z_legacy": float(np.mean(rel_err_Z_legacy)),
         "mean_abs_error_z_by_component": np.mean(abs_err_Z, axis=(0, 1)).astype(np.float32),
-        "mean_rel_error_z_by_component": np.mean(rel_err_Z, axis=(0, 1)).astype(np.float32),
+        "mean_rel_error_z_by_component": (np.sum(rel_err_Z, axis=(0, 1)) / valid_count_comp).astype(np.float32),
+        "mean_rel_error_z_by_component_legacy": np.mean(rel_err_Z_legacy, axis=(0, 1)).astype(np.float32),
+        "valid_rel_error_fraction_z_by_component": np.mean(valid_mask.astype(np.float32), axis=(0, 1)).astype(np.float32),
         "z_component_labels": _z_component_labels(D),
     }
 
@@ -911,6 +1381,8 @@ def compute_stitched_exact_bundle(
         "mean_abs_error_y": mean_abs_err_Y_t.astype(np.float32),
         "mean_abs_error_z": mean_abs_err_Z_t.astype(np.float32),
         "mean_rel_error_z": mean_rel_err_Z_t.astype(np.float32),
+        "mean_rel_error_z_legacy": mean_rel_err_Z_legacy_t.astype(np.float32),
+        "valid_rel_error_fraction_z": np.mean(valid_mask.astype(np.float32), axis=0).astype(np.float32),
         "z_component_labels": _z_component_labels(D),
     }
 
@@ -927,6 +1399,7 @@ def save_exact_error_timeseries_csv(timeseries: Dict[str, np.ndarray], path: str
     abs_y = np.asarray(timeseries["mean_abs_error_y"])
     abs_z = np.asarray(timeseries["mean_abs_error_z"])
     rel_z = np.asarray(timeseries["mean_rel_error_z"])
+    rel_z_legacy = np.asarray(timeseries["mean_rel_error_z_legacy"]) if "mean_rel_error_z_legacy" in timeseries else None
     labels = timeseries.get("z_component_labels", _z_component_labels(abs_z.shape[1]))
 
     rows = []
@@ -938,6 +1411,8 @@ def save_exact_error_timeseries_csv(timeseries: Dict[str, np.ndarray], path: str
         for d, label in enumerate(labels):
             row[f"mean_abs_error_{label}"] = float(abs_z[i, d])
             row[f"mean_rel_error_{label}"] = float(rel_z[i, d])
+            if rel_z_legacy is not None:
+                row[f"mean_rel_error_{label}_legacy"] = float(rel_z_legacy[i, d])
         rows.append(row)
 
     save_rows_csv(rows, path)
@@ -1007,8 +1482,17 @@ def plot_recursive_exact_comparison(
     plt.savefig(os.path.join(out_dir, f"recursive_stitched_Y_exact{file_suffix}.png"), dpi=160)
     plt.close()
 
-    rel_err_Z = np.abs((Z_pred - Z_exact) / (np.abs(Z_exact) + 1.0e-8))
-    mean_rel_err_Z = np.mean(rel_err_Z, axis=0)
+    abs_err_Z_full = np.abs(Z_pred - Z_exact)
+    valid_mask = np.abs(Z_exact) > 1.0e-8
+    rel_err_Z = np.zeros_like(abs_err_Z_full, dtype=np.float32)
+    np.divide(
+        abs_err_Z_full,
+        np.abs(Z_exact) + 1.0e-8,
+        out=rel_err_Z,
+        where=valid_mask,
+    )
+    valid_count_t = np.maximum(np.sum(valid_mask, axis=0), 1.0).astype(np.float32)
+    mean_rel_err_Z = np.sum(rel_err_Z, axis=0) / valid_count_t
 
     plt.figure(figsize=(12, 6))
     for d in range(Z_pred.shape[2]):
@@ -1028,7 +1512,7 @@ def plot_recursive_exact_comparison(
     plt.savefig(os.path.join(out_dir, f"recursive_stitched_Z_rel_error{file_suffix}.png"), dpi=160)
     plt.close()
 
-    abs_err_Z = np.mean(np.abs(Z_pred - Z_exact), axis=0)
+    abs_err_Z = np.mean(abs_err_Z_full, axis=0)
     abs_err_Y = np.mean(np.abs(Y_pred - Y_exact), axis=0)
 
     plt.figure(figsize=(12, 6))
@@ -1163,7 +1647,7 @@ def plot_recursive_stitched_y_convergence(
             y_mean,
             color=colors[i],
             linewidth=1.8,
-            label=f"pass{pass_id} mean Y",
+            label=f"{_pass_label(pass_id)} mean Y",
         )
 
     for block in blocks[:-1]:
@@ -1424,6 +1908,45 @@ def build_blocks(T_total: float, block_size: float) -> List[Dict[str, float]]:
     return blocks
 
 
+def _normalize_training_plan_rule(raw: Dict[str, Any], source_row: int = 0) -> Optional[Dict]:
+    if raw is None:
+        return None
+
+    pass_scope = str(raw.get("pass_scope", "")).strip()
+    block_scope = str(raw.get("block_scope", "")).strip().lower()
+    phase = str(raw.get("phase", "")).strip().lower()
+    if pass_scope == "" or block_scope == "" or phase == "":
+        return None
+    if phase not in ("stage", "final", "refine"):
+        raise ValueError(
+            f"Invalid phase '{phase}' in training plan rule (allowed: stage, final, refine)"
+        )
+
+    enabled_raw = str(raw.get("enabled", "1")).strip().lower()
+    enabled = enabled_raw not in ("0", "false", "no", "off", "")
+    if not enabled:
+        return None
+
+    order_raw = str(raw.get("order", "0")).strip()
+    order = int(order_raw) if order_raw != "" else 0
+    n_iter = int(str(raw.get("n_iter", "")).strip())
+    lr = float(str(raw.get("lr", "")).strip())
+    if n_iter <= 0:
+        raise ValueError(f"n_iter must be > 0 in training plan rule (source_row={source_row})")
+    if lr <= 0:
+        raise ValueError(f"lr must be > 0 in training plan rule (source_row={source_row})")
+
+    return {
+        "pass_scope": pass_scope,
+        "block_scope": block_scope,
+        "phase": phase,
+        "order": int(order),
+        "n_iter": int(n_iter),
+        "lr": float(lr),
+        "source_row": int(source_row),
+    }
+
+
 def load_training_plan_csv(csv_path: Optional[str]) -> List[Dict]:
     if csv_path is None or str(csv_path).strip() == "":
         return []
@@ -1441,46 +1964,77 @@ def load_training_plan_csv(csv_path: Optional[str]) -> List[Dict]:
             raise ValueError(f"Training plan CSV missing required columns: {sorted(missing)}")
 
         for i_row, row in enumerate(reader, start=2):
-            if row is None:
-                continue
-            pass_scope = str(row.get("pass_scope", "")).strip()
-            block_scope = str(row.get("block_scope", "")).strip().lower()
-            phase = str(row.get("phase", "")).strip().lower()
-            if pass_scope == "" or block_scope == "" or phase == "":
-                continue
-            if phase not in ("stage", "final", "refine"):
-                raise ValueError(
-                    f"Invalid phase '{phase}' in {csv_path}:{i_row} (allowed: stage, final, refine)"
-                )
-
-            enabled_raw = str(row.get("enabled", "1")).strip().lower()
-            enabled = enabled_raw not in ("0", "false", "no", "off", "")
-            if not enabled:
-                continue
-
-            order_raw = str(row.get("order", "0")).strip()
-            order = int(order_raw) if order_raw != "" else 0
-
-            n_iter = int(str(row.get("n_iter", "")).strip())
-            lr = float(str(row.get("lr", "")).strip())
-            if n_iter <= 0:
-                raise ValueError(f"n_iter must be > 0 in {csv_path}:{i_row}")
-            if lr <= 0:
-                raise ValueError(f"lr must be > 0 in {csv_path}:{i_row}")
-
-            rules.append(
-                {
-                    "pass_scope": pass_scope,
-                    "block_scope": block_scope,
-                    "phase": phase,
-                    "order": int(order),
-                    "n_iter": int(n_iter),
-                    "lr": float(lr),
-                    "source_row": int(i_row),
-                }
-            )
+            normalized = _normalize_training_plan_rule(row, source_row=i_row)
+            if normalized is not None:
+                rules.append(normalized)
 
     return rules
+
+
+def _find_resume_run_root(resume_models_dir: str) -> Optional[str]:
+    resume_models_dir = str(resume_models_dir or "").strip()
+    if resume_models_dir == "":
+        return None
+
+    p = os.path.abspath(os.path.expanduser(resume_models_dir))
+    candidates = []
+    cur = p
+    for _ in range(5):
+        candidates.append(cur)
+        parent = os.path.dirname(cur)
+        if parent == cur:
+            break
+        cur = parent
+
+    seen = set()
+    ordered = []
+    for c in candidates:
+        if c not in seen:
+            seen.add(c)
+            ordered.append(c)
+
+    for c in ordered:
+        cfg = os.path.join(c, "run_config.json")
+        if os.path.isfile(cfg):
+            return c
+    return None
+
+
+def load_training_plan_rules_from_resume_run(
+    resume_models_dir: str,
+) -> Tuple[List[Dict], Optional[str], Optional[str]]:
+    run_root = _find_resume_run_root(resume_models_dir)
+    if run_root is None:
+        return [], None, None
+
+    cfg_path = os.path.join(run_root, "run_config.json")
+    if not os.path.isfile(cfg_path):
+        return [], None, None
+
+    with open(cfg_path, "r", encoding="utf-8") as f:
+        cfg = json.load(f)
+
+    raw_rules = cfg.get("training_plan_rules", [])
+    plan_csv = cfg.get("training_plan_csv", None)
+    if not isinstance(raw_rules, list):
+        return [], cfg_path, plan_csv
+
+    rules = []
+    for i, raw in enumerate(raw_rules):
+        normalized = _normalize_training_plan_rule(raw, source_row=int(raw.get("source_row", i + 1)))
+        if normalized is not None:
+            rules.append(normalized)
+    return rules, cfg_path, plan_csv
+
+
+def _find_resume_eval_bundle_path(resume_models_dir: str) -> Optional[str]:
+    run_root = _find_resume_run_root(resume_models_dir)
+    if run_root is None:
+        return None
+    candidate = os.path.join(run_root, "recursive", "evaluation_bundle.npz")
+    if os.path.isfile(candidate):
+        return candidate
+    return None
 
 
 def _pass_scope_priority(pass_scope: str, pass_id: int) -> int:
@@ -1939,6 +2493,7 @@ def run_recursive_training(
     resume_models_dir: str = "",
     resume_from_pass: int = 0,
     empirical_jitter_scale: float = 0.02,
+    on_pass_end: Optional[Callable[[Dict[str, Any]], None]] = None,
 ):
     if int(n_passes) < 1:
         raise ValueError("n_passes must be >= 1")
@@ -1968,7 +2523,7 @@ def run_recursive_training(
 
         for b in range(len(blocks) - 1, -1, -1):
             block = blocks[b]
-            label = f"pass{pass_id}:block{b}"
+            label = f"{_pass_label(pass_id)}:block{b}"
             print(
                 f"\n[RecursiveBlock] {label} t=[{block['t_start']:.2f},{block['t_end']:.2f}] "
                 f"T_block={block['T_block']:.2f}"
@@ -2131,8 +2686,8 @@ def run_recursive_training(
             "available_passes": available_passes,
         }
         print(
-            f"[Resume] loaded pass={loaded_pass_id} from {resume_models_dir}, "
-            f"continuing from pass={start_pass_id}"
+            f"[Resume] loaded {_pass_label(loaded_pass_id)} from {resume_models_dir}, "
+            f"continuing from {_pass_label(start_pass_id)}"
         )
 
     for pass_id in range(start_pass_id, int(n_passes) + 1):
@@ -2197,6 +2752,17 @@ def run_recursive_training(
                 "models_dir": pass_dir_i,
             }
         )
+
+        if on_pass_end is not None:
+            on_pass_end(
+                {
+                    "pass_id": int(pass_id),
+                    "passes": list(pass_results),
+                    "blocks": blocks,
+                    "resumed_from": resumed_from,
+                    "boundary_samples": prev_boundary_samples if prev_boundary_samples is not None else [],
+                }
+            )
 
     result = {
         "blocks": blocks,
@@ -2291,6 +2857,55 @@ def main():
             "Valori supportati: none, quadratic_coupled"
         ),
     )
+    parser.add_argument(
+        "--selection_metric",
+        type=str,
+        default="auto",
+        choices=["auto", "loss", "exact_mae_y", "exact_rmse_y", "exact_abs_y0"],
+        help=(
+            "Metrica di selezione della pass finale: "
+            "auto usa exact_mae_y se exact_solution è attiva, altrimenti loss."
+        ),
+    )
+    parser.add_argument(
+        "--exact_regression_tolerance",
+        type=float,
+        default=0.20,
+        help=(
+            "Tolleranza regressione relativa tra pass consecutive su mean_abs_error_y "
+            "(es. 0.20 = +20%). <=0 disabilita il guardrail."
+        ),
+    )
+    parser.add_argument(
+        "--exact_regression_action",
+        type=str,
+        default="warn",
+        choices=["warn", "error", "ignore"],
+        help="Azione quando il guardrail exact rileva regressione oltre soglia.",
+    )
+    parser.add_argument(
+        "--eval_bundle_path",
+        type=str,
+        default="",
+        help=(
+            "Percorso opzionale a evaluation_bundle.npz da riusare per confronto path-by-path "
+            "tra pass/run."
+        ),
+    )
+    parser.add_argument(
+        "--eval_seed",
+        type=int,
+        default=1234,
+        help="Seed usato per costruire un evaluation bundle nuovo quando non viene caricato.",
+    )
+    parser.add_argument(
+        "--allow_resume_without_plan",
+        action="store_true",
+        help=(
+            "Permette resume con training_plan assente/non ereditabile. "
+            "Di default il resume fallisce per evitare mismatch di schedule."
+        ),
+    )
     args = parser.parse_args()
 
     np.random.seed(1234)
@@ -2322,9 +2937,44 @@ def main():
     stage_plan = [(5000, 1e-3), (5000, 5e-4), (5000, 1e-4), (5000, 5e-5)]
     final_plan = [(5000, 1e-5), (5000, 5e-6)]
     training_plan_rules = load_training_plan_csv(args.training_plan_csv)
+    training_plan_effective_source = str(args.training_plan_csv or "").strip()
+    training_plan_inherited_from_resume = False
+    training_plan_inherited_run_config = None
+    training_plan_inherited_csv = None
+
+    resume_models_dir_arg = str(args.resume_models_dir or "").strip()
+    resume_models_dir_resolved = (
+        resolve_resume_models_dir(resume_models_dir_arg) if resume_models_dir_arg != "" else ""
+    )
+
+    if resume_models_dir_resolved != "" and len(training_plan_rules) == 0:
+        inherited_rules, resume_cfg_path, resume_plan_csv = load_training_plan_rules_from_resume_run(
+            resume_models_dir_resolved
+        )
+        if len(inherited_rules) > 0:
+            training_plan_rules = inherited_rules
+            training_plan_effective_source = f"inherited_from_resume:{resume_cfg_path}"
+            training_plan_inherited_from_resume = True
+            training_plan_inherited_run_config = resume_cfg_path
+            training_plan_inherited_csv = resume_plan_csv
+            print(
+                f"[TrainingPlan] inherited {len(training_plan_rules)} rules from resume run config: "
+                f"{resume_cfg_path}"
+            )
+        else:
+            msg = (
+                "Resume requested but no training plan was provided and no reusable "
+                "training_plan_rules were found in the resumed run config. "
+                "Pass --training_plan_csv (recommended) or --allow_resume_without_plan to proceed."
+            )
+            if bool(args.allow_resume_without_plan):
+                print(f"[TrainingPlan][WARN] {msg}")
+            else:
+                raise ValueError(msg)
+
     if len(training_plan_rules) > 0:
         print(
-            f"[TrainingPlan] loaded {len(training_plan_rules)} rules from {args.training_plan_csv}"
+            f"[TrainingPlan] loaded {len(training_plan_rules)} rules from {training_plan_effective_source}"
         )
 
     exact_solution = build_exact_solution_functions(
@@ -2352,15 +3002,26 @@ def main():
         "block_size": args.block_size,
         "passes": int(args.passes),
         "resume_models_dir": args.resume_models_dir,
+        "resume_models_dir_resolved": resume_models_dir_resolved,
         "resume_from_pass": int(args.resume_from_pass),
         "empirical_jitter_scale": float(args.empirical_jitter_scale),
         "layers": layers,
         "stage_plan": stage_plan,
         "final_plan": final_plan,
         "training_plan_csv": args.training_plan_csv,
+        "training_plan_effective_source": training_plan_effective_source,
         "training_plan_rules_count": len(training_plan_rules),
         "training_plan_rules": training_plan_rules,
+        "training_plan_inherited_from_resume": bool(training_plan_inherited_from_resume),
+        "training_plan_inherited_run_config": training_plan_inherited_run_config,
+        "training_plan_inherited_csv": training_plan_inherited_csv,
         "pass1_warm_start_from_next": bool(args.pass1_warm_start_from_next),
+        "selection_metric": str(args.selection_metric),
+        "exact_regression_tolerance": float(args.exact_regression_tolerance),
+        "exact_regression_action": str(args.exact_regression_action),
+        "eval_bundle_path": str(args.eval_bundle_path),
+        "eval_seed": int(args.eval_seed),
+        "allow_resume_without_plan": bool(args.allow_resume_without_plan),
         "exact_solution": "none" if exact_solution is None else exact_solution["name"],
         "params": params,
         "plotting_available": _PLOTTING_AVAILABLE,
@@ -2460,6 +3121,49 @@ def main():
         print("\n==================== RECURSIVE ====================")
         rec_dir = os.path.join(run_root, "recursive")
         os.makedirs(rec_dir, exist_ok=True)
+
+        explicit_eval_bundle = str(args.eval_bundle_path or "").strip()
+        resume_eval_bundle = _find_resume_eval_bundle_path(resume_models_dir_resolved)
+        if explicit_eval_bundle != "":
+            eval_bundle_path = os.path.abspath(os.path.expanduser(explicit_eval_bundle))
+        elif resume_eval_bundle is not None:
+            eval_bundle_path = os.path.abspath(os.path.expanduser(resume_eval_bundle))
+        else:
+            eval_bundle_path = os.path.abspath(os.path.join(rec_dir, "evaluation_bundle.npz"))
+
+        pass_plot_summary_holder = {"summary": None}
+
+        def _on_recursive_pass_end(progress: Dict[str, Any]) -> None:
+            passes_so_far = sorted(progress.get("passes", []), key=lambda x: int(x["pass_id"]))
+            if len(passes_so_far) == 0:
+                return
+            pass_id = int(progress.get("pass_id", passes_so_far[-1]["pass_id"]))
+            is_last_requested_pass = pass_id >= int(args.passes)
+            print(
+                f"\n[RecursivePlot] completed {_pass_label(pass_id)}: "
+                f"updating cumulative plots up to {_pass_label(pass_id)}"
+            )
+            pass_plot_summary_holder["summary"] = print_recursive_pass(
+                pass_entries=passes_so_far,
+                blocks=progress.get("blocks", []),
+                rec_dir=rec_dir,
+                params=params,
+                N_per_block=N,
+                D=D,
+                layers=layers,
+                T_total=args.T_total,
+                exact_solution=exact_solution,
+                selection_metric=str(args.selection_metric),
+                exact_regression_tolerance=float(args.exact_regression_tolerance),
+                exact_regression_action=str(args.exact_regression_action),
+                eval_bundle_path=eval_bundle_path,
+                eval_seed=int(args.eval_seed),
+                eval_min_paths=max(64, M),
+                sample_paths=8,
+                enforce_exact_regression_guardrail=is_last_requested_pass,
+                print_compact_logs=is_last_requested_pass,
+            )
+
         rec = run_recursive_training(
             Xi_generator=Xi_generator_default,
             params=params,
@@ -2479,182 +3183,42 @@ def main():
             training_plan_rules=training_plan_rules,
             pass1_warm_start_from_next=bool(args.pass1_warm_start_from_next),
             n_passes=int(args.passes),
-            resume_models_dir=args.resume_models_dir,
+            resume_models_dir=resume_models_dir_resolved,
             resume_from_pass=int(args.resume_from_pass),
             empirical_jitter_scale=float(args.empirical_jitter_scale),
+            on_pass_end=_on_recursive_pass_end,
         )
 
         pass_entries = sorted(rec.get("passes", []), key=lambda x: int(x["pass_id"]))
         if len(pass_entries) == 0:
             raise RuntimeError("No pass results available after recursive training")
 
-        pass_logs_by_pass = {}
-        for p in pass_entries:
-            pass_id = int(p["pass_id"])
-            logs = p.get("logs", [])
-            pass_logs_by_pass[pass_id] = logs
-
-            print(f"\n=== Recursive Log pass{pass_id} (compact) ===")
-            for row in logs:
-                norm_msg = ""
-                if "eval_mean_loss_per_sample" in row:
-                    norm_msg = f", eval_loss/M={row['eval_mean_loss_per_sample']:.3e}"
-                print(
-                    f"block={row['block']}, t=[{row['t_start']:.1f},{row['t_end']:.1f}], "
-                    f"eval_loss={row['eval_mean_loss']:.3e}{norm_msg}, eval_y0={row['eval_mean_y0']:.3f}, "
-                    f"target={row['precision_target']}, refine={row['refine_rounds']}"
-                )
-
-            save_rows_csv(logs, os.path.join(rec_dir, f"pass_{pass_id:02d}_logs.csv"))
-            if pass_id == 1:
-                save_rows_csv(logs, os.path.join(rec_dir, "pass1_logs.csv"))
-            if pass_id == 2:
-                save_rows_csv(logs, os.path.join(rec_dir, "pass2_logs.csv"))
-
-        plot_recursive_pass_logs_multi(pass_logs_by_pass, os.path.join(rec_dir, "plots"))
-
-        score_key = "eval_mean_loss_per_sample"
-        all_rows = [row for rows in pass_logs_by_pass.values() for row in rows]
-        if not all(score_key in row for row in all_rows):
-            score_key = "eval_mean_loss"
-        pass_scores = {
-            int(pass_id): score_pass_logs(rows, loss_key=score_key)
-            for pass_id, rows in pass_logs_by_pass.items()
-            if len(rows) > 0
-        }
-        if len(pass_scores) == 0:
-            raise RuntimeError("No pass logs available for pass selection")
-        best_pass_id = int(min(pass_scores, key=pass_scores.get))
-        print(
-            f"[Selection] metric={score_key}, best_pass={best_pass_id}, "
-            f"score={pass_scores[best_pass_id]:.6e}"
-        )
-
-        Xi_stitched = Xi_generator_default(max(64, M), D).astype(np.float32)
-        rollout_inputs = build_stitched_rollout_inputs(
-            blocks=rec["blocks"],
-            M=Xi_stitched.shape[0],
-            N_per_block=N,
-            D=D,
-            seed=1234,
-        )
-        stitched_by_pass = {}
-        exact_summary_by_pass = {}
-        selected_exact_bundle = None
-        for p in pass_entries:
-            pass_id = int(p["pass_id"])
-            stitched_pred = predict_recursive_stitched(
-                block_blobs=p["blobs"],
+        expected_pass_ids = sorted(int(p["pass_id"]) for p in pass_entries)
+        plot_summary = pass_plot_summary_holder.get("summary", None)
+        if plot_summary is None or plot_summary.get("processed_pass_ids", []) != expected_pass_ids:
+            plot_summary = print_recursive_pass(
+                pass_entries=pass_entries,
                 blocks=rec["blocks"],
-                Xi_initial=Xi_stitched,
+                rec_dir=rec_dir,
                 params=params,
                 N_per_block=N,
                 D=D,
                 layers=layers,
                 T_total=args.T_total,
-                rollout_inputs=rollout_inputs,
-            )
-            stitched_by_pass[pass_id] = stitched_pred
-
-            np.savez(
-                os.path.join(rec_dir, f"stitched_predictions_pass{pass_id:02d}.npz"),
-                t=stitched_pred["t"],
-                X=stitched_pred["X"],
-                Y=stitched_pred["Y"],
-                Z=stitched_pred["Z"],
-            )
-            plot_recursive_stitched_predictions(
-                stitched=stitched_pred,
-                blocks=rec["blocks"],
-                out_dir=os.path.join(rec_dir, "plots"),
+                exact_solution=exact_solution,
+                selection_metric=str(args.selection_metric),
+                exact_regression_tolerance=float(args.exact_regression_tolerance),
+                exact_regression_action=str(args.exact_regression_action),
+                eval_bundle_path=eval_bundle_path,
+                eval_seed=int(args.eval_seed),
+                eval_min_paths=max(64, M),
                 sample_paths=8,
-                file_suffix=f"_pass{pass_id:02d}",
+                enforce_exact_regression_guardrail=True,
+                print_compact_logs=True,
             )
 
-            if exact_solution is not None:
-                exact_bundle = compute_stitched_exact_bundle(
-                    stitched=stitched_pred,
-                    exact_solution=exact_solution,
-                )
-                exact_summary = exact_bundle["summary"]
-                exact_summary_by_pass[pass_id] = exact_summary
-                print(
-                    f"[Exact] pass{pass_id} "
-                    f"mean_pred_Y0={exact_summary['mean_pred_y0']:.6f}, "
-                    f"mean_exact_Y0={exact_summary['mean_exact_y0']:.6f}, "
-                    f"abs_err_Y0={exact_summary['abs_error_mean_y0']:.6e}, "
-                    f"mean_abs_err_Y={exact_summary['mean_abs_error_y']:.6e}, "
-                    f"mean_abs_err_Z={exact_summary['mean_abs_error_z']:.6e}"
-                )
-
-                save_json(
-                    {
-                        "summary": exact_summary,
-                        "timeseries": exact_bundle["timeseries"],
-                    },
-                    os.path.join(rec_dir, f"exact_metrics_pass{pass_id:02d}.json"),
-                )
-                save_exact_error_timeseries_csv(
-                    exact_bundle["timeseries"],
-                    os.path.join(rec_dir, f"exact_errors_pass{pass_id:02d}.csv"),
-                )
-                plot_recursive_exact_comparison(
-                    stitched=stitched_pred,
-                    Y_exact=exact_bundle["Y_exact"],
-                    Z_exact=exact_bundle["Z_exact"],
-                    blocks=rec["blocks"],
-                    out_dir=os.path.join(rec_dir, "plots"),
-                    sample_paths=8,
-                    file_suffix=f"_pass{pass_id:02d}",
-                )
-
-                if pass_id == best_pass_id:
-                    selected_exact_bundle = exact_bundle
-
-        selected_stitched = stitched_by_pass[best_pass_id]
-        np.savez(
-            os.path.join(rec_dir, "stitched_predictions_final.npz"),
-            t=selected_stitched["t"],
-            X=selected_stitched["X"],
-            Y=selected_stitched["Y"],
-            Z=selected_stitched["Z"],
-        )
-        plot_recursive_stitched_predictions(
-            stitched=selected_stitched,
-            blocks=rec["blocks"],
-            out_dir=os.path.join(rec_dir, "plots"),
-            sample_paths=8,
-            file_suffix="",
-        )
-
-        if exact_solution is not None and selected_exact_bundle is not None:
-            save_json(
-                {
-                    "summary": selected_exact_bundle["summary"],
-                    "timeseries": selected_exact_bundle["timeseries"],
-                },
-                os.path.join(rec_dir, "exact_metrics_final.json"),
-            )
-            save_exact_error_timeseries_csv(
-                selected_exact_bundle["timeseries"],
-                os.path.join(rec_dir, "exact_errors_final.csv"),
-            )
-            plot_recursive_exact_comparison(
-                stitched=selected_stitched,
-                Y_exact=selected_exact_bundle["Y_exact"],
-                Z_exact=selected_exact_bundle["Z_exact"],
-                blocks=rec["blocks"],
-                out_dir=os.path.join(rec_dir, "plots"),
-                sample_paths=8,
-                file_suffix="",
-            )
-
-        plot_recursive_stitched_y_convergence(
-            stitched_by_pass=stitched_by_pass,
-            blocks=rec["blocks"],
-            out_dir=os.path.join(rec_dir, "plots"),
-            sample_paths=8,
-        )
+        exact_summary_by_pass = plot_summary["exact_summary_by_pass"]
+        exact_summary_by_pass_index = plot_summary.get("exact_summary_by_pass_index", {})
 
         boundary_stats = []
         for i, arr in enumerate(rec.get("boundary_samples", [])):
@@ -2671,15 +3235,17 @@ def main():
 
         passes_summary = []
         for p in pass_entries:
+            pass_id = int(p["pass_id"])
             passes_summary.append(
                 {
-                    "pass_id": int(p["pass_id"]),
+                    "pass_id": pass_id,
+                    "pass_index": _pass_index(pass_id),
                     "reference_loss": float(p["reference_loss"]),
                     "logs": p.get("logs", []),
                     "models_dir": p.get("models_dir", None),
                 }
             )
-        pass_summary_by_id = {int(p["pass_id"]): p for p in passes_summary}
+        pass_summary_by_index = {int(p["pass_index"]): p for p in passes_summary}
 
         rec_summary = {
             "blocks": rec["blocks"],
@@ -2687,10 +3253,19 @@ def main():
             "resumed_from": rec.get("resumed_from", None),
             "boundary_stats": boundary_stats,
             "models_dir": os.path.join(rec_dir, "models"),
-            "selected_pass_id": int(best_pass_id),
-            "selected_score_metric": score_key,
-            "selected_score": float(pass_scores[best_pass_id]),
-            "pass_scores": {str(k): float(v) for k, v in pass_scores.items()},
+            "evaluation_bundle_path": plot_summary["eval_bundle_path"],
+            "evaluation_bundle_M": int(plot_summary["evaluation_bundle_M"]),
+            "selected_pass_id": int(plot_summary["selected_pass_id"]),
+            "selected_pass_index": int(plot_summary["selected_pass_index"]),
+            "selected_score_metric": plot_summary["selected_score_metric"],
+            "selected_score": float(plot_summary["selected_score"]),
+            "selected_scores_by_pass": plot_summary["selected_scores_by_pass"],
+            "selected_scores_by_pass_index": plot_summary["selected_scores_by_pass_index"],
+            "loss_score_metric": plot_summary["score_key"],
+            "loss_pass_scores": {str(k): float(v) for k, v in plot_summary["pass_scores_loss"].items()},
+            "loss_pass_scores_by_index": {
+                str(k): float(v) for k, v in plot_summary["pass_scores_loss_by_index"].items()
+            },
         }
         if exact_solution is None:
             rec_summary["exact_solution"] = {"enabled": False, "profile": "none"}
@@ -2699,17 +3274,26 @@ def main():
                 "enabled": True,
                 "profile": exact_solution["name"],
                 "by_pass": {str(k): v for k, v in exact_summary_by_pass.items()},
-                "selected_pass_summary": exact_summary_by_pass.get(int(best_pass_id), None),
+                "by_pass_index": exact_summary_by_pass_index,
+                "selected_pass_summary": exact_summary_by_pass.get(
+                    int(plot_summary["selected_pass_id"]),
+                    None,
+                ),
             }
-        if 1 in pass_summary_by_id:
+        if 0 in pass_summary_by_index:
+            rec_summary["pass0"] = {
+                "reference_loss": pass_summary_by_index[0]["reference_loss"],
+                "logs": pass_summary_by_index[0]["logs"],
+            }
+        if 1 in pass_summary_by_index:
             rec_summary["pass1"] = {
-                "reference_loss": pass_summary_by_id[1]["reference_loss"],
-                "logs": pass_summary_by_id[1]["logs"],
+                "reference_loss": pass_summary_by_index[1]["reference_loss"],
+                "logs": pass_summary_by_index[1]["logs"],
             }
-        if 2 in pass_summary_by_id:
+        if 2 in pass_summary_by_index:
             rec_summary["pass2"] = {
-                "reference_loss": pass_summary_by_id[2]["reference_loss"],
-                "logs": pass_summary_by_id[2]["logs"],
+                "reference_loss": pass_summary_by_index[2]["reference_loss"],
+                "logs": pass_summary_by_index[2]["logs"],
             }
         save_json(rec_summary, os.path.join(rec_dir, "results.json"))
 
