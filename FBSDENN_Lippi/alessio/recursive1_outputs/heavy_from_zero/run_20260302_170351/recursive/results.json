@@ -1,0 +1,1676 @@
+{
+  "blocks": [
+    {
+      "idx": 0,
+      "t_start": 0.0,
+      "t_end": 12.0,
+      "T_block": 12.0
+    },
+    {
+      "idx": 1,
+      "t_start": 12.0,
+      "t_end": 24.0,
+      "T_block": 12.0
+    },
+    {
+      "idx": 2,
+      "t_start": 24.0,
+      "t_end": 36.0,
+      "T_block": 12.0
+    },
+    {
+      "idx": 3,
+      "t_start": 36.0,
+      "t_end": 48.0,
+      "T_block": 12.0
+    }
+  ],
+  "passes": [
+    {
+      "pass_id": 1,
+      "pass_index": 0,
+      "reference_loss": 2322.880517578125,
+      "logs": [
+        {
+          "pass": 1,
+          "block": 0,
+          "t_start": 0.0,
+          "t_end": 12.0,
+          "T_block": 12.0,
+          "eval_mean_loss": 6512.859301757812,
+          "eval_std_loss": 8271.079822433841,
+          "eval_mean_loss_per_sample": 1.628214825439453,
+          "eval_std_loss_per_sample": 2.06776995560846,
+          "eval_mean_y0": -9.741339683532715,
+          "precision_target": 2555.1685693359377,
+          "refine_rounds": 3,
+          "stage_plan_used": [
+            [
+              7000,
+              0.0002
+            ],
+            [
+              7000,
+              0.0001
+            ],
+            [
+              6000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              5000,
+              1e-05
+            ],
+            [
+              4000,
+              5e-06
+            ],
+            [
+              3000,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1500,
+              1e-05
+            ],
+            [
+              1500,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_1/block_00.npz",
+          "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_1/block_00.ckpt"
+        },
+        {
+          "pass": 1,
+          "block": 1,
+          "t_start": 12.0,
+          "t_end": 24.0,
+          "T_block": 12.0,
+          "eval_mean_loss": 2228.219580078125,
+          "eval_std_loss": 644.7228775746781,
+          "eval_mean_loss_per_sample": 0.5570548950195313,
+          "eval_std_loss_per_sample": 0.16118071939366954,
+          "eval_mean_y0": -13.442570686340332,
+          "precision_target": 2555.1685693359377,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              7000,
+              0.0002
+            ],
+            [
+              7000,
+              0.0001
+            ],
+            [
+              6000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              5000,
+              1e-05
+            ],
+            [
+              4000,
+              5e-06
+            ],
+            [
+              3000,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1500,
+              1e-05
+            ],
+            [
+              1500,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_1/block_01.npz",
+          "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_1/block_01.ckpt"
+        },
+        {
+          "pass": 1,
+          "block": 2,
+          "t_start": 24.0,
+          "t_end": 36.0,
+          "T_block": 12.0,
+          "eval_mean_loss": 4693.809619140625,
+          "eval_std_loss": 3578.9384399108735,
+          "eval_mean_loss_per_sample": 1.1734524047851562,
+          "eval_std_loss_per_sample": 0.8947346099777185,
+          "eval_mean_y0": -17.659587860107422,
+          "precision_target": 2555.1685693359377,
+          "refine_rounds": 3,
+          "stage_plan_used": [
+            [
+              7000,
+              0.0002
+            ],
+            [
+              7000,
+              0.0001
+            ],
+            [
+              6000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              5000,
+              1e-05
+            ],
+            [
+              4000,
+              5e-06
+            ],
+            [
+              3000,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1500,
+              1e-05
+            ],
+            [
+              1500,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_1/block_02.npz",
+          "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_1/block_02.ckpt"
+        },
+        {
+          "pass": 1,
+          "block": 3,
+          "t_start": 36.0,
+          "t_end": 48.0,
+          "T_block": 12.0,
+          "eval_mean_loss": 2322.880517578125,
+          "eval_std_loss": 2312.9128718330476,
+          "eval_mean_loss_per_sample": 0.5807201293945312,
+          "eval_std_loss_per_sample": 0.5782282179582621,
+          "eval_mean_y0": -24.035062789916992,
+          "precision_target": null,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              12000,
+              0.001
+            ],
+            [
+              9000,
+              0.0005
+            ],
+            [
+              9000,
+              0.0001
+            ],
+            [
+              7000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              6000,
+              1e-05
+            ],
+            [
+              6000,
+              5e-06
+            ],
+            [
+              4000,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1500,
+              1e-05
+            ],
+            [
+              1500,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_1/block_03.npz",
+          "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_1/block_03.ckpt"
+        }
+      ],
+      "models_dir": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_1"
+    },
+    {
+      "pass_id": 2,
+      "pass_index": 1,
+      "reference_loss": 520.3413330078125,
+      "logs": [
+        {
+          "pass": 2,
+          "block": 0,
+          "t_start": 0.0,
+          "t_end": 12.0,
+          "T_block": 12.0,
+          "eval_mean_loss": 6051.359375,
+          "eval_std_loss": 2462.8453469605925,
+          "eval_mean_loss_per_sample": 1.5128398437500001,
+          "eval_std_loss_per_sample": 0.6157113367401481,
+          "eval_mean_y0": -30.853544235229492,
+          "precision_target": 7164.145231933594,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              7000,
+              0.0001
+            ],
+            [
+              6000,
+              5e-05
+            ],
+            [
+              5000,
+              2e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              5000,
+              1e-05
+            ],
+            [
+              4000,
+              5e-06
+            ],
+            [
+              3000,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1500,
+              5e-06
+            ],
+            [
+              1500,
+              2e-06
+            ],
+            [
+              1200,
+              1e-06
+            ]
+          ],
+          "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_2/block_00.npz",
+          "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_2/block_00.ckpt"
+        },
+        {
+          "pass": 2,
+          "block": 1,
+          "t_start": 12.0,
+          "t_end": 24.0,
+          "T_block": 12.0,
+          "eval_mean_loss": 478.4954895019531,
+          "eval_std_loss": 6.729797110955806,
+          "eval_mean_loss_per_sample": 0.11962387237548829,
+          "eval_std_loss_per_sample": 0.0016824492777389544,
+          "eval_mean_y0": -40.0346794128418,
+          "precision_target": 2451.0415380859376,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              5000,
+              0.0002
+            ],
+            [
+              5000,
+              0.0001
+            ],
+            [
+              4000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              3500,
+              1e-05
+            ],
+            [
+              3000,
+              5e-06
+            ],
+            [
+              2500,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1200,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_2/block_01.npz",
+          "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_2/block_01.ckpt"
+        },
+        {
+          "pass": 2,
+          "block": 2,
+          "t_start": 24.0,
+          "t_end": 36.0,
+          "T_block": 12.0,
+          "eval_mean_loss": 482.5572265625,
+          "eval_std_loss": 10.74299512251973,
+          "eval_mean_loss_per_sample": 0.12063930664062501,
+          "eval_std_loss_per_sample": 0.00268574878062993,
+          "eval_mean_y0": -25.717147827148438,
+          "precision_target": 5163.190581054688,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              5000,
+              0.0002
+            ],
+            [
+              5000,
+              0.0001
+            ],
+            [
+              4000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              3500,
+              1e-05
+            ],
+            [
+              3000,
+              5e-06
+            ],
+            [
+              2500,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1200,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_2/block_02.npz",
+          "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_2/block_02.ckpt"
+        },
+        {
+          "pass": 2,
+          "block": 3,
+          "t_start": 36.0,
+          "t_end": 48.0,
+          "T_block": 12.0,
+          "eval_mean_loss": 520.3413330078125,
+          "eval_std_loss": 20.28592755921176,
+          "eval_mean_loss_per_sample": 0.13008533325195312,
+          "eval_std_loss_per_sample": 0.005071481889802943,
+          "eval_mean_y0": -16.983631134033203,
+          "precision_target": 2555.1685693359377,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              5000,
+              0.0002
+            ],
+            [
+              5000,
+              0.0001
+            ],
+            [
+              4000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              3500,
+              1e-05
+            ],
+            [
+              3000,
+              5e-06
+            ],
+            [
+              2500,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1200,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_2/block_03.npz",
+          "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_2/block_03.ckpt"
+        }
+      ],
+      "models_dir": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_2"
+    },
+    {
+      "pass_id": 3,
+      "pass_index": 2,
+      "reference_loss": 515.2179016113281,
+      "logs": [
+        {
+          "pass": 3,
+          "block": 0,
+          "t_start": 0.0,
+          "t_end": 12.0,
+          "T_block": 12.0,
+          "eval_mean_loss": 2110.890283203125,
+          "eval_std_loss": 411.81973566015876,
+          "eval_mean_loss_per_sample": 0.5277225708007813,
+          "eval_std_loss_per_sample": 0.10295493391503972,
+          "eval_mean_y0": -38.327571868896484,
+          "precision_target": 6656.4953125,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              7000,
+              0.0001
+            ],
+            [
+              6000,
+              5e-05
+            ],
+            [
+              5000,
+              2e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              5000,
+              1e-05
+            ],
+            [
+              4000,
+              5e-06
+            ],
+            [
+              3000,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1500,
+              5e-06
+            ],
+            [
+              1500,
+              2e-06
+            ],
+            [
+              1200,
+              1e-06
+            ]
+          ],
+          "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_3/block_00.npz",
+          "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_3/block_00.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 1,
+          "t_start": 12.0,
+          "t_end": 24.0,
+          "T_block": 12.0,
+          "eval_mean_loss": 475.07985229492186,
+          "eval_std_loss": 8.977861102749667,
+          "eval_mean_loss_per_sample": 0.11876996307373047,
+          "eval_std_loss_per_sample": 0.0022444652756874192,
+          "eval_mean_y0": -38.527835845947266,
+          "precision_target": 526.3450384521484,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              5000,
+              0.0002
+            ],
+            [
+              5000,
+              0.0001
+            ],
+            [
+              4000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              3500,
+              1e-05
+            ],
+            [
+              3000,
+              5e-06
+            ],
+            [
+              2500,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1200,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_3/block_01.npz",
+          "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_3/block_01.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 2,
+          "t_start": 24.0,
+          "t_end": 36.0,
+          "T_block": 12.0,
+          "eval_mean_loss": 476.6492553710938,
+          "eval_std_loss": 3.200293875006748,
+          "eval_mean_loss_per_sample": 0.11916231384277345,
+          "eval_std_loss_per_sample": 0.0008000734687516864,
+          "eval_mean_y0": -24.37967872619629,
+          "precision_target": 530.81294921875,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              5000,
+              0.0002
+            ],
+            [
+              5000,
+              0.0001
+            ],
+            [
+              4000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              3500,
+              1e-05
+            ],
+            [
+              3000,
+              5e-06
+            ],
+            [
+              2500,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1200,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_3/block_02.npz",
+          "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_3/block_02.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 3,
+          "t_start": 36.0,
+          "t_end": 48.0,
+          "T_block": 12.0,
+          "eval_mean_loss": 515.2179016113281,
+          "eval_std_loss": 10.597865147090777,
+          "eval_mean_loss_per_sample": 0.12880447540283205,
+          "eval_std_loss_per_sample": 0.002649466286772701,
+          "eval_mean_y0": -16.301639556884766,
+          "precision_target": 572.3754663085938,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              5000,
+              0.0002
+            ],
+            [
+              5000,
+              0.0001
+            ],
+            [
+              4000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              3500,
+              1e-05
+            ],
+            [
+              3000,
+              5e-06
+            ],
+            [
+              2500,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1200,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_3/block_03.npz",
+          "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_3/block_03.ckpt"
+        }
+      ],
+      "models_dir": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_3"
+    }
+  ],
+  "resumed_from": null,
+  "boundary_stats": [
+    {
+      "boundary_idx": 0,
+      "n_samples": 4000,
+      "mean": [
+        0.9779950380325317,
+        0.9947693347930908,
+        0.016053302213549614,
+        4.996201515197754
+      ],
+      "std": [
+        1.0096609592437744,
+        0.9923080205917358,
+        0.9947899580001831,
+        2.3148927688598633
+      ],
+      "min": [
+        -3.1405739784240723,
+        -2.797278881072998,
+        -3.2864115238189697,
+        1.0007959604263306
+      ],
+      "max": [
+        4.6659159660339355,
+        4.4795637130737305,
+        3.5056774616241455,
+        8.999937057495117
+      ]
+    },
+    {
+      "boundary_idx": 1,
+      "n_samples": 4000,
+      "mean": [
+        1.0000005960464478,
+        0.9999997019767761,
+        -0.010608134791254997,
+        4.741210460662842
+      ],
+      "std": [
+        0.36293867230415344,
+        0.36999282240867615,
+        0.6577613353729248,
+        2.549893379211426
+      ],
+      "min": [
+        -0.5990394353866577,
+        -0.25707268714904785,
+        -2.8383729457855225,
+        -0.7574384212493896
+      ],
+      "max": [
+        2.5990352630615234,
+        2.2570724487304688,
+        2.593747138977051,
+        10.826733589172363
+      ]
+    },
+    {
+      "boundary_idx": 2,
+      "n_samples": 4000,
+      "mean": [
+        0.9999996423721313,
+        0.9999997019767761,
+        0.007601156830787659,
+        4.6145782470703125
+      ],
+      "std": [
+        0.3588380813598633,
+        0.36061811447143555,
+        0.6414341330528259,
+        2.6171629428863525
+      ],
+      "min": [
+        -0.36095595359802246,
+        -0.3307739794254303,
+        -2.7258191108703613,
+        -0.7819558382034302
+      ],
+      "max": [
+        2.3609559535980225,
+        2.3307740688323975,
+        2.5219979286193848,
+        10.890300750732422
+      ]
+    },
+    {
+      "boundary_idx": 3,
+      "n_samples": 4000,
+      "mean": [
+        1.0000008344650269,
+        1.0,
+        0.00024084254982881248,
+        4.614021301269531
+      ],
+      "std": [
+        0.3668292164802551,
+        0.36660003662109375,
+        0.6645656824111938,
+        2.5560052394866943
+      ],
+      "min": [
+        -0.23364734649658203,
+        -0.24248343706130981,
+        -2.7121188640594482,
+        -0.7302333116531372
+      ],
+      "max": [
+        2.233647346496582,
+        2.242483615875244,
+        3.075584650039673,
+        10.871957778930664
+      ]
+    },
+    {
+      "boundary_idx": 4,
+      "n_samples": 4000,
+      "mean": [
+        1.0000004768371582,
+        1.000001311302185,
+        0.00556292524561286,
+        4.575055122375488
+      ],
+      "std": [
+        0.363627552986145,
+        0.36937081813812256,
+        0.6288724541664124,
+        2.490139961242676
+      ],
+      "min": [
+        -0.25299298763275146,
+        -0.15957656502723694,
+        -2.4539613723754883,
+        -1.0692620277404785
+      ],
+      "max": [
+        2.252992868423462,
+        2.159576654434204,
+        3.3994452953338623,
+        10.688129425048828
+      ]
+    }
+  ],
+  "models_dir": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models",
+  "evaluation_bundle_path": "/export/home/alessio.rondelli2/python/LIPPI/FBSDENN_Lippi/alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/evaluation_bundle.npz",
+  "evaluation_bundle_M": 4000,
+  "selected_pass_id": 3,
+  "selected_pass_index": 2,
+  "selected_score_metric": "eval_mean_loss_per_sample+0.35*worst_block",
+  "selected_score": 0.40831773056030274,
+  "selected_scores_by_pass": {
+    "1": 1.5547357525634764,
+    "2": 1.0002910343170166,
+    "3": 0.40831773056030274
+  },
+  "selected_scores_by_pass_index": {
+    "0": 1.5547357525634764,
+    "1": 1.0002910343170166,
+    "2": 0.40831773056030274
+  },
+  "loss_score_metric": "eval_mean_loss_per_sample",
+  "loss_pass_scores": {
+    "1": 1.5547357525634764,
+    "2": 1.0002910343170166,
+    "3": 0.40831773056030274
+  },
+  "loss_pass_scores_by_index": {
+    "0": 1.5547357525634764,
+    "1": 1.0002910343170166,
+    "2": 0.40831773056030274
+  },
+  "exact_solution": {
+    "enabled": false,
+    "profile": "none"
+  },
+  "pass0": {
+    "reference_loss": 2322.880517578125,
+    "logs": [
+      {
+        "pass": 1,
+        "block": 0,
+        "t_start": 0.0,
+        "t_end": 12.0,
+        "T_block": 12.0,
+        "eval_mean_loss": 6512.859301757812,
+        "eval_std_loss": 8271.079822433841,
+        "eval_mean_loss_per_sample": 1.628214825439453,
+        "eval_std_loss_per_sample": 2.06776995560846,
+        "eval_mean_y0": -9.741339683532715,
+        "precision_target": 2555.1685693359377,
+        "refine_rounds": 3,
+        "stage_plan_used": [
+          [
+            7000,
+            0.0002
+          ],
+          [
+            7000,
+            0.0001
+          ],
+          [
+            6000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            5000,
+            1e-05
+          ],
+          [
+            4000,
+            5e-06
+          ],
+          [
+            3000,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1500,
+            1e-05
+          ],
+          [
+            1500,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_1/block_00.npz",
+        "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_1/block_00.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 1,
+        "t_start": 12.0,
+        "t_end": 24.0,
+        "T_block": 12.0,
+        "eval_mean_loss": 2228.219580078125,
+        "eval_std_loss": 644.7228775746781,
+        "eval_mean_loss_per_sample": 0.5570548950195313,
+        "eval_std_loss_per_sample": 0.16118071939366954,
+        "eval_mean_y0": -13.442570686340332,
+        "precision_target": 2555.1685693359377,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            7000,
+            0.0002
+          ],
+          [
+            7000,
+            0.0001
+          ],
+          [
+            6000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            5000,
+            1e-05
+          ],
+          [
+            4000,
+            5e-06
+          ],
+          [
+            3000,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1500,
+            1e-05
+          ],
+          [
+            1500,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_1/block_01.npz",
+        "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_1/block_01.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 2,
+        "t_start": 24.0,
+        "t_end": 36.0,
+        "T_block": 12.0,
+        "eval_mean_loss": 4693.809619140625,
+        "eval_std_loss": 3578.9384399108735,
+        "eval_mean_loss_per_sample": 1.1734524047851562,
+        "eval_std_loss_per_sample": 0.8947346099777185,
+        "eval_mean_y0": -17.659587860107422,
+        "precision_target": 2555.1685693359377,
+        "refine_rounds": 3,
+        "stage_plan_used": [
+          [
+            7000,
+            0.0002
+          ],
+          [
+            7000,
+            0.0001
+          ],
+          [
+            6000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            5000,
+            1e-05
+          ],
+          [
+            4000,
+            5e-06
+          ],
+          [
+            3000,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1500,
+            1e-05
+          ],
+          [
+            1500,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_1/block_02.npz",
+        "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_1/block_02.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 3,
+        "t_start": 36.0,
+        "t_end": 48.0,
+        "T_block": 12.0,
+        "eval_mean_loss": 2322.880517578125,
+        "eval_std_loss": 2312.9128718330476,
+        "eval_mean_loss_per_sample": 0.5807201293945312,
+        "eval_std_loss_per_sample": 0.5782282179582621,
+        "eval_mean_y0": -24.035062789916992,
+        "precision_target": null,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            12000,
+            0.001
+          ],
+          [
+            9000,
+            0.0005
+          ],
+          [
+            9000,
+            0.0001
+          ],
+          [
+            7000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            6000,
+            1e-05
+          ],
+          [
+            6000,
+            5e-06
+          ],
+          [
+            4000,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1500,
+            1e-05
+          ],
+          [
+            1500,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_1/block_03.npz",
+        "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_1/block_03.ckpt"
+      }
+    ]
+  },
+  "pass1": {
+    "reference_loss": 520.3413330078125,
+    "logs": [
+      {
+        "pass": 2,
+        "block": 0,
+        "t_start": 0.0,
+        "t_end": 12.0,
+        "T_block": 12.0,
+        "eval_mean_loss": 6051.359375,
+        "eval_std_loss": 2462.8453469605925,
+        "eval_mean_loss_per_sample": 1.5128398437500001,
+        "eval_std_loss_per_sample": 0.6157113367401481,
+        "eval_mean_y0": -30.853544235229492,
+        "precision_target": 7164.145231933594,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            7000,
+            0.0001
+          ],
+          [
+            6000,
+            5e-05
+          ],
+          [
+            5000,
+            2e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            5000,
+            1e-05
+          ],
+          [
+            4000,
+            5e-06
+          ],
+          [
+            3000,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1500,
+            5e-06
+          ],
+          [
+            1500,
+            2e-06
+          ],
+          [
+            1200,
+            1e-06
+          ]
+        ],
+        "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_2/block_00.npz",
+        "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_2/block_00.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 1,
+        "t_start": 12.0,
+        "t_end": 24.0,
+        "T_block": 12.0,
+        "eval_mean_loss": 478.4954895019531,
+        "eval_std_loss": 6.729797110955806,
+        "eval_mean_loss_per_sample": 0.11962387237548829,
+        "eval_std_loss_per_sample": 0.0016824492777389544,
+        "eval_mean_y0": -40.0346794128418,
+        "precision_target": 2451.0415380859376,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            5000,
+            0.0002
+          ],
+          [
+            5000,
+            0.0001
+          ],
+          [
+            4000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            3500,
+            1e-05
+          ],
+          [
+            3000,
+            5e-06
+          ],
+          [
+            2500,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1200,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_2/block_01.npz",
+        "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_2/block_01.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 2,
+        "t_start": 24.0,
+        "t_end": 36.0,
+        "T_block": 12.0,
+        "eval_mean_loss": 482.5572265625,
+        "eval_std_loss": 10.74299512251973,
+        "eval_mean_loss_per_sample": 0.12063930664062501,
+        "eval_std_loss_per_sample": 0.00268574878062993,
+        "eval_mean_y0": -25.717147827148438,
+        "precision_target": 5163.190581054688,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            5000,
+            0.0002
+          ],
+          [
+            5000,
+            0.0001
+          ],
+          [
+            4000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            3500,
+            1e-05
+          ],
+          [
+            3000,
+            5e-06
+          ],
+          [
+            2500,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1200,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_2/block_02.npz",
+        "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_2/block_02.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 3,
+        "t_start": 36.0,
+        "t_end": 48.0,
+        "T_block": 12.0,
+        "eval_mean_loss": 520.3413330078125,
+        "eval_std_loss": 20.28592755921176,
+        "eval_mean_loss_per_sample": 0.13008533325195312,
+        "eval_std_loss_per_sample": 0.005071481889802943,
+        "eval_mean_y0": -16.983631134033203,
+        "precision_target": 2555.1685693359377,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            5000,
+            0.0002
+          ],
+          [
+            5000,
+            0.0001
+          ],
+          [
+            4000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            3500,
+            1e-05
+          ],
+          [
+            3000,
+            5e-06
+          ],
+          [
+            2500,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1200,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_2/block_03.npz",
+        "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_2/block_03.ckpt"
+      }
+    ]
+  },
+  "pass2": {
+    "reference_loss": 515.2179016113281,
+    "logs": [
+      {
+        "pass": 3,
+        "block": 0,
+        "t_start": 0.0,
+        "t_end": 12.0,
+        "T_block": 12.0,
+        "eval_mean_loss": 2110.890283203125,
+        "eval_std_loss": 411.81973566015876,
+        "eval_mean_loss_per_sample": 0.5277225708007813,
+        "eval_std_loss_per_sample": 0.10295493391503972,
+        "eval_mean_y0": -38.327571868896484,
+        "precision_target": 6656.4953125,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            7000,
+            0.0001
+          ],
+          [
+            6000,
+            5e-05
+          ],
+          [
+            5000,
+            2e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            5000,
+            1e-05
+          ],
+          [
+            4000,
+            5e-06
+          ],
+          [
+            3000,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1500,
+            5e-06
+          ],
+          [
+            1500,
+            2e-06
+          ],
+          [
+            1200,
+            1e-06
+          ]
+        ],
+        "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_3/block_00.npz",
+        "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_3/block_00.ckpt"
+      },
+      {
+        "pass": 3,
+        "block": 1,
+        "t_start": 12.0,
+        "t_end": 24.0,
+        "T_block": 12.0,
+        "eval_mean_loss": 475.07985229492186,
+        "eval_std_loss": 8.977861102749667,
+        "eval_mean_loss_per_sample": 0.11876996307373047,
+        "eval_std_loss_per_sample": 0.0022444652756874192,
+        "eval_mean_y0": -38.527835845947266,
+        "precision_target": 526.3450384521484,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            5000,
+            0.0002
+          ],
+          [
+            5000,
+            0.0001
+          ],
+          [
+            4000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            3500,
+            1e-05
+          ],
+          [
+            3000,
+            5e-06
+          ],
+          [
+            2500,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1200,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_3/block_01.npz",
+        "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_3/block_01.ckpt"
+      },
+      {
+        "pass": 3,
+        "block": 2,
+        "t_start": 24.0,
+        "t_end": 36.0,
+        "T_block": 12.0,
+        "eval_mean_loss": 476.6492553710938,
+        "eval_std_loss": 3.200293875006748,
+        "eval_mean_loss_per_sample": 0.11916231384277345,
+        "eval_std_loss_per_sample": 0.0008000734687516864,
+        "eval_mean_y0": -24.37967872619629,
+        "precision_target": 530.81294921875,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            5000,
+            0.0002
+          ],
+          [
+            5000,
+            0.0001
+          ],
+          [
+            4000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            3500,
+            1e-05
+          ],
+          [
+            3000,
+            5e-06
+          ],
+          [
+            2500,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1200,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_3/block_02.npz",
+        "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_3/block_02.ckpt"
+      },
+      {
+        "pass": 3,
+        "block": 3,
+        "t_start": 36.0,
+        "t_end": 48.0,
+        "T_block": 12.0,
+        "eval_mean_loss": 515.2179016113281,
+        "eval_std_loss": 10.597865147090777,
+        "eval_mean_loss_per_sample": 0.12880447540283205,
+        "eval_std_loss_per_sample": 0.002649466286772701,
+        "eval_mean_y0": -16.301639556884766,
+        "precision_target": 572.3754663085938,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            5000,
+            0.0002
+          ],
+          [
+            5000,
+            0.0001
+          ],
+          [
+            4000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            3500,
+            1e-05
+          ],
+          [
+            3000,
+            5e-06
+          ],
+          [
+            2500,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1200,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_3/block_03.npz",
+        "ckpt_path": "alessio/recursive1_outputs/heavy_from_zero/run_20260302_170351/recursive/models/pass_3/block_03.ckpt"
+      }
+    ]
+  }
+}
