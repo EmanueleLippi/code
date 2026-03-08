@@ -1,0 +1,2 @@
+source_mode,pass_id,pass_index,n_blocks,n_paths,n_time_points,mean_y0,std_y0,mean_abs_y,mean_abs_z,drift_y_vs_prev,drift_z_vs_prev,prev_pass_index,exact_mean_abs_error_y,exact_mean_abs_error_z,exact_abs_error_mean_y0,exact_rmse_y,exact_rmse_y0
+models,4,3,4,1024,321,-36.41029357910156,25.50312042236328,25.86455535888672,2.3087072372436523,nan,nan,,12.547192573547363,0.4325871467590332,17.45950698852539,15.594216346740723,18.400108337402344
