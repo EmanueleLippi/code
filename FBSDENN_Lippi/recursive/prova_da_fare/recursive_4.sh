@@ -1,5 +1,7 @@
 #!/bin/bash -l
 
+set -euo pipefail
+
 #
 
 #SBATCH --partition=gpu                      # cpu / gpu (gpu in case of cuda p>
@@ -36,44 +38,65 @@ echo "anaconda tensorflow"
 
 module load anaconda
 
-#conda info --envs
-conda init bash
-#conda create --name tf-gpu tensorflow-gpu
+CONDA_SH="/usr/local/anaconda3.22/etc/profile.d/conda.sh"
+if [[ -f "$CONDA_SH" ]]; then
+  source "$CONDA_SH"
+else
+  eval "$(/usr/local/anaconda3.22/bin/conda shell.bash hook)"
+fi
 conda activate tf-gpu
 
-#(echo "import tensorflow as tf" ; echo "print('Num GPUs Available: ', len(tf.config.list_physical_devices('GPU')))") | python
+ROOT="${ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+cd "$ROOT"
 
-COMMON_EVAL_BUNDLE="$ROOT/recursive/recursive1_outputs/qc_compare_eval_bundle_T4_B05_M2000_N20.npz"
+export TF_GPU_ALLOCATOR="${TF_GPU_ALLOCATOR:-cuda_malloc_async}"
 
-python recursive/modules/main.py \
+T_TOTAL="${T_TOTAL:-4}"
+BLOCK_SIZE="${BLOCK_SIZE:-0.5}"
+M="${M:-2000}"
+N="${N:-20}"
+PASSES="${PASSES:-3}"
+SELECTION_METRIC="${SELECTION_METRIC:-loss}"
+TRAINING_PLAN="${TRAINING_PLAN:-$ROOT/recursive/training_plan_example.csv}"
+MODULES_OUT="${MODULES_OUT:-$ROOT/recursive/recursive1_outputs/qc_modules}"
+LEGACY_OUT="${LEGACY_OUT:-$ROOT/recursive/recursive1_outputs/qc_recursive1}"
+COMMON_EVAL_BUNDLE="${COMMON_EVAL_BUNDLE:-$ROOT/recursive/recursive1_outputs/qc_compare_eval_bundle_T4_B05_M2000_N20.npz}"
+
+echo "ROOT=$ROOT"
+echo "python=$(command -v python)"
+echo "TF_GPU_ALLOCATOR=$TF_GPU_ALLOCATOR"
+echo "training_plan=$TRAINING_PLAN"
+echo "GPU snapshot"
+nvidia-smi || true
+
+python "$ROOT/recursive/modules/main.py" \
   --mode recursive \
   --exact_solution quadratic_coupled \
-  --selection_metric loss \
-  --T_total 4 \
-  --block_size 0.5 \
-  --M 2000 \
-  --N 20 \
-  --passes 3 \
-  --training_plan_csv recursive/training_plan_example.csv \
-  --output_dir recursive/recursive1_outputs/qc_modules \
+  --selection_metric "$SELECTION_METRIC" \
+  --T_total "$T_TOTAL" \
+  --block_size "$BLOCK_SIZE" \
+  --M "$M" \
+  --N "$N" \
+  --passes "$PASSES" \
+  --training_plan_csv "$TRAINING_PLAN" \
+  --output_dir "$MODULES_OUT" \
   --disable_cross_pass_warm_start \
   --eval_bundle_path "$COMMON_EVAL_BUNDLE"
 
 echo "Finito 1"
 
-python recursive/recursive1.py \
+python "$ROOT/recursive/recursive1.py" \
   --mode recursive \
   --exact_solution quadratic_coupled \
-  --selection_metric loss \
-  --T_total 4 \
-  --block_size 0.5 \
-  --M 2000 \
-  --N 20 \
-  --passes 3 \
-  --training_plan_csv recursive/training_plan_example.csv \
-  --output_dir recursive/recursive1_outputs/qc_recursive1 \
+  --selection_metric "$SELECTION_METRIC" \
+  --T_total "$T_TOTAL" \
+  --block_size "$BLOCK_SIZE" \
+  --M "$M" \
+  --N "$N" \
+  --passes "$PASSES" \
+  --training_plan_csv "$TRAINING_PLAN" \
+  --output_dir "$LEGACY_OUT" \
   --disable_cross_pass_warm_start \
   --eval_bundle_path "$COMMON_EVAL_BUNDLE"
 
 echo "Finito 2"
-

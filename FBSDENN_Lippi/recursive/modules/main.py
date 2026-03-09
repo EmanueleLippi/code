@@ -53,6 +53,30 @@ def _log(logger, msg: str) -> None:
         print(msg)
 
 
+def _configure_tensorflow_runtime(logger=None) -> None:
+    try:
+        gpus = tf.config.list_physical_devices("GPU")
+    except Exception as exc:
+        _log(logger, f"[TensorFlow] unable to query GPUs: {exc}")
+        return
+
+    if len(gpus) == 0:
+        _log(logger, "[TensorFlow] no visible GPUs")
+        return
+
+    gpu_labels = []
+    for gpu in gpus:
+        label = str(getattr(gpu, "name", gpu))
+        try:
+            tf.config.experimental.set_memory_growth(gpu, True)
+            label = f"{label} (memory_growth=on)"
+        except Exception as exc:
+            label = f"{label} (memory_growth=off: {exc})"
+        gpu_labels.append(label)
+
+    _log(logger, "[TensorFlow] visible GPUs: " + ", ".join(gpu_labels))
+
+
 def print_recursive_pass(
     pass_entries: List[Dict[str, Any]],
     blocks: List[Dict[str, float]],
@@ -477,7 +501,6 @@ def main():
     args = parser.parse_args()
 
     np.random.seed(1234)
-    tf.random.set_seed(1234)
 
     config = TrainingConfig(
         M=args.M,
@@ -509,6 +532,8 @@ def main():
 
     logger = setup_logger(log_file=os.path.join(run_root, "execution.log"))
     _log(logger, f"Avvio esperimento con mode={args.mode}")
+    _configure_tensorflow_runtime(logger)
+    tf.random.set_seed(1234)
 
     training_plan_rules = load_training_plan_csv(config.training_plan_csv)
     training_plan_effective_source = str(config.training_plan_csv or "").strip()
