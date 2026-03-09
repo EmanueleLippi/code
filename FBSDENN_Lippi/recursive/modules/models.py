@@ -244,8 +244,28 @@ def _init_quadratic_coupled_parameters(model, parameters):
 
 
 class NN_Quadratic_Coupled(FBSNN):
-    def __init__(self, Xi, T, M, N, D, layers, parameters):
-        super().__init__(Xi, T, M, N, D, layers)
+    def __init__(
+        self,
+        Xi,
+        T,
+        M,
+        N,
+        D,
+        layers,
+        parameters,
+        clip_grad_norm=1.0,
+        use_antithetic_sampling=True,
+    ):
+        super().__init__(
+            Xi,
+            T,
+            M,
+            N,
+            D,
+            layers,
+            clip_grad_norm=clip_grad_norm,
+            use_antithetic_sampling=use_antithetic_sampling,
+        )
         _init_quadratic_coupled_parameters(self, parameters)
 
     def psi(self, X_state):
@@ -351,7 +371,10 @@ class FBSNN_Recursive(FBSNN):
         self._x_norm_std_tf = tf.constant(self.x_norm_std_np, dtype=tf.float32)
         self._T_total_tf = tf.constant(self.T_total_val, dtype=tf.float32)
 
-        super().__init__(
+        # Call the base class explicitly to avoid the diamond-inheritance MRO
+        # from routing through NN_Quadratic_Coupled.__init__.
+        FBSNN.__init__(
+            self,
             Xi_generator,
             T,
             M,
@@ -539,6 +562,8 @@ class NN_Quadratic_Coupled_Recursive(FBSNN_Recursive, NN_Quadratic_Coupled):
         normalize_time_input=True,
         x_norm_mean=None,
         x_norm_std=None,
+        clip_grad_norm=1.0,
+        use_antithetic_sampling=True,
     ):
         FBSNN_Recursive.__init__(
             self,
@@ -555,6 +580,8 @@ class NN_Quadratic_Coupled_Recursive(FBSNN_Recursive, NN_Quadratic_Coupled):
             normalize_time_input=normalize_time_input,
             x_norm_mean=x_norm_mean,
             x_norm_std=x_norm_std,
+            clip_grad_norm=clip_grad_norm,
+            use_antithetic_sampling=use_antithetic_sampling,
         )
         _init_quadratic_coupled_parameters(self, parameters)
 
