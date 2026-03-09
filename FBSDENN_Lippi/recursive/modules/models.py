@@ -395,10 +395,10 @@ class FBSNN_Recursive(FBSNN):
 
     @tf.function
     def net_u(self, t, X):
-        t_in = self._normalize_t(t)
-        X_in = self._normalize_x(X)
         with tf.GradientTape(watch_accessed_variables=False) as tape:
             tape.watch(X)
+            t_in = self._normalize_t(t)
+            X_in = self._normalize_x(X)
             u = self.net(tf.concat([t_in, X_in], axis=1))
         Du = tape.gradient(u, X)
         return u, Du
