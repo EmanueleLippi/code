@@ -46,6 +46,12 @@ class FBSNN(tf.keras.Model, ABC):
         dummy_x = tf.zeros((1, D), dtype=tf.float32)
         self.net(tf.concat([dummy_t, dummy_x], axis=1))
 
+    def save_model(self, path: str) -> None:
+        self.save_weights(path)
+
+    def load_model(self, path: str) -> None:
+        self.load_weights(path)
+
     @tf.function
     def net_u(self, t, X):
         with tf.GradientTape(watch_accessed_variables=False) as tape:
@@ -151,13 +157,17 @@ class FBSNN(tf.keras.Model, ABC):
         self.optimizer.learning_rate.assign(learning_rate)
         with tf.GradientTape() as tape:
             loss, X_pred, Y_pred, Z_pred = self.loss_function(t, W, Xi)
-        
+
         trainable_vars = self.trainable_variables
         gradients = tape.gradient(loss, trainable_vars)
-        if self.clip_grad_norm is not None:
-            gradients, _ = tf.clip_by_global_norm(gradients, self.clip_grad_norm)
-        
-        self.optimizer.apply_gradients(zip(gradients, trainable_vars))
+        grads_and_vars = [(g, v) for g, v in zip(gradients, trainable_vars) if g is not None]
+        if self.clip_grad_norm is not None and grads_and_vars:
+            grads, vars_ = zip(*grads_and_vars)
+            clipped, _ = tf.clip_by_global_norm(list(grads), self.clip_grad_norm)
+            grads_and_vars = list(zip(clipped, vars_))
+
+        if grads_and_vars:
+            self.optimizer.apply_gradients(grads_and_vars)
         return loss, X_pred, Y_pred, Z_pred
 
     def evaluate_model(self, const_value=None, n_batches=5):
@@ -188,9 +198,9 @@ class FBSNN(tf.keras.Model, ABC):
         if const_value is not None:
             self.const_val.assign(const_value)
         _, X_star, Y_star, Z_star = self.loss_function(
-            tf.constant(t_star, dtype=tf.float32),
-            tf.constant(W_star, dtype=tf.float32),
-            tf.constant(Xi_star, dtype=tf.float32)
+            tf.convert_to_tensor(t_star, dtype=tf.float32),
+            tf.convert_to_tensor(W_star, dtype=tf.float32),
+            tf.convert_to_tensor(Xi_star, dtype=tf.float32),
         )
         return X_star.numpy(), Y_star.numpy(), Z_star.numpy()
 
@@ -482,24 +492,34 @@ class FBSNN_Recursive(FBSNN):
         blob = _as_blob_dict(blob_or_path)
         if blob is None:
             return
-        
+
         n_layers = len(self.net.get_weights()) // 2
         if strict and int(blob["n_layers"]) != n_layers:
             raise ValueError(
                 f"n_layers mismatch: model={n_layers}, blob={int(blob['n_layers'])}"
             )
-        
+
         new_weights = []
         for i in range(n_layers):
             w_key = f"W_{i}"
             b_key = f"b_{i}"
-            if w_key in blob and b_key in blob:
+            if w_key in blob:
                 new_weights.append(blob[w_key])
+            elif strict:
+                raise KeyError(f"Missing key {w_key} in blob")
+
+            if b_key in blob:
                 new_weights.append(blob[b_key])
             elif strict:
-                raise KeyError(f"Missing key in blob for layer {i}")
+                raise KeyError(f"Missing key {b_key} in blob")
         if len(new_weights) > 0:
             self.net.set_weights(new_weights)
+
+    def save_parameter_blob(self, path: str) -> None:
+        save_blob_npz(self.export_parameter_blob(), path)
+
+    def load_parameter_blob(self, path: str, strict=True) -> None:
+        self.import_parameter_blob(path, strict=strict)
 
 
 class NN_Quadratic_Coupled_Recursive(FBSNN_Recursive, NN_Quadratic_Coupled):

@@ -1,6 +1,9 @@
 import os
 from typing import Dict, List
+
 import numpy as np
+
+from utils import _pass_label, _z_component_labels
 
 try:
     import matplotlib
@@ -78,7 +81,14 @@ def plot_recursive_pass_logs_multi(pass_logs_by_pass: Dict[int, List[Dict]], out
         rows = normalized[pass_id]
         b = np.array([r["block"] for r in rows], dtype=np.int32)
         l = np.array([r[loss_key] for r in rows], dtype=np.float64)
-        plt.plot(b, l, marker="o", linewidth=1.5, color=colors[i], label=f"pass{pass_id} loss")
+        plt.plot(
+            b,
+            l,
+            marker="o",
+            linewidth=1.5,
+            color=colors[i],
+            label=f"{_pass_label(pass_id)} loss",
+        )
     plt.yscale("log")
     if use_per_sample_loss:
         plt.title("Recursive blocks - Eval Mean Loss per Sample")
@@ -98,7 +108,14 @@ def plot_recursive_pass_logs_multi(pass_logs_by_pass: Dict[int, List[Dict]], out
         rows = normalized[pass_id]
         b = np.array([r["block"] for r in rows], dtype=np.int32)
         y = np.array([r["eval_mean_y0"] for r in rows], dtype=np.float64)
-        plt.plot(b, y, marker="o", linewidth=1.5, color=colors[i], label=f"pass{pass_id} y0")
+        plt.plot(
+            b,
+            y,
+            marker="o",
+            linewidth=1.5,
+            color=colors[i],
+            label=f"{_pass_label(pass_id)} y0",
+        )
     plt.title("Recursive blocks - Eval Mean Y0")
     plt.xlabel("Block index")
     plt.ylabel("Mean Y0")
@@ -220,7 +237,7 @@ def plot_recursive_stitched_y_convergence(
             y_mean,
             color=colors[i],
             linewidth=1.8,
-            label=f"pass{pass_id} mean Y",
+            label=f"{_pass_label(pass_id)} mean Y",
         )
 
     for block in blocks[:-1]:
@@ -261,8 +278,6 @@ def plot_recursive_exact_comparison(
     if Y_exact.shape != Y_pred.shape or Z_exact.shape != Z_pred.shape:
         return
 
-    from utils import _z_component_labels
-
     os.makedirs(out_dir, exist_ok=True)
     n_paths = max(1, min(int(sample_paths), int(t_all.shape[0])))
     z_labels = _z_component_labels(int(Z_pred.shape[2]))
@@ -302,11 +317,11 @@ def plot_recursive_exact_comparison(
     plt.savefig(os.path.join(out_dir, f"recursive_stitched_Y_exact{file_suffix}.png"), dpi=160)
     plt.close()
 
-    abs_err_Z = np.abs(Z_pred - Z_exact)
+    abs_err_Z_full = np.abs(Z_pred - Z_exact)
     valid_mask = np.abs(Z_exact) > 1.0e-8
-    rel_err_Z = np.zeros_like(abs_err_Z, dtype=np.float32)
+    rel_err_Z = np.zeros_like(abs_err_Z_full, dtype=np.float32)
     np.divide(
-        abs_err_Z,
+        abs_err_Z_full,
         np.abs(Z_exact) + 1.0e-8,
         out=rel_err_Z,
         where=valid_mask,
@@ -332,7 +347,7 @@ def plot_recursive_exact_comparison(
     plt.savefig(os.path.join(out_dir, f"recursive_stitched_Z_rel_error{file_suffix}.png"), dpi=160)
     plt.close()
 
-    abs_err_Z = np.mean(abs_err_Z, axis=0)
+    abs_err_Z = np.mean(abs_err_Z_full, axis=0)
     abs_err_Y = np.mean(np.abs(Y_pred - Y_exact), axis=0)
 
     plt.figure(figsize=(12, 6))

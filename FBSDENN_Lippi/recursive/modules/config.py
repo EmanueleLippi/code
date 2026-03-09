@@ -33,13 +33,22 @@ class TrainingConfig:
     T_standard: float = 12.0
     T_total: float = 48.0
     block_size: float = 12.0
-    
+
     passes: int = 2
+    resume_models_dir: str = ""
+    resume_from_pass: int = 0
     empirical_jitter_scale: float = 0.02
     pass1_warm_start_from_next: bool = False
+    cross_pass_warm_start: bool = True
     exact_solution: str = "none"
+    selection_metric: str = "auto"
+    exact_regression_tolerance: float = 0.20
+    exact_regression_action: str = "warn"
+    eval_bundle_path: str = ""
+    eval_seed: int = 1234
+    allow_resume_without_plan: bool = False
     training_plan_csv: str = ""
-    
+
     # Plans
     stage_plan: List[Tuple[int, float]] = dataclasses.field(
         default_factory=lambda: [(5000, 1e-3), (5000, 5e-4), (5000, 1e-4), (5000, 5e-5)]
