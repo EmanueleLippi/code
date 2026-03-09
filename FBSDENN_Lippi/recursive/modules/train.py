@@ -919,7 +919,7 @@ def run_recursive_training(
 
                 ckpt_path = None
                 if save_tf_checkpoints:
-                    ckpt_path = os.path.join(pass_dir, f"block_{b:02d}.ckpt")
+                    ckpt_path = os.path.join(pass_dir, f"block_{b:02d}.weights.h5")
                     model.save_model(ckpt_path)
 
                 log_row = {

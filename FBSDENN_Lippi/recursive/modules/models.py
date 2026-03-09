@@ -46,11 +46,24 @@ class FBSNN(tf.keras.Model, ABC):
         dummy_x = tf.zeros((1, D), dtype=tf.float32)
         self.net(tf.concat([dummy_t, dummy_x], axis=1))
 
+    @staticmethod
+    def _normalize_weights_path(path: str) -> str:
+        path = str(path)
+        if path.endswith(".weights.h5"):
+            return path
+        if path.endswith(".ckpt"):
+            return path[:-5] + ".weights.h5"
+        return path + ".weights.h5"
+
     def save_model(self, path: str) -> None:
-        self.save_weights(path)
+        self.net.save_weights(self._normalize_weights_path(path))
 
     def load_model(self, path: str) -> None:
-        self.load_weights(path)
+        normalized_path = self._normalize_weights_path(path)
+        if tf.io.gfile.exists(normalized_path):
+            self.net.load_weights(normalized_path)
+            return
+        self.net.load_weights(path)
 
     @tf.function
     def net_u(self, t, X):

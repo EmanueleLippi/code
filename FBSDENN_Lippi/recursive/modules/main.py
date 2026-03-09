@@ -643,7 +643,7 @@ def main():
             logger=logger,
         )
 
-        std_ckpt_path = os.path.join(std_dir, "model.ckpt")
+        std_ckpt_path = os.path.join(std_dir, "model.weights.h5")
         model_std.save_model(std_ckpt_path)
 
         std_blob = export_standard_parameter_blob(model_std)
