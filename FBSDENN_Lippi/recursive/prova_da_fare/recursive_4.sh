@@ -38,11 +38,18 @@ echo "anaconda tensorflow"
 
 module load anaconda
 
-CONDA_SH="/usr/local/anaconda3.22/etc/profile.d/conda.sh"
+# Initialize Conda explicitly because Slurm batch shells are non-interactive.
+CONDA_SH="${CONDA_SH:-/usr/local/anaconda3.22/etc/profile.d/conda.sh}"
+CONDA_BIN="${CONDA_BIN:-/usr/local/anaconda3.22/bin/conda}"
 if [[ -f "$CONDA_SH" ]]; then
   source "$CONDA_SH"
+elif command -v conda >/dev/null 2>&1; then
+  eval "$(conda shell.bash hook)"
+elif [[ -x "$CONDA_BIN" ]]; then
+  eval "$("$CONDA_BIN" shell.bash hook)"
 else
-  eval "$(/usr/local/anaconda3.22/bin/conda shell.bash hook)"
+  echo "Unable to initialize conda after 'module load anaconda'." >&2
+  exit 1
 fi
 conda activate tf-gpu
 
@@ -58,7 +65,6 @@ N="${N:-20}"
 PASSES="${PASSES:-3}"
 SELECTION_METRIC="${SELECTION_METRIC:-loss}"
 TRAINING_PLAN="${TRAINING_PLAN:-$ROOT/recursive/training_plan_example.csv}"
-MODULES_OUT="${MODULES_OUT:-$ROOT/recursive/recursive1_outputs/qc_modules}"
 LEGACY_OUT="${LEGACY_OUT:-$ROOT/recursive/recursive1_outputs/qc_recursive1}"
 COMMON_EVAL_BUNDLE="${COMMON_EVAL_BUNDLE:-$ROOT/recursive/recursive1_outputs/qc_compare_eval_bundle_T4_B05_M2000_N20.npz}"
 
@@ -69,21 +75,7 @@ echo "training_plan=$TRAINING_PLAN"
 echo "GPU snapshot"
 nvidia-smi || true
 
-python "$ROOT/recursive/modules/main.py" \
-  --mode recursive \
-  --exact_solution quadratic_coupled \
-  --selection_metric "$SELECTION_METRIC" \
-  --T_total "$T_TOTAL" \
-  --block_size "$BLOCK_SIZE" \
-  --M "$M" \
-  --N "$N" \
-  --passes "$PASSES" \
-  --training_plan_csv "$TRAINING_PLAN" \
-  --output_dir "$MODULES_OUT" \
-  --disable_cross_pass_warm_start \
-  --eval_bundle_path "$COMMON_EVAL_BUNDLE"
-
-echo "Finito 1"
+echo "Running recursive1 only"
 
 python "$ROOT/recursive/recursive1.py" \
   --mode recursive \
@@ -99,4 +91,4 @@ python "$ROOT/recursive/recursive1.py" \
   --disable_cross_pass_warm_start \
   --eval_bundle_path "$COMMON_EVAL_BUNDLE"
 
-echo "Finito 2"
+echo "Recursive1 finished"
