@@ -1,7 +1,5 @@
 #!/bin/bash -l
 
-set -euo pipefail
-
 #
 
 #SBATCH --partition=gpu                      # cpu / gpu (gpu in case of cuda p>
@@ -38,57 +36,24 @@ echo "anaconda tensorflow"
 
 module load anaconda
 
-# Initialize Conda explicitly because Slurm batch shells are non-interactive.
-CONDA_SH="${CONDA_SH:-/usr/local/anaconda3.22/etc/profile.d/conda.sh}"
-CONDA_BIN="${CONDA_BIN:-/usr/local/anaconda3.22/bin/conda}"
-if [[ -f "$CONDA_SH" ]]; then
-  source "$CONDA_SH"
-elif command -v conda >/dev/null 2>&1; then
-  eval "$(conda shell.bash hook)"
-elif [[ -x "$CONDA_BIN" ]]; then
-  eval "$("$CONDA_BIN" shell.bash hook)"
-else
-  echo "Unable to initialize conda after 'module load anaconda'." >&2
-  exit 1
-fi
+#conda info --envs
+conda init bash
+#conda create --name tf-gpu tensorflow-gpu
 conda activate tf-gpu
 
-ROOT="${ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
-cd "$ROOT"
+#(echo "import tensorflow as tf" ; echo "print('Num GPUs Available: ', len(tf.config.list_physical_devices('GPU')))") | python
 
-export TF_GPU_ALLOCATOR="${TF_GPU_ALLOCATOR:-cuda_malloc_async}"
-
-T_TOTAL="${T_TOTAL:-4}"
-BLOCK_SIZE="${BLOCK_SIZE:-0.5}"
-M="${M:-2000}"
-N="${N:-20}"
-PASSES="${PASSES:-3}"
-SELECTION_METRIC="${SELECTION_METRIC:-loss}"
-TRAINING_PLAN="${TRAINING_PLAN:-$ROOT/recursive/training_plan_example.csv}"
-LEGACY_OUT="${LEGACY_OUT:-$ROOT/recursive/recursive1_outputs/qc_recursive1}"
-COMMON_EVAL_BUNDLE="${COMMON_EVAL_BUNDLE:-$ROOT/recursive/recursive1_outputs/qc_compare_eval_bundle_T4_B05_M2000_N20.npz}"
-
-echo "ROOT=$ROOT"
-echo "python=$(command -v python)"
-echo "TF_GPU_ALLOCATOR=$TF_GPU_ALLOCATOR"
-echo "training_plan=$TRAINING_PLAN"
-echo "GPU snapshot"
-nvidia-smi || true
-
-echo "Running recursive1 only"
-
-python "$ROOT/recursive/recursive1.py" \
+cd /export/home/alessio.rondelli2/python/recursive
+python "[TUO_PATH]/code/FBSDENN_Lippi/recursive/recursive1.py" \
   --mode recursive \
   --exact_solution quadratic_coupled \
-  --selection_metric "$SELECTION_METRIC" \
-  --T_total "$T_TOTAL" \
-  --block_size "$BLOCK_SIZE" \
-  --M "$M" \
-  --N "$N" \
-  --passes "$PASSES" \
-  --training_plan_csv "$TRAINING_PLAN" \
-  --output_dir "$LEGACY_OUT" \
+  --selection_metric loss \
   --disable_cross_pass_warm_start \
-  --eval_bundle_path "$COMMON_EVAL_BUNDLE"
-
-echo "Recursive1 finished"
+  --M 2000 \
+  --N 20 \
+  --D 4 \
+  --T_total 4 \
+  --block_size 0.5 \
+  --passes 3 \
+  --training_plan_csv "[TUO_PATH]/code/FBSDENN_Lippi/recursive/prova_da_fare/training_plan.csv" \
+  --output_dir "[TUO_PATH]/code/FBSDENN_Lippi/alessio/recursive1_outputs/prova_da_fare"
