@@ -772,6 +772,7 @@ def print_recursive_pass(
     sample_paths: int = 8,
     enforce_exact_regression_guardrail: bool = True,
     print_compact_logs: bool = True,
+    exclude_pass_ids_from_selection: Optional[List[int]] = None,
 ) -> Dict[str, Any]:
     if pass_entries is None or len(pass_entries) == 0:
         raise RuntimeError("print_recursive_pass called with empty pass_entries")
@@ -824,6 +825,24 @@ def print_recursive_pass(
         f"[Selection:loss] metric={score_key}, best={_pass_label(best_pass_by_loss)}, "
         f"score={pass_scores_loss[best_pass_by_loss]:.6e}"
     )
+    excluded_pass_ids_effective = sorted(
+        int(pid)
+        for pid in {int(x) for x in (exclude_pass_ids_from_selection or [])}
+        if int(pid) in pass_scores_loss
+    )
+    pass_scores_loss_for_selection = {
+        int(pass_id): float(score)
+        for pass_id, score in pass_scores_loss.items()
+        if int(pass_id) not in excluded_pass_ids_effective
+    }
+    if len(pass_scores_loss_for_selection) == 0:
+        pass_scores_loss_for_selection = dict(pass_scores_loss)
+        excluded_pass_ids_effective = []
+    elif len(excluded_pass_ids_effective) > 0:
+        print(
+            "[Selection] excluding passes from final choice: "
+            + ", ".join(_pass_label(pid) for pid in excluded_pass_ids_effective)
+        )
 
     eval_bundle_path = str(eval_bundle_path or "").strip()
     if eval_bundle_path == "":
@@ -962,9 +981,14 @@ def print_recursive_pass(
                 prev_id = pass_id
                 prev_val = curr_val
 
+    exact_summary_by_pass_for_selection = {
+        int(pass_id): summary
+        for pass_id, summary in exact_summary_by_pass.items()
+        if int(pass_id) in pass_scores_loss_for_selection
+    }
     selected_pass_id, selected_score_metric, selected_score, selected_score_by_pass = resolve_pass_selection(
-        pass_scores_by_loss=pass_scores_loss,
-        exact_summary_by_pass=exact_summary_by_pass,
+        pass_scores_by_loss=pass_scores_loss_for_selection,
+        exact_summary_by_pass=exact_summary_by_pass_for_selection,
         selection_metric=str(selection_metric),
         loss_metric_label=score_key,
     )
@@ -1027,6 +1051,10 @@ def print_recursive_pass(
         "pass_scores_loss_by_index": {
             str(_pass_index(k)): float(v) for k, v in pass_scores_loss.items()
         },
+        "excluded_pass_ids_from_selection": excluded_pass_ids_effective,
+        "excluded_pass_indices_from_selection": [
+            int(_pass_index(pid)) for pid in excluded_pass_ids_effective
+        ],
         "selected_pass_id": int(selected_pass_id),
         "selected_pass_index": int(_pass_index(selected_pass_id)),
         "selected_score_metric": selected_score_metric,
@@ -1307,6 +1335,142 @@ def build_exact_solution_functions(
         "Unknown exact_solution profile "
         f"'{solution_name}'. Supported: none, quadratic_coupled"
     )
+
+
+def _clip_unit_interval_np(arr: np.ndarray) -> np.ndarray:
+    return np.maximum(0.0, np.minimum(1.0, arr)).astype(np.float32)
+
+
+def _quadratic_coupled_psi_x_np(X_state: np.ndarray, params: Dict[str, np.ndarray]) -> np.ndarray:
+    d = float(params["d"])
+    x_max = float(params["x_max"])
+    return np.maximum(
+        0.0,
+        np.minimum(
+            1.0,
+            np.minimum(X_state / d, (x_max - X_state) / d),
+        ),
+    ).astype(np.float32)
+
+
+def _quadratic_coupled_psi3_np(V: np.ndarray, params: Dict[str, np.ndarray]) -> np.ndarray:
+    d = float(params["d"])
+    v_max = float(params["v_max"])
+    return _clip_unit_interval_np((v_max - V) / d)
+
+
+def _quadratic_coupled_psi4_np(V: np.ndarray, params: Dict[str, np.ndarray]) -> np.ndarray:
+    d = float(params["d"])
+    v_min = float(params["v_min"])
+    return _clip_unit_interval_np((V - v_min) / d)
+
+
+def quadratic_coupled_exact_z_np(X: np.ndarray, params: Dict[str, np.ndarray]) -> np.ndarray:
+    X = np.asarray(X, dtype=np.float32)
+    S = X[:, 0:1]
+    V = X[:, 2:3]
+    X_state = X[:, 3:4]
+    gamma = float(params["gamma"])
+    s1 = float(params["s1"])
+    s3 = float(params["s3"])
+    z_s = -gamma * np.exp(S) * X_state * s1
+    z_h = np.zeros_like(z_s)
+    z_v = (2.0 * V + X_state) * s3
+    z_x = np.zeros_like(z_s)
+    return np.concatenate([z_s, z_h, z_v, z_x], axis=1).astype(np.float32)
+
+
+def quadratic_coupled_mu_np(
+    X: np.ndarray,
+    Z: np.ndarray,
+    params: Dict[str, np.ndarray],
+) -> np.ndarray:
+    X = np.asarray(X, dtype=np.float32)
+    Z = np.asarray(Z, dtype=np.float32)
+
+    S = X[:, 0:1]
+    H = X[:, 1:2]
+    V = X[:, 2:3]
+    X_state = X[:, 3:4]
+    Z_S = Z[:, 0:1]
+
+    mu1 = float(params["mu1"])
+    mu2 = float(params["mu2"])
+    c1 = float(params["c1"])
+    c2 = float(params["c2"])
+    c3 = float(params["c3"])
+    c4 = float(params["c4"])
+    gamma = float(params["gamma"])
+    s1 = float(params["s1"])
+    x_max = float(params["x_max"])
+
+    psi_x = _quadratic_coupled_psi_x_np(X_state, params)
+    psi_neg_x = _quadratic_coupled_psi_x_np(-X_state, params)
+    psi_x_minus_xmax = _quadratic_coupled_psi_x_np(X_state - x_max, params)
+    psi3 = _quadratic_coupled_psi3_np(V, params)
+    psi4 = _quadratic_coupled_psi4_np(V, params)
+    exp_neg_S = np.exp(-S).astype(np.float32)
+    control = _quadratic_coupled_psi_x_np(-exp_neg_S * Z_S / (gamma * s1), params)
+    f_val = (-0.5 * V * control).astype(np.float32)
+
+    dS = mu1 * (c1 - S)
+    dH = mu2 * (c2 - H)
+    dV = f_val * psi_x + c3 * psi_neg_x * psi3 - c4 * psi_x_minus_xmax * psi4
+    dX = V
+    return np.concatenate([dS, dH, dV, dX], axis=1).astype(np.float32)
+
+
+def build_exact_initial_boundary_samples(
+    Xi_generator,
+    exact_solution: Dict[str, Any],
+    params: Dict[str, np.ndarray],
+    blocks: List[Dict[str, float]],
+    M_rollout: int,
+    N_per_block: int,
+    D: int,
+    seed: int = 1234,
+) -> List[np.ndarray]:
+    if exact_solution is None:
+        raise ValueError("Exact initialization requested but exact_solution is disabled")
+    if str(exact_solution.get("name", "")).strip().lower() != "quadratic_coupled":
+        raise ValueError(
+            "Exact initialization is currently supported only for exact_solution='quadratic_coupled'"
+        )
+
+    Xi_curr = Xi_generator(M_rollout, D).astype(np.float32)
+    rollout_inputs = build_stitched_rollout_inputs(
+        blocks=blocks,
+        M=int(M_rollout),
+        N_per_block=int(N_per_block),
+        D=int(D),
+        seed=int(seed),
+    )
+    boundary_samples = [Xi_curr.copy()]
+
+    s1 = float(params["s1"])
+    s2 = float(params["s2"])
+    s3 = float(params["s3"])
+
+    for block_idx, block in enumerate(blocks):
+        t_b, W_b = rollout_inputs[block_idx]
+        X_state = Xi_curr.copy()
+        for n in range(int(N_per_block)):
+            dt = (t_b[:, n + 1, :] - t_b[:, n, :]).astype(np.float32)
+            dW = (W_b[:, n + 1, :] - W_b[:, n, :]).astype(np.float32)
+            Z_exact = quadratic_coupled_exact_z_np(X_state, params)
+            mu = quadratic_coupled_mu_np(X_state, Z_exact, params)
+
+            X_next = X_state.copy()
+            X_next[:, 0:1] = X_state[:, 0:1] + mu[:, 0:1] * dt + s1 * dW[:, 0:1]
+            X_next[:, 1:2] = X_state[:, 1:2] + mu[:, 1:2] * dt + s2 * dW[:, 1:2]
+            X_next[:, 2:3] = X_state[:, 2:3] + mu[:, 2:3] * dt + s3 * dW[:, 2:3]
+            X_next[:, 3:4] = X_state[:, 3:4] + mu[:, 3:4] * dt
+            X_state = X_next.astype(np.float32)
+
+        Xi_curr = X_state.astype(np.float32)
+        boundary_samples.append(Xi_curr.copy())
+
+    return boundary_samples
 
 
 def compute_stitched_exact_bundle(
@@ -2471,6 +2635,43 @@ def rollout_boundaries(
     return boundary_samples
 
 
+def validate_boundary_samples(
+    boundary_samples: Optional[List[np.ndarray]],
+    blocks: List[Dict[str, float]],
+    D: int,
+    label: str = "boundary_samples",
+) -> None:
+    if boundary_samples is None:
+        return
+    if len(boundary_samples) != len(blocks) + 1:
+        raise ValueError(
+            f"{label} must contain len(blocks)+1 arrays, got {len(boundary_samples)} vs expected {len(blocks) + 1}"
+        )
+    for idx, arr in enumerate(boundary_samples):
+        arr_np = np.asarray(arr)
+        if arr_np.ndim != 2 or arr_np.shape[1] != int(D):
+            raise ValueError(
+                f"{label}[{idx}] must have shape [M, {int(D)}], got {list(arr_np.shape)}"
+            )
+
+
+def summarize_boundary_samples(boundary_samples: List[np.ndarray]) -> List[Dict[str, Any]]:
+    summary = []
+    for i, arr in enumerate(boundary_samples or []):
+        arr_np = np.asarray(arr, dtype=np.float32)
+        summary.append(
+            {
+                "boundary_idx": int(i),
+                "n_samples": int(arr_np.shape[0]),
+                "mean": np.mean(arr_np, axis=0),
+                "std": np.std(arr_np, axis=0),
+                "min": np.min(arr_np, axis=0),
+                "max": np.max(arr_np, axis=0),
+            }
+        )
+    return summary
+
+
 def run_recursive_training(
     Xi_generator,
     params,
@@ -2494,6 +2695,9 @@ def run_recursive_training(
     resume_models_dir: str = "",
     resume_from_pass: int = 0,
     empirical_jitter_scale: float = 0.02,
+    pass1_init_mode: str = "base",
+    initial_boundary_samples: Optional[List[np.ndarray]] = None,
+    initial_warm_start_blobs: Optional[List[Dict[str, np.ndarray]]] = None,
     on_pass_end: Optional[Callable[[Dict[str, Any]], None]] = None,
 ):
     if int(n_passes) < 1:
@@ -2502,6 +2706,16 @@ def run_recursive_training(
         raise ValueError("resume_from_pass must be >= 0")
 
     blocks = build_blocks(T_total=T_total, block_size=block_size)
+    validate_boundary_samples(
+        boundary_samples=initial_boundary_samples,
+        blocks=blocks,
+        D=D,
+        label="initial_boundary_samples",
+    )
+    if initial_warm_start_blobs is not None and len(initial_warm_start_blobs) != len(blocks):
+        raise ValueError(
+            "initial_warm_start_blobs must contain one blob per block when provided"
+        )
     print(
         f"[Recursive] blocks={len(blocks)} -> {[ (b['t_start'], b['t_end']) for b in blocks ]}, "
         f"n_passes={int(n_passes)}"
@@ -2635,6 +2849,7 @@ def run_recursive_training(
     prev_pass_loss_by_block = None
     resumed_from = None
     start_pass_id = 1
+    pass1_init_mode = str(pass1_init_mode or "base").strip().lower()
 
     resume_models_dir = str(resume_models_dir or "").strip()
     if resume_models_dir != "":
@@ -2692,9 +2907,31 @@ def run_recursive_training(
         )
 
     for pass_id in range(start_pass_id, int(n_passes) + 1):
+        pass_init_mode_current = "recursive_empirical"
+        boundary_source_current = "previous_pass_rollout"
+        is_bootstrap_pass_current = False
         if pass_id == 1:
-            generators = [Xi_generator for _ in blocks]
-            warm_start = None
+            if initial_boundary_samples is not None:
+                pass1_jitter_scale = float(empirical_jitter_scale) if pass1_init_mode == "coarse" else 0.0
+                generators = [
+                    make_empirical_generator(
+                        np.asarray(initial_boundary_samples[b], dtype=np.float32),
+                        jitter_scale=pass1_jitter_scale,
+                    )
+                    for b in range(len(blocks))
+                ]
+                warm_start = initial_warm_start_blobs
+                pass_init_mode_current = pass1_init_mode
+                boundary_source_current = (
+                    "coarse_prepass" if pass1_init_mode == "coarse" else "exact_diagnostic"
+                )
+                is_bootstrap_pass_current = False
+            else:
+                generators = [Xi_generator for _ in blocks]
+                warm_start = None
+                pass_init_mode_current = "base"
+                boundary_source_current = "base_xi"
+                is_bootstrap_pass_current = True
             warm_from_next = bool(pass1_warm_start_from_next)
         else:
             if prev_boundary_samples is None:
@@ -2751,6 +2988,9 @@ def run_recursive_training(
                 "logs": logs_i,
                 "blobs": blobs_i,
                 "models_dir": pass_dir_i,
+                "pass_init_mode": pass_init_mode_current,
+                "boundary_source": boundary_source_current,
+                "is_bootstrap_pass": bool(is_bootstrap_pass_current),
             }
         )
 
@@ -2787,6 +3027,120 @@ def run_recursive_training(
             }
 
     return result
+
+
+def scale_schedule(
+    plan: List[Tuple[int, float]],
+    iter_scale: float,
+    min_iter: int = 50,
+) -> List[Tuple[int, float]]:
+    scaled = []
+    for n_iter, lr in plan:
+        scaled_iters = max(int(min_iter), int(round(float(n_iter) * float(iter_scale))))
+        scaled.append((scaled_iters, float(lr)))
+    return scaled
+
+
+def scale_training_plan_rules(
+    rules: List[Dict[str, Any]],
+    iter_scale: float,
+    min_iter: int = 50,
+) -> List[Dict[str, Any]]:
+    scaled_rules = []
+    for rule in rules or []:
+        scaled_rule = dict(rule)
+        scaled_rule["n_iter"] = max(
+            int(min_iter),
+            int(round(float(rule["n_iter"]) * float(iter_scale))),
+        )
+        scaled_rules.append(scaled_rule)
+    return scaled_rules
+
+
+def run_recursive_coarse_prepass(
+    Xi_generator,
+    params,
+    M,
+    N_per_block,
+    D,
+    T_total,
+    block_size,
+    layers,
+    stage_plan,
+    final_plan,
+    output_dir,
+    precision_margin=0.10,
+    training_plan_rules: Optional[List[Dict[str, Any]]] = None,
+    pass1_warm_start_from_next: bool = False,
+    empirical_jitter_scale: float = 0.0,
+    iter_scale: float = 0.15,
+    prepass_M: int = 0,
+    prepass_N: int = 0,
+    rollout_M: int = 0,
+) -> Dict[str, Any]:
+    coarse_M = int(prepass_M)
+    if coarse_M <= 0:
+        coarse_M = max(64, min(int(M), max(256, int(round(float(M) * 0.25)))))
+
+    coarse_N = int(prepass_N)
+    if coarse_N <= 0:
+        coarse_N = max(8, min(int(N_per_block), int(round(max(8.0, float(N_per_block) * 0.5)))))
+
+    coarse_rollout_M = int(rollout_M)
+    if coarse_rollout_M <= 0:
+        coarse_rollout_M = max(int(coarse_M), 512)
+
+    coarse_stage_plan = scale_schedule(stage_plan, iter_scale=iter_scale, min_iter=50)
+    coarse_final_plan = scale_schedule(final_plan, iter_scale=iter_scale, min_iter=50)
+    coarse_rules = scale_training_plan_rules(
+        training_plan_rules or [],
+        iter_scale=iter_scale,
+        min_iter=50,
+    )
+
+    prepass_result = run_recursive_training(
+        Xi_generator=Xi_generator,
+        params=params,
+        M=int(coarse_M),
+        N_per_block=int(coarse_N),
+        D=D,
+        T_total=T_total,
+        block_size=block_size,
+        layers=layers,
+        stage_plan=coarse_stage_plan,
+        final_plan=coarse_final_plan,
+        output_dir=output_dir,
+        precision_margin=precision_margin,
+        max_refine_rounds=1,
+        rollout_M=int(coarse_rollout_M),
+        save_tf_checkpoints=False,
+        training_plan_rules=coarse_rules,
+        pass1_warm_start_from_next=bool(pass1_warm_start_from_next),
+        cross_pass_warm_start=False,
+        n_passes=1,
+        resume_models_dir="",
+        resume_from_pass=0,
+        empirical_jitter_scale=float(empirical_jitter_scale),
+        pass1_init_mode="base",
+        initial_boundary_samples=None,
+        initial_warm_start_blobs=None,
+        on_pass_end=None,
+    )
+
+    return {
+        "boundary_samples": prepass_result.get("boundary_samples", []),
+        "pass1_blobs": prepass_result.get("pass1", {}).get("blobs", None),
+        "summary": {
+            "M": int(coarse_M),
+            "N": int(coarse_N),
+            "rollout_M": int(coarse_rollout_M),
+            "iter_scale": float(iter_scale),
+            "stage_plan": coarse_stage_plan,
+            "final_plan": coarse_final_plan,
+            "training_plan_rules_count": len(coarse_rules),
+            "boundary_stats": summarize_boundary_samples(prepass_result.get("boundary_samples", [])),
+        },
+    }
 
 
 ###############################################################################
@@ -2916,6 +3270,46 @@ def main():
             "Di default il resume fallisce per evitare mismatch di schedule."
         ),
     )
+    parser.add_argument(
+        "--pass1_init",
+        type=str,
+        default="base",
+        choices=["base", "coarse", "exact"],
+        help=(
+            "Strategia di inizializzazione della passata 1. "
+            "base=bootstrap puro; coarse=prepass economica; exact=boundary oracle per benchmark."
+        ),
+    )
+    parser.add_argument(
+        "--coarse_prepass_M",
+        type=int,
+        default=0,
+        help="Batch size della prepass coarse. 0=auto.",
+    )
+    parser.add_argument(
+        "--coarse_prepass_N",
+        type=int,
+        default=0,
+        help="Numero di step temporali per blocco nella prepass coarse. 0=auto.",
+    )
+    parser.add_argument(
+        "--coarse_prepass_iter_scale",
+        type=float,
+        default=0.15,
+        help="Fattore di scala delle iterazioni del training plan nella prepass coarse.",
+    )
+    parser.add_argument(
+        "--coarse_prepass_seed",
+        type=int,
+        default=4321,
+        help="Seed logico da salvare per la prepass coarse.",
+    )
+    parser.add_argument(
+        "--exact_init_seed",
+        type=int,
+        default=4321,
+        help="Seed usato per i boundary samples exact nella diagnostica di pass1.",
+    )
     args = parser.parse_args()
 
     np.random.seed(1234)
@@ -3033,6 +3427,12 @@ def main():
         "eval_bundle_path": str(args.eval_bundle_path),
         "eval_seed": int(args.eval_seed),
         "allow_resume_without_plan": bool(args.allow_resume_without_plan),
+        "pass1_init": str(args.pass1_init),
+        "coarse_prepass_M": int(args.coarse_prepass_M),
+        "coarse_prepass_N": int(args.coarse_prepass_N),
+        "coarse_prepass_iter_scale": float(args.coarse_prepass_iter_scale),
+        "coarse_prepass_seed": int(args.coarse_prepass_seed),
+        "exact_init_seed": int(args.exact_init_seed),
         "exact_solution": "none" if exact_solution is None else exact_solution["name"],
         "params": params,
         "plotting_available": _PLOTTING_AVAILABLE,
@@ -3132,6 +3532,15 @@ def main():
         print("\n==================== RECURSIVE ====================")
         rec_dir = os.path.join(run_root, "recursive")
         os.makedirs(rec_dir, exist_ok=True)
+        pass1_init_mode = str(args.pass1_init or "base").strip().lower()
+        initial_boundary_samples = None
+        initial_warm_start_blobs = None
+        initialization_summary = {
+            "pass1_init": pass1_init_mode,
+            "ignored_due_to_resume": False,
+            "coarse_prepass": None,
+            "exact_initialization": None,
+        }
 
         explicit_eval_bundle = str(args.eval_bundle_path or "").strip()
         resume_eval_bundle = _find_resume_eval_bundle_path(resume_models_dir_resolved)
@@ -3141,6 +3550,95 @@ def main():
             eval_bundle_path = os.path.abspath(os.path.expanduser(resume_eval_bundle))
         else:
             eval_bundle_path = os.path.abspath(os.path.join(rec_dir, "evaluation_bundle.npz"))
+
+        if resume_models_dir_resolved != "" and pass1_init_mode != "base":
+            initialization_summary["ignored_due_to_resume"] = True
+            print(
+                f"[Pass1Init] resume attivo: pass1_init='{pass1_init_mode}' viene ignorato "
+                "perche' la run riparte da una passata successiva."
+            )
+            pass1_init_mode = "base"
+
+        rollout_M_recursive = max(2000, M)
+        if resume_models_dir_resolved == "":
+            if pass1_init_mode == "coarse":
+                np_state_before_prepass = np.random.get_state()
+                np.random.seed(int(args.coarse_prepass_seed))
+                tf.set_random_seed(int(args.coarse_prepass_seed))
+                coarse_prepass_dir = os.path.join(run_root, "coarse_prepass", "models")
+                try:
+                    coarse_prepass = run_recursive_coarse_prepass(
+                        Xi_generator=Xi_generator_default,
+                        params=params,
+                        M=M,
+                        N_per_block=N,
+                        D=D,
+                        T_total=args.T_total,
+                        block_size=args.block_size,
+                        layers=layers,
+                        stage_plan=stage_plan,
+                        final_plan=final_plan,
+                        output_dir=coarse_prepass_dir,
+                        precision_margin=0.10,
+                        training_plan_rules=training_plan_rules,
+                        pass1_warm_start_from_next=bool(args.pass1_warm_start_from_next),
+                        empirical_jitter_scale=float(args.empirical_jitter_scale),
+                        iter_scale=float(args.coarse_prepass_iter_scale),
+                        prepass_M=int(args.coarse_prepass_M),
+                        prepass_N=int(args.coarse_prepass_N),
+                        rollout_M=rollout_M_recursive,
+                    )
+                finally:
+                    np.random.set_state(np_state_before_prepass)
+                    tf.set_random_seed(1234)
+                initial_boundary_samples = coarse_prepass["boundary_samples"]
+                initial_warm_start_blobs = coarse_prepass["pass1_blobs"]
+                initialization_summary["coarse_prepass"] = coarse_prepass["summary"]
+                initialization_summary["coarse_prepass"]["seed"] = int(args.coarse_prepass_seed)
+                save_json(
+                    initialization_summary["coarse_prepass"],
+                    os.path.join(run_root, "coarse_prepass", "summary.json"),
+                )
+                print(
+                    "[Pass1Init] coarse prepass ready: "
+                    f"M={initialization_summary['coarse_prepass']['M']}, "
+                    f"N={initialization_summary['coarse_prepass']['N']}, "
+                    f"iter_scale={initialization_summary['coarse_prepass']['iter_scale']:.3f}"
+                )
+            elif pass1_init_mode == "exact":
+                np_state_before_exact = np.random.get_state()
+                np.random.seed(int(args.exact_init_seed))
+                try:
+                    initial_boundary_samples = build_exact_initial_boundary_samples(
+                        Xi_generator=Xi_generator_default,
+                        exact_solution=exact_solution,
+                        params=params,
+                        blocks=build_blocks(T_total=args.T_total, block_size=args.block_size),
+                        M_rollout=rollout_M_recursive,
+                        N_per_block=N,
+                        D=D,
+                        seed=int(args.exact_init_seed),
+                    )
+                finally:
+                    np.random.set_state(np_state_before_exact)
+                initialization_summary["exact_initialization"] = {
+                    "seed": int(args.exact_init_seed),
+                    "boundary_stats": summarize_boundary_samples(initial_boundary_samples),
+                }
+                save_json(
+                    initialization_summary["exact_initialization"],
+                    os.path.join(run_root, "exact_init_summary.json"),
+                )
+                print(
+                    "[Pass1Init] exact diagnostic ready: "
+                    f"M={rollout_M_recursive}, seed={int(args.exact_init_seed)}"
+                )
+
+        excluded_pass_ids_from_selection = (
+            [1]
+            if (resume_models_dir_resolved == "" and pass1_init_mode == "base" and int(args.passes) > 1)
+            else []
+        )
 
         pass_plot_summary_holder = {"summary": None}
 
@@ -3173,6 +3671,7 @@ def main():
                 sample_paths=8,
                 enforce_exact_regression_guardrail=is_last_requested_pass,
                 print_compact_logs=is_last_requested_pass,
+                exclude_pass_ids_from_selection=excluded_pass_ids_from_selection,
             )
 
         rec = run_recursive_training(
@@ -3189,7 +3688,7 @@ def main():
             output_dir=os.path.join(rec_dir, "models"),
             precision_margin=0.10,
             max_refine_rounds=3,
-            rollout_M=max(2000, M),
+            rollout_M=rollout_M_recursive,
             save_tf_checkpoints=True,
             training_plan_rules=training_plan_rules,
             pass1_warm_start_from_next=bool(args.pass1_warm_start_from_next),
@@ -3198,6 +3697,9 @@ def main():
             resume_models_dir=resume_models_dir_resolved,
             resume_from_pass=int(args.resume_from_pass),
             empirical_jitter_scale=float(args.empirical_jitter_scale),
+            pass1_init_mode=pass1_init_mode,
+            initial_boundary_samples=initial_boundary_samples,
+            initial_warm_start_blobs=initial_warm_start_blobs,
             on_pass_end=_on_recursive_pass_end,
         )
 
@@ -3227,23 +3729,13 @@ def main():
                 sample_paths=8,
                 enforce_exact_regression_guardrail=True,
                 print_compact_logs=True,
+                exclude_pass_ids_from_selection=excluded_pass_ids_from_selection,
             )
 
         exact_summary_by_pass = plot_summary["exact_summary_by_pass"]
         exact_summary_by_pass_index = plot_summary.get("exact_summary_by_pass_index", {})
 
-        boundary_stats = []
-        for i, arr in enumerate(rec.get("boundary_samples", [])):
-            boundary_stats.append(
-                {
-                    "boundary_idx": int(i),
-                    "n_samples": int(arr.shape[0]),
-                    "mean": np.mean(arr, axis=0),
-                    "std": np.std(arr, axis=0),
-                    "min": np.min(arr, axis=0),
-                    "max": np.max(arr, axis=0),
-                }
-            )
+        boundary_stats = summarize_boundary_samples(rec.get("boundary_samples", []))
 
         passes_summary = []
         for p in pass_entries:
@@ -3255,6 +3747,9 @@ def main():
                     "reference_loss": float(p["reference_loss"]),
                     "logs": p.get("logs", []),
                     "models_dir": p.get("models_dir", None),
+                    "pass_init_mode": p.get("pass_init_mode", "unknown"),
+                    "boundary_source": p.get("boundary_source", "unknown"),
+                    "is_bootstrap_pass": bool(p.get("is_bootstrap_pass", False)),
                 }
             )
         pass_summary_by_index = {int(p["pass_index"]): p for p in passes_summary}
@@ -3267,6 +3762,9 @@ def main():
             "models_dir": os.path.join(rec_dir, "models"),
             "evaluation_bundle_path": plot_summary["eval_bundle_path"],
             "evaluation_bundle_M": int(plot_summary["evaluation_bundle_M"]),
+            "initialization_summary": initialization_summary,
+            "selection_excluded_pass_ids": plot_summary.get("excluded_pass_ids_from_selection", []),
+            "selection_excluded_pass_indices": plot_summary.get("excluded_pass_indices_from_selection", []),
             "selected_pass_id": int(plot_summary["selected_pass_id"]),
             "selected_pass_index": int(plot_summary["selected_pass_index"]),
             "selected_score_metric": plot_summary["selected_score_metric"],
