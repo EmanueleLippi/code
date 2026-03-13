@@ -1,0 +1,317 @@
+{
+  "timestamp": "20260311_130314",
+  "mode": "recursive",
+  "M": 2000,
+  "N": 40,
+  "D": 4,
+  "T_standard": 12.0,
+  "T_total": 12.0,
+  "block_size": 1.0,
+  "passes": 3,
+  "resume_models_dir": "",
+  "resume_models_dir_resolved": "",
+  "resume_from_pass": 0,
+  "empirical_jitter_scale": 0.02,
+  "layers": [
+    5,
+    256,
+    256,
+    256,
+    256,
+    1
+  ],
+  "stage_plan": [
+    [
+      5000,
+      0.001
+    ],
+    [
+      5000,
+      0.0005
+    ],
+    [
+      5000,
+      0.0001
+    ],
+    [
+      5000,
+      5e-05
+    ]
+  ],
+  "final_plan": [
+    [
+      5000,
+      1e-05
+    ],
+    [
+      5000,
+      5e-06
+    ]
+  ],
+  "training_plan_csv": "training_recursive.csv",
+  "training_plan_effective_source": "training_recursive.csv",
+  "training_plan_rules_count": 25,
+  "training_plan_rules": [
+    {
+      "pass_scope": "1",
+      "block_scope": "terminal",
+      "phase": "stage",
+      "order": 1,
+      "n_iter": 3000,
+      "lr": 0.0005,
+      "source_row": 2
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "terminal",
+      "phase": "stage",
+      "order": 2,
+      "n_iter": 3000,
+      "lr": 0.0001,
+      "source_row": 3
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "terminal",
+      "phase": "stage",
+      "order": 3,
+      "n_iter": 2000,
+      "lr": 5e-05,
+      "source_row": 4
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "terminal",
+      "phase": "final",
+      "order": 1,
+      "n_iter": 1500,
+      "lr": 1e-05,
+      "source_row": 5
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "terminal",
+      "phase": "final",
+      "order": 2,
+      "n_iter": 1000,
+      "lr": 5e-06,
+      "source_row": 6
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "terminal",
+      "phase": "refine",
+      "order": 1,
+      "n_iter": 120,
+      "lr": 1e-05,
+      "source_row": 7
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "terminal",
+      "phase": "refine",
+      "order": 2,
+      "n_iter": 120,
+      "lr": 5e-06,
+      "source_row": 8
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "other",
+      "phase": "stage",
+      "order": 1,
+      "n_iter": 1200,
+      "lr": 0.0001,
+      "source_row": 9
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "other",
+      "phase": "stage",
+      "order": 2,
+      "n_iter": 1200,
+      "lr": 5e-05,
+      "source_row": 10
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "other",
+      "phase": "final",
+      "order": 1,
+      "n_iter": 800,
+      "lr": 1e-05,
+      "source_row": 11
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "other",
+      "phase": "final",
+      "order": 2,
+      "n_iter": 800,
+      "lr": 5e-06,
+      "source_row": 12
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "other",
+      "phase": "refine",
+      "order": 1,
+      "n_iter": 80,
+      "lr": 1e-05,
+      "source_row": 13
+    },
+    {
+      "pass_scope": "1",
+      "block_scope": "other",
+      "phase": "refine",
+      "order": 2,
+      "n_iter": 80,
+      "lr": 5e-06,
+      "source_row": 14
+    },
+    {
+      "pass_scope": "2+",
+      "block_scope": "all",
+      "phase": "stage",
+      "order": 1,
+      "n_iter": 1000,
+      "lr": 0.0001,
+      "source_row": 15
+    },
+    {
+      "pass_scope": "2+",
+      "block_scope": "all",
+      "phase": "stage",
+      "order": 2,
+      "n_iter": 1000,
+      "lr": 5e-05,
+      "source_row": 16
+    },
+    {
+      "pass_scope": "2+",
+      "block_scope": "all",
+      "phase": "final",
+      "order": 1,
+      "n_iter": 700,
+      "lr": 1e-05,
+      "source_row": 17
+    },
+    {
+      "pass_scope": "2+",
+      "block_scope": "all",
+      "phase": "final",
+      "order": 2,
+      "n_iter": 700,
+      "lr": 5e-06,
+      "source_row": 18
+    },
+    {
+      "pass_scope": "2+",
+      "block_scope": "all",
+      "phase": "refine",
+      "order": 1,
+      "n_iter": 60,
+      "lr": 1e-05,
+      "source_row": 19
+    },
+    {
+      "pass_scope": "2+",
+      "block_scope": "all",
+      "phase": "refine",
+      "order": 2,
+      "n_iter": 60,
+      "lr": 5e-06,
+      "source_row": 20
+    },
+    {
+      "pass_scope": "2+",
+      "block_scope": "idx:0",
+      "phase": "stage",
+      "order": 1,
+      "n_iter": 1800,
+      "lr": 5e-05,
+      "source_row": 21
+    },
+    {
+      "pass_scope": "2+",
+      "block_scope": "idx:0",
+      "phase": "stage",
+      "order": 2,
+      "n_iter": 1800,
+      "lr": 2e-05,
+      "source_row": 22
+    },
+    {
+      "pass_scope": "2+",
+      "block_scope": "idx:0",
+      "phase": "final",
+      "order": 1,
+      "n_iter": 1200,
+      "lr": 1e-05,
+      "source_row": 23
+    },
+    {
+      "pass_scope": "2+",
+      "block_scope": "idx:0",
+      "phase": "final",
+      "order": 2,
+      "n_iter": 1000,
+      "lr": 5e-06,
+      "source_row": 24
+    },
+    {
+      "pass_scope": "2+",
+      "block_scope": "idx:0",
+      "phase": "refine",
+      "order": 1,
+      "n_iter": 100,
+      "lr": 5e-06,
+      "source_row": 25
+    },
+    {
+      "pass_scope": "2+",
+      "block_scope": "idx:0",
+      "phase": "refine",
+      "order": 2,
+      "n_iter": 100,
+      "lr": 2e-06,
+      "source_row": 26
+    }
+  ],
+  "training_plan_inherited_from_resume": false,
+  "training_plan_inherited_run_config": null,
+  "training_plan_inherited_csv": null,
+  "pass1_warm_start_from_next": false,
+  "cross_pass_warm_start": true,
+  "selection_metric": "loss",
+  "exact_regression_tolerance": 0.2,
+  "exact_regression_action": "warn",
+  "eval_bundle_path": "results/eval_bundle_T12_B10_M2000_N40.npz",
+  "eval_seed": 1234,
+  "allow_resume_without_plan": false,
+  "pass1_init": "base",
+  "coarse_prepass_M": 0,
+  "coarse_prepass_N": 0,
+  "coarse_prepass_iter_scale": 0.15,
+  "coarse_prepass_seed": 4321,
+  "exact_init_seed": 4321,
+  "exact_solution": "quadratic_coupled",
+  "params": {
+    "mu1": 1.0,
+    "mu2": 1.0,
+    "c1": 1.0,
+    "c2": 1.0,
+    "c3": 10.0,
+    "c4": 10.0,
+    "gamma": 1.0,
+    "d": 1.0,
+    "x_max": 10.0,
+    "v_max": 2.0,
+    "v_min": -2.0,
+    "s1": 0.5,
+    "s2": 0.5,
+    "s3": 0.5,
+    "const": 0.0
+  },
+  "plotting_available": true
+}

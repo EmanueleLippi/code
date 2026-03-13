@@ -1,0 +1,4566 @@
+{
+  "blocks": [
+    {
+      "idx": 0,
+      "t_start": 0.0,
+      "t_end": 1.0,
+      "T_block": 1.0
+    },
+    {
+      "idx": 1,
+      "t_start": 1.0,
+      "t_end": 2.0,
+      "T_block": 1.0
+    },
+    {
+      "idx": 2,
+      "t_start": 2.0,
+      "t_end": 3.0,
+      "T_block": 1.0
+    },
+    {
+      "idx": 3,
+      "t_start": 3.0,
+      "t_end": 4.0,
+      "T_block": 1.0
+    },
+    {
+      "idx": 4,
+      "t_start": 4.0,
+      "t_end": 5.0,
+      "T_block": 1.0
+    },
+    {
+      "idx": 5,
+      "t_start": 5.0,
+      "t_end": 6.0,
+      "T_block": 1.0
+    },
+    {
+      "idx": 6,
+      "t_start": 6.0,
+      "t_end": 7.0,
+      "T_block": 1.0
+    },
+    {
+      "idx": 7,
+      "t_start": 7.0,
+      "t_end": 8.0,
+      "T_block": 1.0
+    },
+    {
+      "idx": 8,
+      "t_start": 8.0,
+      "t_end": 9.0,
+      "T_block": 1.0
+    },
+    {
+      "idx": 9,
+      "t_start": 9.0,
+      "t_end": 10.0,
+      "T_block": 1.0
+    },
+    {
+      "idx": 10,
+      "t_start": 10.0,
+      "t_end": 11.0,
+      "T_block": 1.0
+    },
+    {
+      "idx": 11,
+      "t_start": 11.0,
+      "t_end": 12.0,
+      "T_block": 1.0
+    }
+  ],
+  "passes": [
+    {
+      "pass_id": 1,
+      "pass_index": 0,
+      "reference_loss": 10.564505004882813,
+      "logs": [
+        {
+          "pass": 1,
+          "block": 0,
+          "t_start": 0.0,
+          "t_end": 1.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 1549.67216796875,
+          "eval_std_loss": 799.6240892640969,
+          "eval_mean_loss_per_sample": 0.7748360839843749,
+          "eval_std_loss_per_sample": 0.3998120446320485,
+          "eval_mean_y0": -15.1036376953125,
+          "precision_target": 11.620955505371095,
+          "refine_rounds": 3,
+          "stage_plan_used": [
+            [
+              1200,
+              0.0001
+            ],
+            [
+              1200,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              800,
+              1e-05
+            ],
+            [
+              800,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              80,
+              1e-05
+            ],
+            [
+              80,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_00.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_00.ckpt"
+        },
+        {
+          "pass": 1,
+          "block": 1,
+          "t_start": 1.0,
+          "t_end": 2.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 25.91902847290039,
+          "eval_std_loss": 6.634460237403561,
+          "eval_mean_loss_per_sample": 0.012959514236450195,
+          "eval_std_loss_per_sample": 0.00331723011870178,
+          "eval_mean_y0": -13.857505798339844,
+          "precision_target": 11.620955505371095,
+          "refine_rounds": 3,
+          "stage_plan_used": [
+            [
+              1200,
+              0.0001
+            ],
+            [
+              1200,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              800,
+              1e-05
+            ],
+            [
+              800,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              80,
+              1e-05
+            ],
+            [
+              80,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_01.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_01.ckpt"
+        },
+        {
+          "pass": 1,
+          "block": 2,
+          "t_start": 2.0,
+          "t_end": 3.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 9.395185375213623,
+          "eval_std_loss": 1.480968331846399,
+          "eval_mean_loss_per_sample": 0.004697592687606811,
+          "eval_std_loss_per_sample": 0.0007404841659231996,
+          "eval_mean_y0": -13.553791999816895,
+          "precision_target": 11.620955505371095,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1200,
+              0.0001
+            ],
+            [
+              1200,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              800,
+              1e-05
+            ],
+            [
+              800,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              80,
+              1e-05
+            ],
+            [
+              80,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_02.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_02.ckpt"
+        },
+        {
+          "pass": 1,
+          "block": 3,
+          "t_start": 3.0,
+          "t_end": 4.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 9.585381412506104,
+          "eval_std_loss": 2.0031356001324414,
+          "eval_mean_loss_per_sample": 0.004792690706253051,
+          "eval_std_loss_per_sample": 0.0010015678000662206,
+          "eval_mean_y0": -13.621662139892578,
+          "precision_target": 11.620955505371095,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1200,
+              0.0001
+            ],
+            [
+              1200,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              800,
+              1e-05
+            ],
+            [
+              800,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              80,
+              1e-05
+            ],
+            [
+              80,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_03.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_03.ckpt"
+        },
+        {
+          "pass": 1,
+          "block": 4,
+          "t_start": 4.0,
+          "t_end": 5.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 9.773397541046142,
+          "eval_std_loss": 1.6239291788674768,
+          "eval_mean_loss_per_sample": 0.004886698770523072,
+          "eval_std_loss_per_sample": 0.0008119645894337385,
+          "eval_mean_y0": -14.136873245239258,
+          "precision_target": 11.620955505371095,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1200,
+              0.0001
+            ],
+            [
+              1200,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              800,
+              1e-05
+            ],
+            [
+              800,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              80,
+              1e-05
+            ],
+            [
+              80,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_04.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_04.ckpt"
+        },
+        {
+          "pass": 1,
+          "block": 5,
+          "t_start": 5.0,
+          "t_end": 6.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 9.69063663482666,
+          "eval_std_loss": 2.030186753581681,
+          "eval_mean_loss_per_sample": 0.00484531831741333,
+          "eval_std_loss_per_sample": 0.0010150933767908406,
+          "eval_mean_y0": -14.204689025878906,
+          "precision_target": 11.620955505371095,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1200,
+              0.0001
+            ],
+            [
+              1200,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              800,
+              1e-05
+            ],
+            [
+              800,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              80,
+              1e-05
+            ],
+            [
+              80,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_05.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_05.ckpt"
+        },
+        {
+          "pass": 1,
+          "block": 6,
+          "t_start": 6.0,
+          "t_end": 7.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 8.773505115509034,
+          "eval_std_loss": 2.333857487163933,
+          "eval_mean_loss_per_sample": 0.004386752557754516,
+          "eval_std_loss_per_sample": 0.0011669287435819664,
+          "eval_mean_y0": -13.951592445373535,
+          "precision_target": 11.620955505371095,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1200,
+              0.0001
+            ],
+            [
+              1200,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              800,
+              1e-05
+            ],
+            [
+              800,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              80,
+              1e-05
+            ],
+            [
+              80,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_06.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_06.ckpt"
+        },
+        {
+          "pass": 1,
+          "block": 7,
+          "t_start": 7.0,
+          "t_end": 8.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 10.919795036315918,
+          "eval_std_loss": 2.3031404678912732,
+          "eval_mean_loss_per_sample": 0.005459897518157959,
+          "eval_std_loss_per_sample": 0.0011515702339456367,
+          "eval_mean_y0": -13.82002067565918,
+          "precision_target": 11.620955505371095,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1200,
+              0.0001
+            ],
+            [
+              1200,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              800,
+              1e-05
+            ],
+            [
+              800,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              80,
+              1e-05
+            ],
+            [
+              80,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_07.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_07.ckpt"
+        },
+        {
+          "pass": 1,
+          "block": 8,
+          "t_start": 8.0,
+          "t_end": 9.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 17.45336742401123,
+          "eval_std_loss": 6.274362234547033,
+          "eval_mean_loss_per_sample": 0.008726683712005615,
+          "eval_std_loss_per_sample": 0.0031371811172735166,
+          "eval_mean_y0": -14.24956226348877,
+          "precision_target": 11.620955505371095,
+          "refine_rounds": 3,
+          "stage_plan_used": [
+            [
+              1200,
+              0.0001
+            ],
+            [
+              1200,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              800,
+              1e-05
+            ],
+            [
+              800,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              80,
+              1e-05
+            ],
+            [
+              80,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_08.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_08.ckpt"
+        },
+        {
+          "pass": 1,
+          "block": 9,
+          "t_start": 9.0,
+          "t_end": 10.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 14.884601211547851,
+          "eval_std_loss": 2.471459526720339,
+          "eval_mean_loss_per_sample": 0.007442300605773925,
+          "eval_std_loss_per_sample": 0.0012357297633601699,
+          "eval_mean_y0": -14.194108009338379,
+          "precision_target": 11.620955505371095,
+          "refine_rounds": 3,
+          "stage_plan_used": [
+            [
+              1200,
+              0.0001
+            ],
+            [
+              1200,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              800,
+              1e-05
+            ],
+            [
+              800,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              80,
+              1e-05
+            ],
+            [
+              80,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_09.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_09.ckpt"
+        },
+        {
+          "pass": 1,
+          "block": 10,
+          "t_start": 10.0,
+          "t_end": 11.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 37.10293827056885,
+          "eval_std_loss": 27.319162344456494,
+          "eval_mean_loss_per_sample": 0.01855146913528442,
+          "eval_std_loss_per_sample": 0.013659581172228248,
+          "eval_mean_y0": -14.335002899169922,
+          "precision_target": 11.620955505371095,
+          "refine_rounds": 3,
+          "stage_plan_used": [
+            [
+              1200,
+              0.0001
+            ],
+            [
+              1200,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              800,
+              1e-05
+            ],
+            [
+              800,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              80,
+              1e-05
+            ],
+            [
+              80,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_10.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_10.ckpt"
+        },
+        {
+          "pass": 1,
+          "block": 11,
+          "t_start": 11.0,
+          "t_end": 12.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 10.564505004882813,
+          "eval_std_loss": 0.3732650295642646,
+          "eval_mean_loss_per_sample": 0.0052822525024414065,
+          "eval_std_loss_per_sample": 0.00018663251478213245,
+          "eval_mean_y0": -14.123068809509277,
+          "precision_target": null,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              3000,
+              0.0005
+            ],
+            [
+              3000,
+              0.0001
+            ],
+            [
+              2000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              1500,
+              1e-05
+            ],
+            [
+              1000,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              120,
+              1e-05
+            ],
+            [
+              120,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_11.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_11.ckpt"
+        }
+      ],
+      "models_dir": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1",
+      "pass_init_mode": "coarse",
+      "boundary_source": "coarse_prepass",
+      "is_bootstrap_pass": false
+    },
+    {
+      "pass_id": 2,
+      "pass_index": 1,
+      "reference_loss": 9.480545806884766,
+      "logs": [
+        {
+          "pass": 2,
+          "block": 0,
+          "t_start": 0.0,
+          "t_end": 1.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 1304.203173828125,
+          "eval_std_loss": 370.68078105621254,
+          "eval_mean_loss_per_sample": 0.6521015869140625,
+          "eval_std_loss_per_sample": 0.18534039052810627,
+          "eval_mean_y0": -17.312028884887695,
+          "precision_target": 1704.6393847656252,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1800,
+              5e-05
+            ],
+            [
+              1800,
+              2e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              1200,
+              1e-05
+            ],
+            [
+              1000,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              100,
+              5e-06
+            ],
+            [
+              100,
+              2e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_00.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_00.ckpt"
+        },
+        {
+          "pass": 2,
+          "block": 1,
+          "t_start": 1.0,
+          "t_end": 2.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 14.474669456481934,
+          "eval_std_loss": 3.9272213752301943,
+          "eval_mean_loss_per_sample": 0.007237334728240967,
+          "eval_std_loss_per_sample": 0.001963610687615097,
+          "eval_mean_y0": -14.09239673614502,
+          "precision_target": 28.51093132019043,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_01.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_01.ckpt"
+        },
+        {
+          "pass": 2,
+          "block": 2,
+          "t_start": 2.0,
+          "t_end": 3.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 8.098002338409424,
+          "eval_std_loss": 0.995114305099727,
+          "eval_mean_loss_per_sample": 0.004049001169204711,
+          "eval_std_loss_per_sample": 0.0004975571525498634,
+          "eval_mean_y0": -13.612340927124023,
+          "precision_target": 10.334703912734987,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_02.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_02.ckpt"
+        },
+        {
+          "pass": 2,
+          "block": 3,
+          "t_start": 3.0,
+          "t_end": 4.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 6.974761581420898,
+          "eval_std_loss": 0.42451752632108636,
+          "eval_mean_loss_per_sample": 0.003487380790710449,
+          "eval_std_loss_per_sample": 0.00021225876316054314,
+          "eval_mean_y0": -13.669853210449219,
+          "precision_target": 10.543919553756716,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_03.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_03.ckpt"
+        },
+        {
+          "pass": 2,
+          "block": 4,
+          "t_start": 4.0,
+          "t_end": 5.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 7.265817546844483,
+          "eval_std_loss": 0.37452129658801714,
+          "eval_mean_loss_per_sample": 0.003632908773422241,
+          "eval_std_loss_per_sample": 0.00018726064829400842,
+          "eval_mean_y0": -13.884871482849121,
+          "precision_target": 10.750737295150758,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_04.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_04.ckpt"
+        },
+        {
+          "pass": 2,
+          "block": 5,
+          "t_start": 5.0,
+          "t_end": 6.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 7.293077754974365,
+          "eval_std_loss": 1.0326053244160338,
+          "eval_mean_loss_per_sample": 0.0036465388774871827,
+          "eval_std_loss_per_sample": 0.0005163026622080169,
+          "eval_mean_y0": -14.370594024658203,
+          "precision_target": 10.659700298309327,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_05.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_05.ckpt"
+        },
+        {
+          "pass": 2,
+          "block": 6,
+          "t_start": 6.0,
+          "t_end": 7.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 7.576958179473877,
+          "eval_std_loss": 0.5098382334300636,
+          "eval_mean_loss_per_sample": 0.0037884790897369383,
+          "eval_std_loss_per_sample": 0.0002549191167150317,
+          "eval_mean_y0": -14.325423240661621,
+          "precision_target": 9.650855627059938,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_06.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_06.ckpt"
+        },
+        {
+          "pass": 2,
+          "block": 7,
+          "t_start": 7.0,
+          "t_end": 8.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 9.052457809448242,
+          "eval_std_loss": 1.9612566327763226,
+          "eval_mean_loss_per_sample": 0.0045262289047241205,
+          "eval_std_loss_per_sample": 0.0009806283163881612,
+          "eval_mean_y0": -14.38406753540039,
+          "precision_target": 12.011774539947512,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_07.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_07.ckpt"
+        },
+        {
+          "pass": 2,
+          "block": 8,
+          "t_start": 8.0,
+          "t_end": 9.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 9.387533569335938,
+          "eval_std_loss": 1.8832338400192805,
+          "eval_mean_loss_per_sample": 0.004693766784667968,
+          "eval_std_loss_per_sample": 0.0009416169200096403,
+          "eval_mean_y0": -14.203790664672852,
+          "precision_target": 19.198704166412355,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_08.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_08.ckpt"
+        },
+        {
+          "pass": 2,
+          "block": 9,
+          "t_start": 9.0,
+          "t_end": 10.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 9.419766426086426,
+          "eval_std_loss": 1.241200511403745,
+          "eval_mean_loss_per_sample": 0.004709883213043213,
+          "eval_std_loss_per_sample": 0.0006206002557018725,
+          "eval_mean_y0": -14.352901458740234,
+          "precision_target": 16.373061332702637,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_09.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_09.ckpt"
+        },
+        {
+          "pass": 2,
+          "block": 10,
+          "t_start": 10.0,
+          "t_end": 11.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 7.503712368011475,
+          "eval_std_loss": 0.4206409325064079,
+          "eval_mean_loss_per_sample": 0.0037518561840057378,
+          "eval_std_loss_per_sample": 0.000210320466253204,
+          "eval_mean_y0": -14.236152648925781,
+          "precision_target": 40.813232097625736,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_10.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_10.ckpt"
+        },
+        {
+          "pass": 2,
+          "block": 11,
+          "t_start": 11.0,
+          "t_end": 12.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 9.480545806884766,
+          "eval_std_loss": 0.2848854720624508,
+          "eval_mean_loss_per_sample": 0.004740272903442383,
+          "eval_std_loss_per_sample": 0.00014244273603122534,
+          "eval_mean_y0": -14.137935638427734,
+          "precision_target": 11.620955505371095,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_11.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_11.ckpt"
+        }
+      ],
+      "models_dir": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2",
+      "pass_init_mode": "recursive_empirical",
+      "boundary_source": "previous_pass_rollout",
+      "is_bootstrap_pass": false
+    },
+    {
+      "pass_id": 3,
+      "pass_index": 2,
+      "reference_loss": 9.269247436523438,
+      "logs": [
+        {
+          "pass": 3,
+          "block": 0,
+          "t_start": 0.0,
+          "t_end": 1.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 472.93043212890626,
+          "eval_std_loss": 64.3807001082718,
+          "eval_mean_loss_per_sample": 0.23646521606445314,
+          "eval_std_loss_per_sample": 0.03219035005413591,
+          "eval_mean_y0": -17.669281005859375,
+          "precision_target": 1434.6234912109376,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1800,
+              5e-05
+            ],
+            [
+              1800,
+              2e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              1200,
+              1e-05
+            ],
+            [
+              1000,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              100,
+              5e-06
+            ],
+            [
+              100,
+              2e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_00.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_00.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 1,
+          "t_start": 1.0,
+          "t_end": 2.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 10.582639026641846,
+          "eval_std_loss": 2.796127957654189,
+          "eval_mean_loss_per_sample": 0.005291319513320923,
+          "eval_std_loss_per_sample": 0.0013980639788270949,
+          "eval_mean_y0": -13.584420204162598,
+          "precision_target": 15.922136402130128,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_01.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_01.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 2,
+          "t_start": 2.0,
+          "t_end": 3.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 7.0503288269042965,
+          "eval_std_loss": 0.7017247689176281,
+          "eval_mean_loss_per_sample": 0.003525164413452149,
+          "eval_std_loss_per_sample": 0.0003508623844588139,
+          "eval_mean_y0": -13.284018516540527,
+          "precision_target": 8.907802572250368,
+          "refine_rounds": 1,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_02.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_02.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 3,
+          "t_start": 3.0,
+          "t_end": 4.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 7.334333801269532,
+          "eval_std_loss": 0.9374130856288009,
+          "eval_mean_loss_per_sample": 0.0036671669006347655,
+          "eval_std_loss_per_sample": 0.0004687065428144005,
+          "eval_mean_y0": -13.462295532226562,
+          "precision_target": 7.672237739562989,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_03.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_03.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 4,
+          "t_start": 4.0,
+          "t_end": 5.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 7.419979667663574,
+          "eval_std_loss": 1.2736533616913375,
+          "eval_mean_loss_per_sample": 0.0037099898338317865,
+          "eval_std_loss_per_sample": 0.0006368266808456687,
+          "eval_mean_y0": -13.902331352233887,
+          "precision_target": 7.992399301528931,
+          "refine_rounds": 1,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_04.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_04.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 5,
+          "t_start": 5.0,
+          "t_end": 6.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 6.871070861816406,
+          "eval_std_loss": 0.5295130844474135,
+          "eval_mean_loss_per_sample": 0.0034355354309082028,
+          "eval_std_loss_per_sample": 0.0002647565422237066,
+          "eval_mean_y0": -13.845796585083008,
+          "precision_target": 8.022385530471801,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_05.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_05.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 6,
+          "t_start": 6.0,
+          "t_end": 7.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 7.394916915893555,
+          "eval_std_loss": 0.766196081341006,
+          "eval_mean_loss_per_sample": 0.003697458457946777,
+          "eval_std_loss_per_sample": 0.00038309804067050284,
+          "eval_mean_y0": -13.658438682556152,
+          "precision_target": 8.334653997421265,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_06.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_06.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 7,
+          "t_start": 7.0,
+          "t_end": 8.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 7.232122898101807,
+          "eval_std_loss": 0.45407667269664864,
+          "eval_mean_loss_per_sample": 0.003616061449050903,
+          "eval_std_loss_per_sample": 0.00022703833634832418,
+          "eval_mean_y0": -13.799867630004883,
+          "precision_target": 9.957703590393066,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_07.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_07.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 8,
+          "t_start": 8.0,
+          "t_end": 9.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 8.093658638000488,
+          "eval_std_loss": 0.5648705554647888,
+          "eval_mean_loss_per_sample": 0.004046829319000244,
+          "eval_std_loss_per_sample": 0.0002824352777323945,
+          "eval_mean_y0": -13.82569408416748,
+          "precision_target": 10.326286926269532,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_08.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_08.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 9,
+          "t_start": 9.0,
+          "t_end": 10.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 6.963099956512451,
+          "eval_std_loss": 0.3623923742104411,
+          "eval_mean_loss_per_sample": 0.003481549978256225,
+          "eval_std_loss_per_sample": 0.00018119618710522056,
+          "eval_mean_y0": -13.750041007995605,
+          "precision_target": 10.36174306869507,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_09.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_09.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 10,
+          "t_start": 10.0,
+          "t_end": 11.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 7.101303958892823,
+          "eval_std_loss": 0.7760021887627769,
+          "eval_mean_loss_per_sample": 0.0035506519794464113,
+          "eval_std_loss_per_sample": 0.0003880010943813884,
+          "eval_mean_y0": -13.830276489257812,
+          "precision_target": 8.254083604812623,
+          "refine_rounds": 2,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_10.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_10.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 11,
+          "t_start": 11.0,
+          "t_end": 12.0,
+          "T_block": 1.0,
+          "eval_mean_loss": 9.269247436523438,
+          "eval_std_loss": 0.22406484668680735,
+          "eval_mean_loss_per_sample": 0.004634623718261718,
+          "eval_std_loss_per_sample": 0.00011203242334340355,
+          "eval_mean_y0": -13.746198654174805,
+          "precision_target": 10.428600387573244,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              1000,
+              0.0001
+            ],
+            [
+              1000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              700,
+              1e-05
+            ],
+            [
+              700,
+              5e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              60,
+              1e-05
+            ],
+            [
+              60,
+              5e-06
+            ]
+          ],
+          "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_11.npz",
+          "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_11.ckpt"
+        }
+      ],
+      "models_dir": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3",
+      "pass_init_mode": "recursive_empirical",
+      "boundary_source": "previous_pass_rollout",
+      "is_bootstrap_pass": false
+    }
+  ],
+  "resumed_from": null,
+  "boundary_stats": [
+    {
+      "boundary_idx": 0,
+      "n_samples": 2000,
+      "mean": [
+        0.9921169877052307,
+        1.0058928728103638,
+        0.0061140041798353195,
+        4.9926371574401855
+      ],
+      "std": [
+        0.9881709218025208,
+        0.9964255094528198,
+        0.9974193572998047,
+        2.2834579944610596
+      ],
+      "min": [
+        -2.2351646423339844,
+        -2.131049633026123,
+        -3.4379382133483887,
+        1.001381516456604
+      ],
+      "max": [
+        4.194913387298584,
+        4.500112056732178,
+        3.4877665042877197,
+        8.995521545410156
+      ]
+    },
+    {
+      "boundary_idx": 1,
+      "n_samples": 2000,
+      "mean": [
+        0.997136116027832,
+        1.0021401643753052,
+        0.005218075588345528,
+        4.997982501983643
+      ],
+      "std": [
+        0.4914615750312805,
+        0.49397793412208557,
+        0.748876690864563,
+        2.46415376663208
+      ],
+      "min": [
+        -0.5591455698013306,
+        -0.5361328721046448,
+        -2.4120607376098633,
+        -0.7331628799438477
+      ],
+      "max": [
+        2.4935925006866455,
+        2.7771029472351074,
+        2.3983511924743652,
+        11.264420509338379
+      ]
+    },
+    {
+      "boundary_idx": 2,
+      "n_samples": 2000,
+      "mean": [
+        0.9989609122276306,
+        1.0007778406143188,
+        0.0016605379059910774,
+        4.999680519104004
+      ],
+      "std": [
+        0.3704075813293457,
+        0.37808993458747864,
+        0.6575451493263245,
+        2.694566011428833
+      ],
+      "min": [
+        -0.5092384219169617,
+        -0.33487075567245483,
+        -2.5601634979248047,
+        -0.7632717490196228
+      ],
+      "max": [
+        2.265646457672119,
+        2.401552677154541,
+        2.169600486755371,
+        10.669160842895508
+      ]
+    },
+    {
+      "boundary_idx": 3,
+      "n_samples": 2000,
+      "mean": [
+        0.9996234774589539,
+        1.0002816915512085,
+        -0.0005767797701992095,
+        5.004937171936035
+      ],
+      "std": [
+        0.3582627773284912,
+        0.3617844581604004,
+        0.6283947229385376,
+        2.7715325355529785
+      ],
+      "min": [
+        -0.2002798616886139,
+        -0.06816114485263824,
+        -2.5495691299438477,
+        -0.5519071221351624
+      ],
+      "max": [
+        2.195737361907959,
+        2.185213565826416,
+        2.295502185821533,
+        10.629459381103516
+      ]
+    },
+    {
+      "boundary_idx": 4,
+      "n_samples": 2000,
+      "mean": [
+        0.9998639822006226,
+        1.0001026391983032,
+        -0.011280205100774765,
+        4.99779748916626
+      ],
+      "std": [
+        0.35723283886909485,
+        0.3490327000617981,
+        0.6226786971092224,
+        2.762749433517456
+      ],
+      "min": [
+        -0.27260351181030273,
+        -0.2571723759174347,
+        -2.881519317626953,
+        -0.5607638955116272
+      ],
+      "max": [
+        2.269104480743408,
+        2.274839401245117,
+        2.1959187984466553,
+        10.491654396057129
+      ]
+    },
+    {
+      "boundary_idx": 5,
+      "n_samples": 2000,
+      "mean": [
+        0.9999509453773499,
+        1.0000377893447876,
+        -0.00548604317009449,
+        4.988546848297119
+      ],
+      "std": [
+        0.3590746521949768,
+        0.3577231168746948,
+        0.6193238496780396,
+        2.7470998764038086
+      ],
+      "min": [
+        -0.5069947242736816,
+        -0.17583738267421722,
+        -2.727539539337158,
+        -0.719380795955658
+      ],
+      "max": [
+        2.521035671234131,
+        2.1688919067382812,
+        2.2938952445983887,
+        10.660323143005371
+      ]
+    },
+    {
+      "boundary_idx": 6,
+      "n_samples": 2000,
+      "mean": [
+        0.999980628490448,
+        1.0000131130218506,
+        -0.015506098046898842,
+        4.9786224365234375
+      ],
+      "std": [
+        0.3584992587566376,
+        0.3549928665161133,
+        0.6026714444160461,
+        2.715897798538208
+      ],
+      "min": [
+        -0.1605922281742096,
+        -0.232258141040802,
+        -2.1644320487976074,
+        -0.4652634263038635
+      ],
+      "max": [
+        2.1597399711608887,
+        2.2297348976135254,
+        2.1429879665374756,
+        10.631293296813965
+      ]
+    },
+    {
+      "boundary_idx": 7,
+      "n_samples": 2000,
+      "mean": [
+        0.9999938011169434,
+        1.0000046491622925,
+        -0.011647321283817291,
+        4.96319055557251
+      ],
+      "std": [
+        0.35272374749183655,
+        0.3433179557323456,
+        0.6116517186164856,
+        2.6795494556427
+      ],
+      "min": [
+        -0.16507072746753693,
+        -0.0914766937494278,
+        -2.2878377437591553,
+        -0.467687726020813
+      ],
+      "max": [
+        2.163649559020996,
+        2.0938446521759033,
+        2.0552542209625244,
+        10.485289573669434
+      ]
+    },
+    {
+      "boundary_idx": 8,
+      "n_samples": 2000,
+      "mean": [
+        0.9999969601631165,
+        1.0000016689300537,
+        -0.007341467309743166,
+        4.955016136169434
+      ],
+      "std": [
+        0.36636191606521606,
+        0.35762616991996765,
+        0.582531213760376,
+        2.668301582336426
+      ],
+      "min": [
+        -0.2113960236310959,
+        -0.32474860548973083,
+        -2.579221725463867,
+        -0.5830250978469849
+      ],
+      "max": [
+        2.2119452953338623,
+        2.3252170085906982,
+        2.354942798614502,
+        10.646693229675293
+      ]
+    },
+    {
+      "boundary_idx": 9,
+      "n_samples": 2000,
+      "mean": [
+        0.9999986290931702,
+        1.000001311302185,
+        -0.01715434342622757,
+        4.9411468505859375
+      ],
+      "std": [
+        0.37868526577949524,
+        0.3551533818244934,
+        0.5855345129966736,
+        2.6363465785980225
+      ],
+      "min": [
+        -0.3996041417121887,
+        -0.2150021195411682,
+        -2.266486644744873,
+        -0.5027007460594177
+      ],
+      "max": [
+        2.3996267318725586,
+        2.2149767875671387,
+        1.9250564575195312,
+        10.726746559143066
+      ]
+    },
+    {
+      "boundary_idx": 10,
+      "n_samples": 2000,
+      "mean": [
+        0.9999992847442627,
+        0.999999463558197,
+        -0.010602829046547413,
+        4.9267754554748535
+      ],
+      "std": [
+        0.3701220154762268,
+        0.34613296389579773,
+        0.5670351386070251,
+        2.6214513778686523
+      ],
+      "min": [
+        -0.3221803903579712,
+        -0.07601282000541687,
+        -1.8574204444885254,
+        -0.6633140444755554
+      ],
+      "max": [
+        2.3222572803497314,
+        2.0759940147399902,
+        1.9166617393493652,
+        10.492711067199707
+      ]
+    },
+    {
+      "boundary_idx": 11,
+      "n_samples": 2000,
+      "mean": [
+        0.9999991655349731,
+        1.0,
+        -0.0016900943592190742,
+        4.921274185180664
+      ],
+      "std": [
+        0.3603416681289673,
+        0.3533962070941925,
+        0.5808296203613281,
+        2.620591163635254
+      ],
+      "min": [
+        -0.16895601153373718,
+        -0.11380519717931747,
+        -2.209726572036743,
+        -0.6124531030654907
+      ],
+      "max": [
+        2.1689553260803223,
+        2.113802909851074,
+        1.92197847366333,
+        10.498180389404297
+      ]
+    },
+    {
+      "boundary_idx": 12,
+      "n_samples": 2000,
+      "mean": [
+        0.9999995231628418,
+        0.9999992847442627,
+        -0.0032428367994725704,
+        4.917111873626709
+      ],
+      "std": [
+        0.3562454283237457,
+        0.3633382022380829,
+        0.5691001415252686,
+        2.5968430042266846
+      ],
+      "min": [
+        -0.07350973039865494,
+        -0.23827390372753143,
+        -1.9742261171340942,
+        -0.5680332183837891
+      ],
+      "max": [
+        2.0735225677490234,
+        2.2382724285125732,
+        1.965682864189148,
+        10.703256607055664
+      ]
+    }
+  ],
+  "models_dir": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models",
+  "evaluation_bundle_path": "/export/home/alessio.rondelli2/alessio_python/results/eval_bundle_T12_B10_M2000_N40.npz",
+  "evaluation_bundle_M": 2000,
+  "initialization_summary": {
+    "pass1_init": "coarse",
+    "ignored_due_to_resume": false,
+    "coarse_prepass": {
+      "M": 500,
+      "N": 20,
+      "rollout_M": 2000,
+      "iter_scale": 0.15,
+      "stage_plan": [
+        [
+          750,
+          0.001
+        ],
+        [
+          750,
+          0.0005
+        ],
+        [
+          750,
+          0.0001
+        ],
+        [
+          750,
+          5e-05
+        ]
+      ],
+      "final_plan": [
+        [
+          750,
+          1e-05
+        ],
+        [
+          750,
+          5e-06
+        ]
+      ],
+      "training_plan_rules_count": 25,
+      "boundary_stats": [
+        {
+          "boundary_idx": 0,
+          "n_samples": 2000,
+          "mean": [
+            0.9812052845954895,
+            0.9850912094116211,
+            0.01139562577009201,
+            5.025457382202148
+          ],
+          "std": [
+            0.9995686411857605,
+            1.014034390449524,
+            0.9982978701591492,
+            2.3475751876831055
+          ],
+          "min": [
+            -2.5598561763763428,
+            -2.5882418155670166,
+            -3.54384708404541,
+            1.0020745992660522
+          ],
+          "max": [
+            4.60708475112915,
+            4.242406845092773,
+            3.56662917137146,
+            8.998730659484863
+          ]
+        },
+        {
+          "boundary_idx": 1,
+          "n_samples": 2000,
+          "mean": [
+            0.9932624697685242,
+            0.9946544170379639,
+            0.0005411547026596963,
+            5.030461311340332
+          ],
+          "std": [
+            0.4971410632133484,
+            0.5028457641601562,
+            0.7370020747184753,
+            2.4964957237243652
+          ],
+          "min": [
+            -0.6977280378341675,
+            -0.9020198583602905,
+            -2.402632236480713,
+            -0.757972002029419
+          ],
+          "max": [
+            2.7151992321014404,
+            2.5162770748138428,
+            2.5956971645355225,
+            10.812004089355469
+          ]
+        },
+        {
+          "boundary_idx": 2,
+          "n_samples": 2000,
+          "mean": [
+            0.9975837469100952,
+            0.9980840086936951,
+            -0.00709114782512188,
+            5.0261101722717285
+          ],
+          "std": [
+            0.37531578540802,
+            0.36686059832572937,
+            0.635781466960907,
+            2.6948580741882324
+          ],
+          "min": [
+            -0.21761074662208557,
+            -0.1901286095380783,
+            -2.514369010925293,
+            -0.8614631295204163
+          ],
+          "max": [
+            2.3082761764526367,
+            2.2414145469665527,
+            2.4243242740631104,
+            10.85988998413086
+          ]
+        },
+        {
+          "boundary_idx": 3,
+          "n_samples": 2000,
+          "mean": [
+            0.9991348385810852,
+            0.9993134140968323,
+            -0.01785384491086006,
+            5.016114234924316
+          ],
+          "std": [
+            0.3595632314682007,
+            0.36125069856643677,
+            0.6120746731758118,
+            2.7708537578582764
+          ],
+          "min": [
+            -0.13920141756534576,
+            -0.22601449489593506,
+            -2.527070999145508,
+            -0.717377781867981
+          ],
+          "max": [
+            2.1985456943511963,
+            2.256398916244507,
+            2.023181676864624,
+            10.813356399536133
+          ]
+        },
+        {
+          "boundary_idx": 4,
+          "n_samples": 2000,
+          "mean": [
+            0.9996896982192993,
+            0.999754011631012,
+            -0.02024446800351143,
+            4.9935760498046875
+          ],
+          "std": [
+            0.35981908440589905,
+            0.3593628406524658,
+            0.6030391454696655,
+            2.7489428520202637
+          ],
+          "min": [
+            -0.13404487073421478,
+            -0.37337473034858704,
+            -2.3366012573242188,
+            -0.595574140548706
+          ],
+          "max": [
+            2.1370935440063477,
+            2.3830795288085938,
+            2.492257833480835,
+            10.443312644958496
+          ]
+        },
+        {
+          "boundary_idx": 5,
+          "n_samples": 2000,
+          "mean": [
+            0.9998883008956909,
+            0.9999114871025085,
+            0.00025880985776893795,
+            4.98481559753418
+          ],
+          "std": [
+            0.36748939752578735,
+            0.34762030839920044,
+            0.560969352722168,
+            2.7195937633514404
+          ],
+          "min": [
+            -0.36535167694091797,
+            -0.2936985492706299,
+            -1.9986956119537354,
+            -0.3848409056663513
+          ],
+          "max": [
+            2.350766897201538,
+            2.3026533126831055,
+            1.8736220598220825,
+            10.646696090698242
+          ]
+        },
+        {
+          "boundary_idx": 6,
+          "n_samples": 2000,
+          "mean": [
+            0.9999600052833557,
+            0.9999683499336243,
+            5.64886795473285e-05,
+            4.98598051071167
+          ],
+          "std": [
+            0.34088125824928284,
+            0.3688855767250061,
+            0.5666940212249756,
+            2.7074837684631348
+          ],
+          "min": [
+            -0.11497198045253754,
+            -0.2796507179737091,
+            -1.991881251335144,
+            -0.5782309174537659
+          ],
+          "max": [
+            2.113126754760742,
+            2.28164005279541,
+            2.1055803298950195,
+            10.528158187866211
+          ]
+        },
+        {
+          "boundary_idx": 7,
+          "n_samples": 2000,
+          "mean": [
+            0.9999861717224121,
+            0.9999878406524658,
+            -0.00491828378289938,
+            4.981868743896484
+          ],
+          "std": [
+            0.35095199942588806,
+            0.3470602035522461,
+            0.5571076273918152,
+            2.712216377258301
+          ],
+          "min": [
+            -0.15138490498065948,
+            -0.1667717546224594,
+            -1.9486145973205566,
+            -0.544776439666748
+          ],
+          "max": [
+            2.1521639823913574,
+            2.166530132293701,
+            2.06606125831604,
+            10.507586479187012
+          ]
+        },
+        {
+          "boundary_idx": 8,
+          "n_samples": 2000,
+          "mean": [
+            0.9999945759773254,
+            0.9999951124191284,
+            -0.004057849291712046,
+            4.976672172546387
+          ],
+          "std": [
+            0.36840638518333435,
+            0.3519114553928375,
+            0.5725734233856201,
+            2.7013304233551025
+          ],
+          "min": [
+            -0.6839640140533447,
+            -0.24433065950870514,
+            -1.8672236204147339,
+            -0.5523020029067993
+          ],
+          "max": [
+            2.6842434406280518,
+            2.2442405223846436,
+            2.0979692935943604,
+            10.477178573608398
+          ]
+        },
+        {
+          "boundary_idx": 9,
+          "n_samples": 2000,
+          "mean": [
+            0.9999974966049194,
+            0.9999979734420776,
+            -0.0075127119198441505,
+            4.972424030303955
+          ],
+          "std": [
+            0.35435765981674194,
+            0.34793248772621155,
+            0.5634843111038208,
+            2.7154219150543213
+          ],
+          "min": [
+            -0.18005657196044922,
+            -0.15388411283493042,
+            -2.0521063804626465,
+            -0.5746655464172363
+          ],
+          "max": [
+            2.179960250854492,
+            2.153942584991455,
+            2.1345300674438477,
+            10.661982536315918
+          ]
+        },
+        {
+          "boundary_idx": 10,
+          "n_samples": 2000,
+          "mean": [
+            0.9999978542327881,
+            0.9999991655349731,
+            -0.010501127690076828,
+            4.96280574798584
+          ],
+          "std": [
+            0.3485300540924072,
+            0.3486064672470093,
+            0.5535118579864502,
+            2.7180728912353516
+          ],
+          "min": [
+            -0.23079915344715118,
+            -0.2004285603761673,
+            -2.0667901039123535,
+            -0.46358001232147217
+          ],
+          "max": [
+            2.230746269226074,
+            2.200449228286743,
+            1.9953097105026245,
+            10.488901138305664
+          ]
+        },
+        {
+          "boundary_idx": 11,
+          "n_samples": 2000,
+          "mean": [
+            0.9999996423721313,
+            1.000000238418579,
+            -0.005698767956346273,
+            4.953287124633789
+          ],
+          "std": [
+            0.3499607443809509,
+            0.3613392114639282,
+            0.5649492740631104,
+            2.7118494510650635
+          ],
+          "min": [
+            -0.06712883710861206,
+            -0.13493676483631134,
+            -2.714364528656006,
+            -0.5501120686531067
+          ],
+          "max": [
+            2.067145586013794,
+            2.1349267959594727,
+            2.069343090057373,
+            10.443048477172852
+          ]
+        },
+        {
+          "boundary_idx": 12,
+          "n_samples": 2000,
+          "mean": [
+            1.0000001192092896,
+            0.999999463558197,
+            0.001151946489699185,
+            4.9521684646606445
+          ],
+          "std": [
+            0.3550128638744354,
+            0.3729158639907837,
+            0.5449674725532532,
+            2.707237958908081
+          ],
+          "min": [
+            -0.029255248606204987,
+            -0.22924335300922394,
+            -2.1648106575012207,
+            -0.5367590188980103
+          ],
+          "max": [
+            2.0292510986328125,
+            2.2292439937591553,
+            1.9228252172470093,
+            10.612334251403809
+          ]
+        }
+      ],
+      "seed": 4321
+    },
+    "exact_initialization": null
+  },
+  "selection_excluded_pass_ids": [],
+  "selection_excluded_pass_indices": [],
+  "selected_pass_id": 3,
+  "selected_pass_index": 2,
+  "selected_score_metric": "eval_mean_loss_per_sample+0.35*worst_block",
+  "selected_score": 0.1060229562107722,
+  "selected_scores_by_pass": {
+    "1": 0.3425982339557011,
+    "2": 0.2865993252809842,
+    "3": 0.1060229562107722
+  },
+  "selected_scores_by_pass_index": {
+    "0": 0.3425982339557011,
+    "1": 0.2865993252809842,
+    "2": 0.1060229562107722
+  },
+  "loss_score_metric": "eval_mean_loss_per_sample",
+  "loss_pass_scores": {
+    "1": 0.3425982339557011,
+    "2": 0.2865993252809842,
+    "3": 0.1060229562107722
+  },
+  "loss_pass_scores_by_index": {
+    "0": 0.3425982339557011,
+    "1": 0.2865993252809842,
+    "2": 0.1060229562107722
+  },
+  "exact_solution": {
+    "enabled": true,
+    "profile": "quadratic_coupled",
+    "by_pass": {
+      "1": {
+        "solution_name": "quadratic_coupled",
+        "n_paths": 2000,
+        "n_time_points": 481,
+        "mean_pred_y0": -15.092435836791992,
+        "mean_exact_y0": -20.86422348022461,
+        "abs_error_mean_y0": 5.847134590148926,
+        "rmse_y0": 18.305259704589844,
+        "mean_abs_error_y": 0.7120057940483093,
+        "rmse_y": 2.6483614444732666,
+        "mean_abs_error_z": 0.2900310456752777,
+        "mean_rel_error_z": 2.3383492723492725,
+        "mean_rel_error_z_legacy": 1635421.5,
+        "mean_abs_error_z_by_component": [
+          0.9844847917556763,
+          0.06541077792644501,
+          0.11008932441473007,
+          0.0
+        ],
+        "mean_rel_error_z_by_component": [
+          4.117649078369141,
+          0.0,
+          0.5496116876602173,
+          0.0
+        ],
+        "mean_rel_error_z_by_component_legacy": [
+          4.117649078369141,
+          6540832.0,
+          0.5496116876602173,
+          0.0
+        ],
+        "valid_rel_error_fraction_z_by_component": [
+          1.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        "z_component_labels": [
+          "Z_S",
+          "Z_H",
+          "Z_V",
+          "Z_X"
+        ]
+      },
+      "2": {
+        "solution_name": "quadratic_coupled",
+        "n_paths": 2000,
+        "n_time_points": 481,
+        "mean_pred_y0": -16.86709213256836,
+        "mean_exact_y0": -20.86422348022461,
+        "abs_error_mean_y0": 4.094540596008301,
+        "rmse_y0": 14.517147064208984,
+        "mean_abs_error_y": 0.4654737412929535,
+        "rmse_y": 1.9731227159500122,
+        "mean_abs_error_z": 0.23651134967803955,
+        "mean_rel_error_z": 0.43601383835758833,
+        "mean_rel_error_z_legacy": 1363892.375,
+        "mean_abs_error_z_by_component": [
+          0.8178889155387878,
+          0.05454912781715393,
+          0.07350940257310867,
+          0.0
+        ],
+        "mean_rel_error_z_by_component": [
+          0.5011975765228271,
+          0.0,
+          0.37004998326301575,
+          0.0
+        ],
+        "mean_rel_error_z_by_component_legacy": [
+          0.5011975765228271,
+          5454810.0,
+          0.37004998326301575,
+          0.0
+        ],
+        "valid_rel_error_fraction_z_by_component": [
+          1.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        "z_component_labels": [
+          "Z_S",
+          "Z_H",
+          "Z_V",
+          "Z_X"
+        ]
+      },
+      "3": {
+        "solution_name": "quadratic_coupled",
+        "n_paths": 2000,
+        "n_time_points": 481,
+        "mean_pred_y0": -18.14983367919922,
+        "mean_exact_y0": -20.86422348022461,
+        "abs_error_mean_y0": 2.821808099746704,
+        "rmse_y0": 11.746807098388672,
+        "mean_abs_error_y": 0.3961659073829651,
+        "rmse_y": 1.6427947282791138,
+        "mean_abs_error_z": 0.21733683347702026,
+        "mean_rel_error_z": 0.23819009875259875,
+        "mean_rel_error_z_legacy": 1055262.875,
+        "mean_abs_error_z_by_component": [
+          0.7638117671012878,
+          0.04220442473888397,
+          0.06321695446968079,
+          0.0
+        ],
+        "mean_rel_error_z_by_component": [
+          0.24899651110172272,
+          0.0,
+          0.22717127203941345,
+          0.0
+        ],
+        "mean_rel_error_z_by_component_legacy": [
+          0.24899651110172272,
+          4220601.0,
+          0.22717127203941345,
+          0.0
+        ],
+        "valid_rel_error_fraction_z_by_component": [
+          1.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        "z_component_labels": [
+          "Z_S",
+          "Z_H",
+          "Z_V",
+          "Z_X"
+        ]
+      }
+    },
+    "by_pass_index": {
+      "0": {
+        "solution_name": "quadratic_coupled",
+        "n_paths": 2000,
+        "n_time_points": 481,
+        "mean_pred_y0": -15.092435836791992,
+        "mean_exact_y0": -20.86422348022461,
+        "abs_error_mean_y0": 5.847134590148926,
+        "rmse_y0": 18.305259704589844,
+        "mean_abs_error_y": 0.7120057940483093,
+        "rmse_y": 2.6483614444732666,
+        "mean_abs_error_z": 0.2900310456752777,
+        "mean_rel_error_z": 2.3383492723492725,
+        "mean_rel_error_z_legacy": 1635421.5,
+        "mean_abs_error_z_by_component": [
+          0.9844847917556763,
+          0.06541077792644501,
+          0.11008932441473007,
+          0.0
+        ],
+        "mean_rel_error_z_by_component": [
+          4.117649078369141,
+          0.0,
+          0.5496116876602173,
+          0.0
+        ],
+        "mean_rel_error_z_by_component_legacy": [
+          4.117649078369141,
+          6540832.0,
+          0.5496116876602173,
+          0.0
+        ],
+        "valid_rel_error_fraction_z_by_component": [
+          1.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        "z_component_labels": [
+          "Z_S",
+          "Z_H",
+          "Z_V",
+          "Z_X"
+        ]
+      },
+      "1": {
+        "solution_name": "quadratic_coupled",
+        "n_paths": 2000,
+        "n_time_points": 481,
+        "mean_pred_y0": -16.86709213256836,
+        "mean_exact_y0": -20.86422348022461,
+        "abs_error_mean_y0": 4.094540596008301,
+        "rmse_y0": 14.517147064208984,
+        "mean_abs_error_y": 0.4654737412929535,
+        "rmse_y": 1.9731227159500122,
+        "mean_abs_error_z": 0.23651134967803955,
+        "mean_rel_error_z": 0.43601383835758833,
+        "mean_rel_error_z_legacy": 1363892.375,
+        "mean_abs_error_z_by_component": [
+          0.8178889155387878,
+          0.05454912781715393,
+          0.07350940257310867,
+          0.0
+        ],
+        "mean_rel_error_z_by_component": [
+          0.5011975765228271,
+          0.0,
+          0.37004998326301575,
+          0.0
+        ],
+        "mean_rel_error_z_by_component_legacy": [
+          0.5011975765228271,
+          5454810.0,
+          0.37004998326301575,
+          0.0
+        ],
+        "valid_rel_error_fraction_z_by_component": [
+          1.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        "z_component_labels": [
+          "Z_S",
+          "Z_H",
+          "Z_V",
+          "Z_X"
+        ]
+      },
+      "2": {
+        "solution_name": "quadratic_coupled",
+        "n_paths": 2000,
+        "n_time_points": 481,
+        "mean_pred_y0": -18.14983367919922,
+        "mean_exact_y0": -20.86422348022461,
+        "abs_error_mean_y0": 2.821808099746704,
+        "rmse_y0": 11.746807098388672,
+        "mean_abs_error_y": 0.3961659073829651,
+        "rmse_y": 1.6427947282791138,
+        "mean_abs_error_z": 0.21733683347702026,
+        "mean_rel_error_z": 0.23819009875259875,
+        "mean_rel_error_z_legacy": 1055262.875,
+        "mean_abs_error_z_by_component": [
+          0.7638117671012878,
+          0.04220442473888397,
+          0.06321695446968079,
+          0.0
+        ],
+        "mean_rel_error_z_by_component": [
+          0.24899651110172272,
+          0.0,
+          0.22717127203941345,
+          0.0
+        ],
+        "mean_rel_error_z_by_component_legacy": [
+          0.24899651110172272,
+          4220601.0,
+          0.22717127203941345,
+          0.0
+        ],
+        "valid_rel_error_fraction_z_by_component": [
+          1.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        "z_component_labels": [
+          "Z_S",
+          "Z_H",
+          "Z_V",
+          "Z_X"
+        ]
+      }
+    },
+    "selected_pass_summary": {
+      "solution_name": "quadratic_coupled",
+      "n_paths": 2000,
+      "n_time_points": 481,
+      "mean_pred_y0": -18.14983367919922,
+      "mean_exact_y0": -20.86422348022461,
+      "abs_error_mean_y0": 2.821808099746704,
+      "rmse_y0": 11.746807098388672,
+      "mean_abs_error_y": 0.3961659073829651,
+      "rmse_y": 1.6427947282791138,
+      "mean_abs_error_z": 0.21733683347702026,
+      "mean_rel_error_z": 0.23819009875259875,
+      "mean_rel_error_z_legacy": 1055262.875,
+      "mean_abs_error_z_by_component": [
+        0.7638117671012878,
+        0.04220442473888397,
+        0.06321695446968079,
+        0.0
+      ],
+      "mean_rel_error_z_by_component": [
+        0.24899651110172272,
+        0.0,
+        0.22717127203941345,
+        0.0
+      ],
+      "mean_rel_error_z_by_component_legacy": [
+        0.24899651110172272,
+        4220601.0,
+        0.22717127203941345,
+        0.0
+      ],
+      "valid_rel_error_fraction_z_by_component": [
+        1.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "z_component_labels": [
+        "Z_S",
+        "Z_H",
+        "Z_V",
+        "Z_X"
+      ]
+    }
+  },
+  "pass0": {
+    "reference_loss": 10.564505004882813,
+    "logs": [
+      {
+        "pass": 1,
+        "block": 0,
+        "t_start": 0.0,
+        "t_end": 1.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 1549.67216796875,
+        "eval_std_loss": 799.6240892640969,
+        "eval_mean_loss_per_sample": 0.7748360839843749,
+        "eval_std_loss_per_sample": 0.3998120446320485,
+        "eval_mean_y0": -15.1036376953125,
+        "precision_target": 11.620955505371095,
+        "refine_rounds": 3,
+        "stage_plan_used": [
+          [
+            1200,
+            0.0001
+          ],
+          [
+            1200,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            800,
+            1e-05
+          ],
+          [
+            800,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            80,
+            1e-05
+          ],
+          [
+            80,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_00.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_00.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 1,
+        "t_start": 1.0,
+        "t_end": 2.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 25.91902847290039,
+        "eval_std_loss": 6.634460237403561,
+        "eval_mean_loss_per_sample": 0.012959514236450195,
+        "eval_std_loss_per_sample": 0.00331723011870178,
+        "eval_mean_y0": -13.857505798339844,
+        "precision_target": 11.620955505371095,
+        "refine_rounds": 3,
+        "stage_plan_used": [
+          [
+            1200,
+            0.0001
+          ],
+          [
+            1200,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            800,
+            1e-05
+          ],
+          [
+            800,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            80,
+            1e-05
+          ],
+          [
+            80,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_01.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_01.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 2,
+        "t_start": 2.0,
+        "t_end": 3.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 9.395185375213623,
+        "eval_std_loss": 1.480968331846399,
+        "eval_mean_loss_per_sample": 0.004697592687606811,
+        "eval_std_loss_per_sample": 0.0007404841659231996,
+        "eval_mean_y0": -13.553791999816895,
+        "precision_target": 11.620955505371095,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1200,
+            0.0001
+          ],
+          [
+            1200,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            800,
+            1e-05
+          ],
+          [
+            800,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            80,
+            1e-05
+          ],
+          [
+            80,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_02.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_02.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 3,
+        "t_start": 3.0,
+        "t_end": 4.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 9.585381412506104,
+        "eval_std_loss": 2.0031356001324414,
+        "eval_mean_loss_per_sample": 0.004792690706253051,
+        "eval_std_loss_per_sample": 0.0010015678000662206,
+        "eval_mean_y0": -13.621662139892578,
+        "precision_target": 11.620955505371095,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1200,
+            0.0001
+          ],
+          [
+            1200,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            800,
+            1e-05
+          ],
+          [
+            800,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            80,
+            1e-05
+          ],
+          [
+            80,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_03.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_03.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 4,
+        "t_start": 4.0,
+        "t_end": 5.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 9.773397541046142,
+        "eval_std_loss": 1.6239291788674768,
+        "eval_mean_loss_per_sample": 0.004886698770523072,
+        "eval_std_loss_per_sample": 0.0008119645894337385,
+        "eval_mean_y0": -14.136873245239258,
+        "precision_target": 11.620955505371095,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1200,
+            0.0001
+          ],
+          [
+            1200,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            800,
+            1e-05
+          ],
+          [
+            800,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            80,
+            1e-05
+          ],
+          [
+            80,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_04.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_04.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 5,
+        "t_start": 5.0,
+        "t_end": 6.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 9.69063663482666,
+        "eval_std_loss": 2.030186753581681,
+        "eval_mean_loss_per_sample": 0.00484531831741333,
+        "eval_std_loss_per_sample": 0.0010150933767908406,
+        "eval_mean_y0": -14.204689025878906,
+        "precision_target": 11.620955505371095,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1200,
+            0.0001
+          ],
+          [
+            1200,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            800,
+            1e-05
+          ],
+          [
+            800,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            80,
+            1e-05
+          ],
+          [
+            80,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_05.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_05.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 6,
+        "t_start": 6.0,
+        "t_end": 7.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 8.773505115509034,
+        "eval_std_loss": 2.333857487163933,
+        "eval_mean_loss_per_sample": 0.004386752557754516,
+        "eval_std_loss_per_sample": 0.0011669287435819664,
+        "eval_mean_y0": -13.951592445373535,
+        "precision_target": 11.620955505371095,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1200,
+            0.0001
+          ],
+          [
+            1200,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            800,
+            1e-05
+          ],
+          [
+            800,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            80,
+            1e-05
+          ],
+          [
+            80,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_06.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_06.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 7,
+        "t_start": 7.0,
+        "t_end": 8.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 10.919795036315918,
+        "eval_std_loss": 2.3031404678912732,
+        "eval_mean_loss_per_sample": 0.005459897518157959,
+        "eval_std_loss_per_sample": 0.0011515702339456367,
+        "eval_mean_y0": -13.82002067565918,
+        "precision_target": 11.620955505371095,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1200,
+            0.0001
+          ],
+          [
+            1200,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            800,
+            1e-05
+          ],
+          [
+            800,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            80,
+            1e-05
+          ],
+          [
+            80,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_07.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_07.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 8,
+        "t_start": 8.0,
+        "t_end": 9.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 17.45336742401123,
+        "eval_std_loss": 6.274362234547033,
+        "eval_mean_loss_per_sample": 0.008726683712005615,
+        "eval_std_loss_per_sample": 0.0031371811172735166,
+        "eval_mean_y0": -14.24956226348877,
+        "precision_target": 11.620955505371095,
+        "refine_rounds": 3,
+        "stage_plan_used": [
+          [
+            1200,
+            0.0001
+          ],
+          [
+            1200,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            800,
+            1e-05
+          ],
+          [
+            800,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            80,
+            1e-05
+          ],
+          [
+            80,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_08.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_08.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 9,
+        "t_start": 9.0,
+        "t_end": 10.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 14.884601211547851,
+        "eval_std_loss": 2.471459526720339,
+        "eval_mean_loss_per_sample": 0.007442300605773925,
+        "eval_std_loss_per_sample": 0.0012357297633601699,
+        "eval_mean_y0": -14.194108009338379,
+        "precision_target": 11.620955505371095,
+        "refine_rounds": 3,
+        "stage_plan_used": [
+          [
+            1200,
+            0.0001
+          ],
+          [
+            1200,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            800,
+            1e-05
+          ],
+          [
+            800,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            80,
+            1e-05
+          ],
+          [
+            80,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_09.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_09.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 10,
+        "t_start": 10.0,
+        "t_end": 11.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 37.10293827056885,
+        "eval_std_loss": 27.319162344456494,
+        "eval_mean_loss_per_sample": 0.01855146913528442,
+        "eval_std_loss_per_sample": 0.013659581172228248,
+        "eval_mean_y0": -14.335002899169922,
+        "precision_target": 11.620955505371095,
+        "refine_rounds": 3,
+        "stage_plan_used": [
+          [
+            1200,
+            0.0001
+          ],
+          [
+            1200,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            800,
+            1e-05
+          ],
+          [
+            800,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            80,
+            1e-05
+          ],
+          [
+            80,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_10.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_10.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 11,
+        "t_start": 11.0,
+        "t_end": 12.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 10.564505004882813,
+        "eval_std_loss": 0.3732650295642646,
+        "eval_mean_loss_per_sample": 0.0052822525024414065,
+        "eval_std_loss_per_sample": 0.00018663251478213245,
+        "eval_mean_y0": -14.123068809509277,
+        "precision_target": null,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            3000,
+            0.0005
+          ],
+          [
+            3000,
+            0.0001
+          ],
+          [
+            2000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            1500,
+            1e-05
+          ],
+          [
+            1000,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            120,
+            1e-05
+          ],
+          [
+            120,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_11.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_1/block_11.ckpt"
+      }
+    ]
+  },
+  "pass1": {
+    "reference_loss": 9.480545806884766,
+    "logs": [
+      {
+        "pass": 2,
+        "block": 0,
+        "t_start": 0.0,
+        "t_end": 1.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 1304.203173828125,
+        "eval_std_loss": 370.68078105621254,
+        "eval_mean_loss_per_sample": 0.6521015869140625,
+        "eval_std_loss_per_sample": 0.18534039052810627,
+        "eval_mean_y0": -17.312028884887695,
+        "precision_target": 1704.6393847656252,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1800,
+            5e-05
+          ],
+          [
+            1800,
+            2e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            1200,
+            1e-05
+          ],
+          [
+            1000,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            100,
+            5e-06
+          ],
+          [
+            100,
+            2e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_00.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_00.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 1,
+        "t_start": 1.0,
+        "t_end": 2.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 14.474669456481934,
+        "eval_std_loss": 3.9272213752301943,
+        "eval_mean_loss_per_sample": 0.007237334728240967,
+        "eval_std_loss_per_sample": 0.001963610687615097,
+        "eval_mean_y0": -14.09239673614502,
+        "precision_target": 28.51093132019043,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_01.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_01.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 2,
+        "t_start": 2.0,
+        "t_end": 3.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 8.098002338409424,
+        "eval_std_loss": 0.995114305099727,
+        "eval_mean_loss_per_sample": 0.004049001169204711,
+        "eval_std_loss_per_sample": 0.0004975571525498634,
+        "eval_mean_y0": -13.612340927124023,
+        "precision_target": 10.334703912734987,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_02.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_02.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 3,
+        "t_start": 3.0,
+        "t_end": 4.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 6.974761581420898,
+        "eval_std_loss": 0.42451752632108636,
+        "eval_mean_loss_per_sample": 0.003487380790710449,
+        "eval_std_loss_per_sample": 0.00021225876316054314,
+        "eval_mean_y0": -13.669853210449219,
+        "precision_target": 10.543919553756716,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_03.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_03.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 4,
+        "t_start": 4.0,
+        "t_end": 5.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 7.265817546844483,
+        "eval_std_loss": 0.37452129658801714,
+        "eval_mean_loss_per_sample": 0.003632908773422241,
+        "eval_std_loss_per_sample": 0.00018726064829400842,
+        "eval_mean_y0": -13.884871482849121,
+        "precision_target": 10.750737295150758,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_04.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_04.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 5,
+        "t_start": 5.0,
+        "t_end": 6.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 7.293077754974365,
+        "eval_std_loss": 1.0326053244160338,
+        "eval_mean_loss_per_sample": 0.0036465388774871827,
+        "eval_std_loss_per_sample": 0.0005163026622080169,
+        "eval_mean_y0": -14.370594024658203,
+        "precision_target": 10.659700298309327,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_05.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_05.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 6,
+        "t_start": 6.0,
+        "t_end": 7.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 7.576958179473877,
+        "eval_std_loss": 0.5098382334300636,
+        "eval_mean_loss_per_sample": 0.0037884790897369383,
+        "eval_std_loss_per_sample": 0.0002549191167150317,
+        "eval_mean_y0": -14.325423240661621,
+        "precision_target": 9.650855627059938,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_06.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_06.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 7,
+        "t_start": 7.0,
+        "t_end": 8.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 9.052457809448242,
+        "eval_std_loss": 1.9612566327763226,
+        "eval_mean_loss_per_sample": 0.0045262289047241205,
+        "eval_std_loss_per_sample": 0.0009806283163881612,
+        "eval_mean_y0": -14.38406753540039,
+        "precision_target": 12.011774539947512,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_07.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_07.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 8,
+        "t_start": 8.0,
+        "t_end": 9.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 9.387533569335938,
+        "eval_std_loss": 1.8832338400192805,
+        "eval_mean_loss_per_sample": 0.004693766784667968,
+        "eval_std_loss_per_sample": 0.0009416169200096403,
+        "eval_mean_y0": -14.203790664672852,
+        "precision_target": 19.198704166412355,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_08.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_08.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 9,
+        "t_start": 9.0,
+        "t_end": 10.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 9.419766426086426,
+        "eval_std_loss": 1.241200511403745,
+        "eval_mean_loss_per_sample": 0.004709883213043213,
+        "eval_std_loss_per_sample": 0.0006206002557018725,
+        "eval_mean_y0": -14.352901458740234,
+        "precision_target": 16.373061332702637,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_09.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_09.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 10,
+        "t_start": 10.0,
+        "t_end": 11.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 7.503712368011475,
+        "eval_std_loss": 0.4206409325064079,
+        "eval_mean_loss_per_sample": 0.0037518561840057378,
+        "eval_std_loss_per_sample": 0.000210320466253204,
+        "eval_mean_y0": -14.236152648925781,
+        "precision_target": 40.813232097625736,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_10.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_10.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 11,
+        "t_start": 11.0,
+        "t_end": 12.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 9.480545806884766,
+        "eval_std_loss": 0.2848854720624508,
+        "eval_mean_loss_per_sample": 0.004740272903442383,
+        "eval_std_loss_per_sample": 0.00014244273603122534,
+        "eval_mean_y0": -14.137935638427734,
+        "precision_target": 11.620955505371095,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_11.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_2/block_11.ckpt"
+      }
+    ]
+  },
+  "pass2": {
+    "reference_loss": 9.269247436523438,
+    "logs": [
+      {
+        "pass": 3,
+        "block": 0,
+        "t_start": 0.0,
+        "t_end": 1.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 472.93043212890626,
+        "eval_std_loss": 64.3807001082718,
+        "eval_mean_loss_per_sample": 0.23646521606445314,
+        "eval_std_loss_per_sample": 0.03219035005413591,
+        "eval_mean_y0": -17.669281005859375,
+        "precision_target": 1434.6234912109376,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1800,
+            5e-05
+          ],
+          [
+            1800,
+            2e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            1200,
+            1e-05
+          ],
+          [
+            1000,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            100,
+            5e-06
+          ],
+          [
+            100,
+            2e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_00.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_00.ckpt"
+      },
+      {
+        "pass": 3,
+        "block": 1,
+        "t_start": 1.0,
+        "t_end": 2.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 10.582639026641846,
+        "eval_std_loss": 2.796127957654189,
+        "eval_mean_loss_per_sample": 0.005291319513320923,
+        "eval_std_loss_per_sample": 0.0013980639788270949,
+        "eval_mean_y0": -13.584420204162598,
+        "precision_target": 15.922136402130128,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_01.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_01.ckpt"
+      },
+      {
+        "pass": 3,
+        "block": 2,
+        "t_start": 2.0,
+        "t_end": 3.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 7.0503288269042965,
+        "eval_std_loss": 0.7017247689176281,
+        "eval_mean_loss_per_sample": 0.003525164413452149,
+        "eval_std_loss_per_sample": 0.0003508623844588139,
+        "eval_mean_y0": -13.284018516540527,
+        "precision_target": 8.907802572250368,
+        "refine_rounds": 1,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_02.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_02.ckpt"
+      },
+      {
+        "pass": 3,
+        "block": 3,
+        "t_start": 3.0,
+        "t_end": 4.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 7.334333801269532,
+        "eval_std_loss": 0.9374130856288009,
+        "eval_mean_loss_per_sample": 0.0036671669006347655,
+        "eval_std_loss_per_sample": 0.0004687065428144005,
+        "eval_mean_y0": -13.462295532226562,
+        "precision_target": 7.672237739562989,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_03.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_03.ckpt"
+      },
+      {
+        "pass": 3,
+        "block": 4,
+        "t_start": 4.0,
+        "t_end": 5.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 7.419979667663574,
+        "eval_std_loss": 1.2736533616913375,
+        "eval_mean_loss_per_sample": 0.0037099898338317865,
+        "eval_std_loss_per_sample": 0.0006368266808456687,
+        "eval_mean_y0": -13.902331352233887,
+        "precision_target": 7.992399301528931,
+        "refine_rounds": 1,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_04.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_04.ckpt"
+      },
+      {
+        "pass": 3,
+        "block": 5,
+        "t_start": 5.0,
+        "t_end": 6.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 6.871070861816406,
+        "eval_std_loss": 0.5295130844474135,
+        "eval_mean_loss_per_sample": 0.0034355354309082028,
+        "eval_std_loss_per_sample": 0.0002647565422237066,
+        "eval_mean_y0": -13.845796585083008,
+        "precision_target": 8.022385530471801,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_05.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_05.ckpt"
+      },
+      {
+        "pass": 3,
+        "block": 6,
+        "t_start": 6.0,
+        "t_end": 7.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 7.394916915893555,
+        "eval_std_loss": 0.766196081341006,
+        "eval_mean_loss_per_sample": 0.003697458457946777,
+        "eval_std_loss_per_sample": 0.00038309804067050284,
+        "eval_mean_y0": -13.658438682556152,
+        "precision_target": 8.334653997421265,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_06.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_06.ckpt"
+      },
+      {
+        "pass": 3,
+        "block": 7,
+        "t_start": 7.0,
+        "t_end": 8.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 7.232122898101807,
+        "eval_std_loss": 0.45407667269664864,
+        "eval_mean_loss_per_sample": 0.003616061449050903,
+        "eval_std_loss_per_sample": 0.00022703833634832418,
+        "eval_mean_y0": -13.799867630004883,
+        "precision_target": 9.957703590393066,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_07.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_07.ckpt"
+      },
+      {
+        "pass": 3,
+        "block": 8,
+        "t_start": 8.0,
+        "t_end": 9.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 8.093658638000488,
+        "eval_std_loss": 0.5648705554647888,
+        "eval_mean_loss_per_sample": 0.004046829319000244,
+        "eval_std_loss_per_sample": 0.0002824352777323945,
+        "eval_mean_y0": -13.82569408416748,
+        "precision_target": 10.326286926269532,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_08.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_08.ckpt"
+      },
+      {
+        "pass": 3,
+        "block": 9,
+        "t_start": 9.0,
+        "t_end": 10.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 6.963099956512451,
+        "eval_std_loss": 0.3623923742104411,
+        "eval_mean_loss_per_sample": 0.003481549978256225,
+        "eval_std_loss_per_sample": 0.00018119618710522056,
+        "eval_mean_y0": -13.750041007995605,
+        "precision_target": 10.36174306869507,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_09.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_09.ckpt"
+      },
+      {
+        "pass": 3,
+        "block": 10,
+        "t_start": 10.0,
+        "t_end": 11.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 7.101303958892823,
+        "eval_std_loss": 0.7760021887627769,
+        "eval_mean_loss_per_sample": 0.0035506519794464113,
+        "eval_std_loss_per_sample": 0.0003880010943813884,
+        "eval_mean_y0": -13.830276489257812,
+        "precision_target": 8.254083604812623,
+        "refine_rounds": 2,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_10.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_10.ckpt"
+      },
+      {
+        "pass": 3,
+        "block": 11,
+        "t_start": 11.0,
+        "t_end": 12.0,
+        "T_block": 1.0,
+        "eval_mean_loss": 9.269247436523438,
+        "eval_std_loss": 0.22406484668680735,
+        "eval_mean_loss_per_sample": 0.004634623718261718,
+        "eval_std_loss_per_sample": 0.00011203242334340355,
+        "eval_mean_y0": -13.746198654174805,
+        "precision_target": 10.428600387573244,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            1000,
+            0.0001
+          ],
+          [
+            1000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            700,
+            1e-05
+          ],
+          [
+            700,
+            5e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            60,
+            1e-05
+          ],
+          [
+            60,
+            5e-06
+          ]
+        ],
+        "blob_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_11.npz",
+        "ckpt_path": "results/t12_b10_coarse_xpass_ws/run_20260311_215608/recursive/models/pass_3/block_11.ckpt"
+      }
+    ]
+  }
+}

@@ -1,0 +1,3548 @@
+{
+  "blocks": [
+    {
+      "idx": 0,
+      "t_start": 0.0,
+      "t_end": 0.5,
+      "T_block": 0.5
+    },
+    {
+      "idx": 1,
+      "t_start": 0.5,
+      "t_end": 1.0,
+      "T_block": 0.5
+    },
+    {
+      "idx": 2,
+      "t_start": 1.0,
+      "t_end": 1.5,
+      "T_block": 0.5
+    },
+    {
+      "idx": 3,
+      "t_start": 1.5,
+      "t_end": 2.0,
+      "T_block": 0.5
+    },
+    {
+      "idx": 4,
+      "t_start": 2.0,
+      "t_end": 2.5,
+      "T_block": 0.5
+    },
+    {
+      "idx": 5,
+      "t_start": 2.5,
+      "t_end": 3.0,
+      "T_block": 0.5
+    },
+    {
+      "idx": 6,
+      "t_start": 3.0,
+      "t_end": 3.5,
+      "T_block": 0.5
+    },
+    {
+      "idx": 7,
+      "t_start": 3.5,
+      "t_end": 4.0,
+      "T_block": 0.5
+    }
+  ],
+  "passes": [
+    {
+      "pass_id": 1,
+      "pass_index": 0,
+      "reference_loss": 511.58212127685545,
+      "logs": [
+        {
+          "pass": 1,
+          "block": 0,
+          "t_start": 0.0,
+          "t_end": 0.5,
+          "T_block": 0.5,
+          "eval_mean_loss": 729.5504943847657,
+          "eval_std_loss": 325.29654516883323,
+          "eval_mean_loss_per_sample": 0.3647752471923828,
+          "eval_std_loss_per_sample": 0.1626482725844166,
+          "eval_mean_y0": -21.610294342041016,
+          "precision_target": 562.740333404541,
+          "refine_rounds": 3,
+          "stage_plan_used": [
+            [
+              7000,
+              0.0002
+            ],
+            [
+              7000,
+              0.0001
+            ],
+            [
+              6000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              5000,
+              1e-05
+            ],
+            [
+              4000,
+              5e-06
+            ],
+            [
+              3000,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1500,
+              1e-05
+            ],
+            [
+              1500,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_00.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_00.ckpt"
+        },
+        {
+          "pass": 1,
+          "block": 1,
+          "t_start": 0.5,
+          "t_end": 1.0,
+          "T_block": 0.5,
+          "eval_mean_loss": 314.46856384277345,
+          "eval_std_loss": 373.5541233251052,
+          "eval_mean_loss_per_sample": 0.15723428192138672,
+          "eval_std_loss_per_sample": 0.18677706166255253,
+          "eval_mean_y0": -21.30030059814453,
+          "precision_target": 562.740333404541,
+          "refine_rounds": 1,
+          "stage_plan_used": [
+            [
+              7000,
+              0.0002
+            ],
+            [
+              7000,
+              0.0001
+            ],
+            [
+              6000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              5000,
+              1e-05
+            ],
+            [
+              4000,
+              5e-06
+            ],
+            [
+              3000,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1500,
+              1e-05
+            ],
+            [
+              1500,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_01.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_01.ckpt"
+        },
+        {
+          "pass": 1,
+          "block": 2,
+          "t_start": 1.0,
+          "t_end": 1.5,
+          "T_block": 0.5,
+          "eval_mean_loss": 372.8468101501465,
+          "eval_std_loss": 203.9901355432334,
+          "eval_mean_loss_per_sample": 0.18642340507507327,
+          "eval_std_loss_per_sample": 0.10199506777161671,
+          "eval_mean_y0": -21.89578628540039,
+          "precision_target": 562.740333404541,
+          "refine_rounds": 1,
+          "stage_plan_used": [
+            [
+              7000,
+              0.0002
+            ],
+            [
+              7000,
+              0.0001
+            ],
+            [
+              6000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              5000,
+              1e-05
+            ],
+            [
+              4000,
+              5e-06
+            ],
+            [
+              3000,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1500,
+              1e-05
+            ],
+            [
+              1500,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_02.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_02.ckpt"
+        },
+        {
+          "pass": 1,
+          "block": 3,
+          "t_start": 1.5,
+          "t_end": 2.0,
+          "T_block": 0.5,
+          "eval_mean_loss": 340.5658042907715,
+          "eval_std_loss": 286.8810957665363,
+          "eval_mean_loss_per_sample": 0.17028290214538572,
+          "eval_std_loss_per_sample": 0.14344054788326815,
+          "eval_mean_y0": -21.223039627075195,
+          "precision_target": 562.740333404541,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              7000,
+              0.0002
+            ],
+            [
+              7000,
+              0.0001
+            ],
+            [
+              6000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              5000,
+              1e-05
+            ],
+            [
+              4000,
+              5e-06
+            ],
+            [
+              3000,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1500,
+              1e-05
+            ],
+            [
+              1500,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_03.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_03.ckpt"
+        },
+        {
+          "pass": 1,
+          "block": 4,
+          "t_start": 2.0,
+          "t_end": 2.5,
+          "T_block": 0.5,
+          "eval_mean_loss": 232.10809783935548,
+          "eval_std_loss": 116.5450524719237,
+          "eval_mean_loss_per_sample": 0.11605404891967772,
+          "eval_std_loss_per_sample": 0.05827252623596185,
+          "eval_mean_y0": -21.102941513061523,
+          "precision_target": 562.740333404541,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              7000,
+              0.0002
+            ],
+            [
+              7000,
+              0.0001
+            ],
+            [
+              6000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              5000,
+              1e-05
+            ],
+            [
+              4000,
+              5e-06
+            ],
+            [
+              3000,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1500,
+              1e-05
+            ],
+            [
+              1500,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_04.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_04.ckpt"
+        },
+        {
+          "pass": 1,
+          "block": 5,
+          "t_start": 2.5,
+          "t_end": 3.0,
+          "T_block": 0.5,
+          "eval_mean_loss": 941.156867980957,
+          "eval_std_loss": 1428.6975148089423,
+          "eval_mean_loss_per_sample": 0.4705784339904785,
+          "eval_std_loss_per_sample": 0.7143487574044711,
+          "eval_mean_y0": -20.79018211364746,
+          "precision_target": 562.740333404541,
+          "refine_rounds": 3,
+          "stage_plan_used": [
+            [
+              7000,
+              0.0002
+            ],
+            [
+              7000,
+              0.0001
+            ],
+            [
+              6000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              5000,
+              1e-05
+            ],
+            [
+              4000,
+              5e-06
+            ],
+            [
+              3000,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1500,
+              1e-05
+            ],
+            [
+              1500,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_05.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_05.ckpt"
+        },
+        {
+          "pass": 1,
+          "block": 6,
+          "t_start": 3.0,
+          "t_end": 3.5,
+          "T_block": 0.5,
+          "eval_mean_loss": 1495.1206604003905,
+          "eval_std_loss": 1411.0769326151915,
+          "eval_mean_loss_per_sample": 0.7475603302001953,
+          "eval_std_loss_per_sample": 0.7055384663075958,
+          "eval_mean_y0": -21.02870750427246,
+          "precision_target": 562.740333404541,
+          "refine_rounds": 3,
+          "stage_plan_used": [
+            [
+              7000,
+              0.0002
+            ],
+            [
+              7000,
+              0.0001
+            ],
+            [
+              6000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              5000,
+              1e-05
+            ],
+            [
+              4000,
+              5e-06
+            ],
+            [
+              3000,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1500,
+              1e-05
+            ],
+            [
+              1500,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_06.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_06.ckpt"
+        },
+        {
+          "pass": 1,
+          "block": 7,
+          "t_start": 3.5,
+          "t_end": 4.0,
+          "T_block": 0.5,
+          "eval_mean_loss": 511.58212127685545,
+          "eval_std_loss": 883.9660428564964,
+          "eval_mean_loss_per_sample": 0.2557910606384277,
+          "eval_std_loss_per_sample": 0.44198302142824825,
+          "eval_mean_y0": -21.59111213684082,
+          "precision_target": null,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              12000,
+              0.001
+            ],
+            [
+              9000,
+              0.0005
+            ],
+            [
+              9000,
+              0.0001
+            ],
+            [
+              7000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              6000,
+              1e-05
+            ],
+            [
+              6000,
+              5e-06
+            ],
+            [
+              4000,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1500,
+              1e-05
+            ],
+            [
+              1500,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_07.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_07.ckpt"
+        }
+      ],
+      "models_dir": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1"
+    },
+    {
+      "pass_id": 2,
+      "pass_index": 1,
+      "reference_loss": 11.696371078491211,
+      "logs": [
+        {
+          "pass": 2,
+          "block": 0,
+          "t_start": 0.0,
+          "t_end": 0.5,
+          "T_block": 0.5,
+          "eval_mean_loss": 375.74414978027346,
+          "eval_std_loss": 128.49693381721553,
+          "eval_mean_loss_per_sample": 0.18787207489013671,
+          "eval_std_loss_per_sample": 0.06424846690860776,
+          "eval_mean_y0": -21.68974494934082,
+          "precision_target": 802.5055438232423,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              7000,
+              0.0001
+            ],
+            [
+              6000,
+              5e-05
+            ],
+            [
+              5000,
+              2e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              5000,
+              1e-05
+            ],
+            [
+              4000,
+              5e-06
+            ],
+            [
+              3000,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1500,
+              5e-06
+            ],
+            [
+              1500,
+              2e-06
+            ],
+            [
+              1200,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_00.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_00.ckpt"
+        },
+        {
+          "pass": 2,
+          "block": 1,
+          "t_start": 0.5,
+          "t_end": 1.0,
+          "T_block": 0.5,
+          "eval_mean_loss": 23.544626235961914,
+          "eval_std_loss": 5.587451720228433,
+          "eval_mean_loss_per_sample": 0.011772313117980956,
+          "eval_std_loss_per_sample": 0.0027937258601142168,
+          "eval_mean_y0": -16.03847885131836,
+          "precision_target": 345.91542022705084,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              5000,
+              0.0002
+            ],
+            [
+              5000,
+              0.0001
+            ],
+            [
+              4000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              3500,
+              1e-05
+            ],
+            [
+              3000,
+              5e-06
+            ],
+            [
+              2500,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1200,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_01.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_01.ckpt"
+        },
+        {
+          "pass": 2,
+          "block": 2,
+          "t_start": 1.0,
+          "t_end": 1.5,
+          "T_block": 0.5,
+          "eval_mean_loss": 16.090839004516603,
+          "eval_std_loss": 5.300895552024965,
+          "eval_mean_loss_per_sample": 0.008045419502258299,
+          "eval_std_loss_per_sample": 0.002650447776012483,
+          "eval_mean_y0": -14.542279243469238,
+          "precision_target": 410.13149116516115,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              5000,
+              0.0002
+            ],
+            [
+              5000,
+              0.0001
+            ],
+            [
+              4000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              3500,
+              1e-05
+            ],
+            [
+              3000,
+              5e-06
+            ],
+            [
+              2500,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1200,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_02.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_02.ckpt"
+        },
+        {
+          "pass": 2,
+          "block": 3,
+          "t_start": 1.5,
+          "t_end": 2.0,
+          "T_block": 0.5,
+          "eval_mean_loss": 8.627975845336914,
+          "eval_std_loss": 0.22656926589774554,
+          "eval_mean_loss_per_sample": 0.004313987922668458,
+          "eval_std_loss_per_sample": 0.00011328463294887258,
+          "eval_mean_y0": -13.774590492248535,
+          "precision_target": 374.6223847198487,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              5000,
+              0.0002
+            ],
+            [
+              5000,
+              0.0001
+            ],
+            [
+              4000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              3500,
+              1e-05
+            ],
+            [
+              3000,
+              5e-06
+            ],
+            [
+              2500,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1200,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_03.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_03.ckpt"
+        },
+        {
+          "pass": 2,
+          "block": 4,
+          "t_start": 2.0,
+          "t_end": 2.5,
+          "T_block": 0.5,
+          "eval_mean_loss": 8.187543582916259,
+          "eval_std_loss": 0.5280432253453132,
+          "eval_mean_loss_per_sample": 0.0040937717914581295,
+          "eval_std_loss_per_sample": 0.0002640216126726566,
+          "eval_mean_y0": -13.797435760498047,
+          "precision_target": 255.31890762329104,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              5000,
+              0.0002
+            ],
+            [
+              5000,
+              0.0001
+            ],
+            [
+              4000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              3500,
+              1e-05
+            ],
+            [
+              3000,
+              5e-06
+            ],
+            [
+              2500,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1200,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_04.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_04.ckpt"
+        },
+        {
+          "pass": 2,
+          "block": 5,
+          "t_start": 2.5,
+          "t_end": 3.0,
+          "T_block": 0.5,
+          "eval_mean_loss": 8.343631553649903,
+          "eval_std_loss": 0.7093183025228775,
+          "eval_mean_loss_per_sample": 0.004171815776824951,
+          "eval_std_loss_per_sample": 0.00035465915126143893,
+          "eval_mean_y0": -14.114825248718262,
+          "precision_target": 1035.2725547790528,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              5000,
+              0.0002
+            ],
+            [
+              5000,
+              0.0001
+            ],
+            [
+              4000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              3500,
+              1e-05
+            ],
+            [
+              3000,
+              5e-06
+            ],
+            [
+              2500,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1200,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_05.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_05.ckpt"
+        },
+        {
+          "pass": 2,
+          "block": 6,
+          "t_start": 3.0,
+          "t_end": 3.5,
+          "T_block": 0.5,
+          "eval_mean_loss": 8.73857765197754,
+          "eval_std_loss": 0.5481771577531768,
+          "eval_mean_loss_per_sample": 0.004369288825988769,
+          "eval_std_loss_per_sample": 0.0002740885788765884,
+          "eval_mean_y0": -14.11600112915039,
+          "precision_target": 1644.6327264404297,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              5000,
+              0.0002
+            ],
+            [
+              5000,
+              0.0001
+            ],
+            [
+              4000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              3500,
+              1e-05
+            ],
+            [
+              3000,
+              5e-06
+            ],
+            [
+              2500,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1200,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_06.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_06.ckpt"
+        },
+        {
+          "pass": 2,
+          "block": 7,
+          "t_start": 3.5,
+          "t_end": 4.0,
+          "T_block": 0.5,
+          "eval_mean_loss": 11.696371078491211,
+          "eval_std_loss": 0.8694820916261009,
+          "eval_mean_loss_per_sample": 0.005848185539245605,
+          "eval_std_loss_per_sample": 0.0004347410458130506,
+          "eval_mean_y0": -14.34626293182373,
+          "precision_target": 562.740333404541,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              5000,
+              0.0002
+            ],
+            [
+              5000,
+              0.0001
+            ],
+            [
+              4000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              3500,
+              1e-05
+            ],
+            [
+              3000,
+              5e-06
+            ],
+            [
+              2500,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1200,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_07.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_07.ckpt"
+        }
+      ],
+      "models_dir": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2"
+    },
+    {
+      "pass_id": 3,
+      "pass_index": 2,
+      "reference_loss": 12.16304931640625,
+      "logs": [
+        {
+          "pass": 3,
+          "block": 0,
+          "t_start": 0.0,
+          "t_end": 0.5,
+          "T_block": 0.5,
+          "eval_mean_loss": 270.39156341552734,
+          "eval_std_loss": 180.8507270164468,
+          "eval_mean_loss_per_sample": 0.13519578170776367,
+          "eval_std_loss_per_sample": 0.0904253635082234,
+          "eval_mean_y0": -19.563800811767578,
+          "precision_target": 413.31856475830085,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              7000,
+              0.0001
+            ],
+            [
+              6000,
+              5e-05
+            ],
+            [
+              5000,
+              2e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              5000,
+              1e-05
+            ],
+            [
+              4000,
+              5e-06
+            ],
+            [
+              3000,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1500,
+              5e-06
+            ],
+            [
+              1500,
+              2e-06
+            ],
+            [
+              1200,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_00.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_00.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 1,
+          "t_start": 0.5,
+          "t_end": 1.0,
+          "T_block": 0.5,
+          "eval_mean_loss": 20.955159759521486,
+          "eval_std_loss": 9.724932472166348,
+          "eval_mean_loss_per_sample": 0.01047757987976074,
+          "eval_std_loss_per_sample": 0.004862466236083174,
+          "eval_mean_y0": -15.124267578125,
+          "precision_target": 25.89908885955811,
+          "refine_rounds": 1,
+          "stage_plan_used": [
+            [
+              5000,
+              0.0002
+            ],
+            [
+              5000,
+              0.0001
+            ],
+            [
+              4000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              3500,
+              1e-05
+            ],
+            [
+              3000,
+              5e-06
+            ],
+            [
+              2500,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1200,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_01.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_01.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 2,
+          "t_start": 1.0,
+          "t_end": 1.5,
+          "T_block": 0.5,
+          "eval_mean_loss": 9.537571144104003,
+          "eval_std_loss": 0.17374655132034925,
+          "eval_mean_loss_per_sample": 0.004768785572052002,
+          "eval_std_loss_per_sample": 8.687327566017463e-05,
+          "eval_mean_y0": -13.7994966506958,
+          "precision_target": 17.699922904968265,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              5000,
+              0.0002
+            ],
+            [
+              5000,
+              0.0001
+            ],
+            [
+              4000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              3500,
+              1e-05
+            ],
+            [
+              3000,
+              5e-06
+            ],
+            [
+              2500,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1200,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_02.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_02.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 3,
+          "t_start": 1.5,
+          "t_end": 2.0,
+          "T_block": 0.5,
+          "eval_mean_loss": 9.439899253845216,
+          "eval_std_loss": 1.810002503620815,
+          "eval_mean_loss_per_sample": 0.004719949626922608,
+          "eval_std_loss_per_sample": 0.0009050012518104074,
+          "eval_mean_y0": -13.621010780334473,
+          "precision_target": 9.490773429870607,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              5000,
+              0.0002
+            ],
+            [
+              5000,
+              0.0001
+            ],
+            [
+              4000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              3500,
+              1e-05
+            ],
+            [
+              3000,
+              5e-06
+            ],
+            [
+              2500,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1200,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_03.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_03.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 4,
+          "t_start": 2.0,
+          "t_end": 2.5,
+          "T_block": 0.5,
+          "eval_mean_loss": 8.684440231323242,
+          "eval_std_loss": 0.41392592620511753,
+          "eval_mean_loss_per_sample": 0.004342220115661622,
+          "eval_std_loss_per_sample": 0.0002069629631025586,
+          "eval_mean_y0": -13.841137886047363,
+          "precision_target": 9.006297941207885,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              5000,
+              0.0002
+            ],
+            [
+              5000,
+              0.0001
+            ],
+            [
+              4000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              3500,
+              1e-05
+            ],
+            [
+              3000,
+              5e-06
+            ],
+            [
+              2500,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1200,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_04.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_04.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 5,
+          "t_start": 2.5,
+          "t_end": 3.0,
+          "T_block": 0.5,
+          "eval_mean_loss": 8.797978019714355,
+          "eval_std_loss": 0.6857851641369958,
+          "eval_mean_loss_per_sample": 0.004398989009857178,
+          "eval_std_loss_per_sample": 0.0003428925820684978,
+          "eval_mean_y0": -13.773486137390137,
+          "precision_target": 9.177994709014895,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              5000,
+              0.0002
+            ],
+            [
+              5000,
+              0.0001
+            ],
+            [
+              4000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              3500,
+              1e-05
+            ],
+            [
+              3000,
+              5e-06
+            ],
+            [
+              2500,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1200,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_05.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_05.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 6,
+          "t_start": 3.0,
+          "t_end": 3.5,
+          "T_block": 0.5,
+          "eval_mean_loss": 8.754140281677246,
+          "eval_std_loss": 0.4381782181559202,
+          "eval_mean_loss_per_sample": 0.004377070140838622,
+          "eval_std_loss_per_sample": 0.00021908910907796005,
+          "eval_mean_y0": -13.77668285369873,
+          "precision_target": 9.612435417175295,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              5000,
+              0.0002
+            ],
+            [
+              5000,
+              0.0001
+            ],
+            [
+              4000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              3500,
+              1e-05
+            ],
+            [
+              3000,
+              5e-06
+            ],
+            [
+              2500,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1200,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_06.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_06.ckpt"
+        },
+        {
+          "pass": 3,
+          "block": 7,
+          "t_start": 3.5,
+          "t_end": 4.0,
+          "T_block": 0.5,
+          "eval_mean_loss": 12.16304931640625,
+          "eval_std_loss": 2.0813009981993402,
+          "eval_mean_loss_per_sample": 0.006081524658203124,
+          "eval_std_loss_per_sample": 0.00104065049909967,
+          "eval_mean_y0": -13.885235786437988,
+          "precision_target": 12.866008186340332,
+          "refine_rounds": 0,
+          "stage_plan_used": [
+            [
+              5000,
+              0.0002
+            ],
+            [
+              5000,
+              0.0001
+            ],
+            [
+              4000,
+              5e-05
+            ]
+          ],
+          "final_plan_used": [
+            [
+              3500,
+              1e-05
+            ],
+            [
+              3000,
+              5e-06
+            ],
+            [
+              2500,
+              2e-06
+            ]
+          ],
+          "refine_plan_used": [
+            [
+              1200,
+              5e-06
+            ],
+            [
+              1200,
+              2e-06
+            ],
+            [
+              800,
+              1e-06
+            ]
+          ],
+          "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_07.npz",
+          "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_07.ckpt"
+        }
+      ],
+      "models_dir": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3"
+    }
+  ],
+  "resumed_from": null,
+  "boundary_stats": [
+    {
+      "boundary_idx": 0,
+      "n_samples": 2000,
+      "mean": [
+        1.0015926361083984,
+        0.9521047472953796,
+        -0.024943694472312927,
+        4.995893478393555
+      ],
+      "std": [
+        1.018265724182129,
+        0.997935950756073,
+        1.0050004720687866,
+        2.2825417518615723
+      ],
+      "min": [
+        -2.385343313217163,
+        -3.1128194332122803,
+        -3.483710289001465,
+        1.0013504028320312
+      ],
+      "max": [
+        4.291022300720215,
+        3.933349609375,
+        3.497084856033325,
+        8.996944427490234
+      ]
+    },
+    {
+      "boundary_idx": 1,
+      "n_samples": 2000,
+      "mean": [
+        1.0009602308273315,
+        0.9711352586746216,
+        -0.016350911930203438,
+        4.98536491394043
+      ],
+      "std": [
+        0.6815545558929443,
+        0.6732910871505737,
+        0.849905252456665,
+        2.348479747772217
+      ],
+      "min": [
+        -1.3401966094970703,
+        -1.5464401245117188,
+        -3.0474886894226074,
+        0.25648683309555054
+      ],
+      "max": [
+        3.5260801315307617,
+        3.139068365097046,
+        3.1351211071014404,
+        10.216654777526855
+      ]
+    },
+    {
+      "boundary_idx": 2,
+      "n_samples": 2000,
+      "mean": [
+        1.0005784034729004,
+        0.9826033115386963,
+        -0.013541871681809425,
+        4.97847843170166
+      ],
+      "std": [
+        0.48859792947769165,
+        0.501272439956665,
+        0.7237981557846069,
+        2.4691805839538574
+      ],
+      "min": [
+        -0.5445897579193115,
+        -0.6727330684661865,
+        -2.565858840942383,
+        -0.6234064102172852
+      ],
+      "max": [
+        2.569622039794922,
+        2.6027865409851074,
+        2.500058174133301,
+        10.94713306427002
+      ]
+    },
+    {
+      "boundary_idx": 3,
+      "n_samples": 2000,
+      "mean": [
+        1.0003478527069092,
+        0.9895150065422058,
+        -0.015593563206493855,
+        4.970729827880859
+      ],
+      "std": [
+        0.4012449383735657,
+        0.4195273816585541,
+        0.6421595811843872,
+        2.58624267578125
+      ],
+      "min": [
+        -0.24277082085609436,
+        -0.5592748522758484,
+        -2.544203758239746,
+        -0.902533233165741
+      ],
+      "max": [
+        2.28790020942688,
+        2.5560410022735596,
+        2.607097864151001,
+        10.850299835205078
+      ]
+    },
+    {
+      "boundary_idx": 4,
+      "n_samples": 2000,
+      "mean": [
+        1.0002096891403198,
+        0.9936814904212952,
+        -0.010476772673428059,
+        4.964095115661621
+      ],
+      "std": [
+        0.36614567041397095,
+        0.3721660375595093,
+        0.645469605922699,
+        2.659977912902832
+      ],
+      "min": [
+        -0.6394482254981995,
+        -0.3713393211364746,
+        -2.4088010787963867,
+        -0.6273449063301086
+      ],
+      "max": [
+        2.3830201625823975,
+        2.2478930950164795,
+        2.1750974655151367,
+        10.682459831237793
+      ]
+    },
+    {
+      "boundary_idx": 5,
+      "n_samples": 2000,
+      "mean": [
+        1.000126600265503,
+        0.9961923360824585,
+        -0.011874389834702015,
+        4.958993434906006
+      ],
+      "std": [
+        0.36038291454315186,
+        0.36080920696258545,
+        0.6308210492134094,
+        2.700166940689087
+      ],
+      "min": [
+        -0.2405041754245758,
+        -0.16389170289039612,
+        -2.5301449298858643,
+        -0.6656588315963745
+      ],
+      "max": [
+        2.159881353378296,
+        2.193284034729004,
+        2.420975685119629,
+        10.716814041137695
+      ]
+    },
+    {
+      "boundary_idx": 6,
+      "n_samples": 2000,
+      "mean": [
+        1.0000770092010498,
+        0.997705340385437,
+        -0.013336791656911373,
+        4.952114105224609
+      ],
+      "std": [
+        0.34936562180519104,
+        0.3536471724510193,
+        0.6272268295288086,
+        2.7096545696258545
+      ],
+      "min": [
+        -0.277789443731308,
+        -0.2645731568336487,
+        -2.1824514865875244,
+        -0.7259064316749573
+      ],
+      "max": [
+        2.203644037246704,
+        2.249890089035034,
+        2.3563287258148193,
+        10.728306770324707
+      ]
+    },
+    {
+      "boundary_idx": 7,
+      "n_samples": 2000,
+      "mean": [
+        1.0000454187393188,
+        0.9986175298690796,
+        -0.011983600445091724,
+        4.9459099769592285
+      ],
+      "std": [
+        0.36632758378982544,
+        0.36199143528938293,
+        0.616070568561554,
+        2.7116458415985107
+      ],
+      "min": [
+        -0.20344430208206177,
+        -0.0666075050830841,
+        -2.240265130996704,
+        -0.5182086229324341
+      ],
+      "max": [
+        2.195115327835083,
+        2.0645952224731445,
+        2.3228001594543457,
+        10.604728698730469
+      ]
+    },
+    {
+      "boundary_idx": 8,
+      "n_samples": 2000,
+      "mean": [
+        1.0000282526016235,
+        0.999167263507843,
+        -0.011454423889517784,
+        4.939907073974609
+      ],
+      "std": [
+        0.35579684376716614,
+        0.3548938035964966,
+        0.6030740141868591,
+        2.717839479446411
+      ],
+      "min": [
+        -0.14222753047943115,
+        -0.20186489820480347,
+        -2.2286276817321777,
+        -0.4644884169101715
+      ],
+      "max": [
+        2.129831314086914,
+        2.219146251678467,
+        2.1028239727020264,
+        10.450586318969727
+      ]
+    }
+  ],
+  "models_dir": "results/prova_da_fare/run_20260310_092219/recursive/models",
+  "evaluation_bundle_path": "/export/home/alessio.rondelli2/alessio_python/results/prova_da_fare/run_20260310_092219/recursive/evaluation_bundle.npz",
+  "evaluation_bundle_M": 2000,
+  "selected_pass_id": 3,
+  "selected_pass_index": 2,
+  "selected_score_metric": "eval_mean_loss_per_sample+0.35*worst_block",
+  "selected_score": 0.06911376118659973,
+  "selected_scores_by_pass": {
+    "1": 0.5702335793304443,
+    "2": 0.09456608338236808,
+    "3": 0.06911376118659973
+  },
+  "selected_scores_by_pass_index": {
+    "0": 0.5702335793304443,
+    "1": 0.09456608338236808,
+    "2": 0.06911376118659973
+  },
+  "loss_score_metric": "eval_mean_loss_per_sample",
+  "loss_pass_scores": {
+    "1": 0.5702335793304443,
+    "2": 0.09456608338236808,
+    "3": 0.06911376118659973
+  },
+  "loss_pass_scores_by_index": {
+    "0": 0.5702335793304443,
+    "1": 0.09456608338236808,
+    "2": 0.06911376118659973
+  },
+  "exact_solution": {
+    "enabled": true,
+    "profile": "quadratic_coupled",
+    "by_pass": {
+      "1": {
+        "solution_name": "quadratic_coupled",
+        "n_paths": 2000,
+        "n_time_points": 161,
+        "mean_pred_y0": -21.296648025512695,
+        "mean_exact_y0": -20.86422348022461,
+        "abs_error_mean_y0": 0.7099581956863403,
+        "rmse_y0": 3.5716779232025146,
+        "mean_abs_error_y": 0.32699841260910034,
+        "rmse_y": 0.6932096481323242,
+        "mean_abs_error_z": 0.0694475844502449,
+        "mean_rel_error_z": 0.09597895234860249,
+        "mean_rel_error_z_legacy": 315091.6875,
+        "mean_abs_error_z_by_component": [
+          0.21647852659225464,
+          0.012603405863046646,
+          0.04870866239070892,
+          0.0
+        ],
+        "mean_rel_error_z_by_component": [
+          0.07020076364278793,
+          0.0,
+          0.12174379825592041,
+          0.0
+        ],
+        "mean_rel_error_z_by_component_legacy": [
+          0.07020076364278793,
+          1260359.0,
+          0.12174379825592041,
+          0.0
+        ],
+        "valid_rel_error_fraction_z_by_component": [
+          1.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        "z_component_labels": [
+          "Z_S",
+          "Z_H",
+          "Z_V",
+          "Z_X"
+        ]
+      },
+      "2": {
+        "solution_name": "quadratic_coupled",
+        "n_paths": 2000,
+        "n_time_points": 161,
+        "mean_pred_y0": -20.572153091430664,
+        "mean_exact_y0": -20.86422348022461,
+        "abs_error_mean_y0": 0.6981582045555115,
+        "rmse_y0": 6.173336505889893,
+        "mean_abs_error_y": 0.26705867052078247,
+        "rmse_y": 1.0588980913162231,
+        "mean_abs_error_z": 0.1453603357076645,
+        "mean_rel_error_z": 0.10719001116071429,
+        "mean_rel_error_z_legacy": 627451.6875,
+        "mean_abs_error_z_by_component": [
+          0.5050212144851685,
+          0.025098156183958054,
+          0.05131522938609123,
+          0.0
+        ],
+        "mean_rel_error_z_by_component": [
+          0.1280060112476349,
+          0.0,
+          0.08636491745710373,
+          0.0
+        ],
+        "mean_rel_error_z_by_component_legacy": [
+          0.1280060112476349,
+          2509787.25,
+          0.08636491745710373,
+          0.0
+        ],
+        "valid_rel_error_fraction_z_by_component": [
+          1.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        "z_component_labels": [
+          "Z_S",
+          "Z_H",
+          "Z_V",
+          "Z_X"
+        ]
+      },
+      "3": {
+        "solution_name": "quadratic_coupled",
+        "n_paths": 2000,
+        "n_time_points": 161,
+        "mean_pred_y0": -20.637542724609375,
+        "mean_exact_y0": -20.86422348022461,
+        "abs_error_mean_y0": 0.662009596824646,
+        "rmse_y0": 5.7293314933776855,
+        "mean_abs_error_y": 0.26779982447624207,
+        "rmse_y": 0.9956496357917786,
+        "mean_abs_error_z": 0.13867823779582977,
+        "mean_rel_error_z": 0.10170899044060559,
+        "mean_rel_error_z_legacy": 707499.5,
+        "mean_abs_error_z_by_component": [
+          0.4818592667579651,
+          0.02829962596297264,
+          0.04454156011343002,
+          0.0
+        ],
+        "mean_rel_error_z_by_component": [
+          0.1068878322839737,
+          0.0,
+          0.09652059525251389,
+          0.0
+        ],
+        "mean_rel_error_z_by_component_legacy": [
+          0.1068878322839737,
+          2829917.75,
+          0.09652059525251389,
+          0.0
+        ],
+        "valid_rel_error_fraction_z_by_component": [
+          1.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        "z_component_labels": [
+          "Z_S",
+          "Z_H",
+          "Z_V",
+          "Z_X"
+        ]
+      }
+    },
+    "by_pass_index": {
+      "0": {
+        "solution_name": "quadratic_coupled",
+        "n_paths": 2000,
+        "n_time_points": 161,
+        "mean_pred_y0": -21.296648025512695,
+        "mean_exact_y0": -20.86422348022461,
+        "abs_error_mean_y0": 0.7099581956863403,
+        "rmse_y0": 3.5716779232025146,
+        "mean_abs_error_y": 0.32699841260910034,
+        "rmse_y": 0.6932096481323242,
+        "mean_abs_error_z": 0.0694475844502449,
+        "mean_rel_error_z": 0.09597895234860249,
+        "mean_rel_error_z_legacy": 315091.6875,
+        "mean_abs_error_z_by_component": [
+          0.21647852659225464,
+          0.012603405863046646,
+          0.04870866239070892,
+          0.0
+        ],
+        "mean_rel_error_z_by_component": [
+          0.07020076364278793,
+          0.0,
+          0.12174379825592041,
+          0.0
+        ],
+        "mean_rel_error_z_by_component_legacy": [
+          0.07020076364278793,
+          1260359.0,
+          0.12174379825592041,
+          0.0
+        ],
+        "valid_rel_error_fraction_z_by_component": [
+          1.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        "z_component_labels": [
+          "Z_S",
+          "Z_H",
+          "Z_V",
+          "Z_X"
+        ]
+      },
+      "1": {
+        "solution_name": "quadratic_coupled",
+        "n_paths": 2000,
+        "n_time_points": 161,
+        "mean_pred_y0": -20.572153091430664,
+        "mean_exact_y0": -20.86422348022461,
+        "abs_error_mean_y0": 0.6981582045555115,
+        "rmse_y0": 6.173336505889893,
+        "mean_abs_error_y": 0.26705867052078247,
+        "rmse_y": 1.0588980913162231,
+        "mean_abs_error_z": 0.1453603357076645,
+        "mean_rel_error_z": 0.10719001116071429,
+        "mean_rel_error_z_legacy": 627451.6875,
+        "mean_abs_error_z_by_component": [
+          0.5050212144851685,
+          0.025098156183958054,
+          0.05131522938609123,
+          0.0
+        ],
+        "mean_rel_error_z_by_component": [
+          0.1280060112476349,
+          0.0,
+          0.08636491745710373,
+          0.0
+        ],
+        "mean_rel_error_z_by_component_legacy": [
+          0.1280060112476349,
+          2509787.25,
+          0.08636491745710373,
+          0.0
+        ],
+        "valid_rel_error_fraction_z_by_component": [
+          1.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        "z_component_labels": [
+          "Z_S",
+          "Z_H",
+          "Z_V",
+          "Z_X"
+        ]
+      },
+      "2": {
+        "solution_name": "quadratic_coupled",
+        "n_paths": 2000,
+        "n_time_points": 161,
+        "mean_pred_y0": -20.637542724609375,
+        "mean_exact_y0": -20.86422348022461,
+        "abs_error_mean_y0": 0.662009596824646,
+        "rmse_y0": 5.7293314933776855,
+        "mean_abs_error_y": 0.26779982447624207,
+        "rmse_y": 0.9956496357917786,
+        "mean_abs_error_z": 0.13867823779582977,
+        "mean_rel_error_z": 0.10170899044060559,
+        "mean_rel_error_z_legacy": 707499.5,
+        "mean_abs_error_z_by_component": [
+          0.4818592667579651,
+          0.02829962596297264,
+          0.04454156011343002,
+          0.0
+        ],
+        "mean_rel_error_z_by_component": [
+          0.1068878322839737,
+          0.0,
+          0.09652059525251389,
+          0.0
+        ],
+        "mean_rel_error_z_by_component_legacy": [
+          0.1068878322839737,
+          2829917.75,
+          0.09652059525251389,
+          0.0
+        ],
+        "valid_rel_error_fraction_z_by_component": [
+          1.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        "z_component_labels": [
+          "Z_S",
+          "Z_H",
+          "Z_V",
+          "Z_X"
+        ]
+      }
+    },
+    "selected_pass_summary": {
+      "solution_name": "quadratic_coupled",
+      "n_paths": 2000,
+      "n_time_points": 161,
+      "mean_pred_y0": -20.637542724609375,
+      "mean_exact_y0": -20.86422348022461,
+      "abs_error_mean_y0": 0.662009596824646,
+      "rmse_y0": 5.7293314933776855,
+      "mean_abs_error_y": 0.26779982447624207,
+      "rmse_y": 0.9956496357917786,
+      "mean_abs_error_z": 0.13867823779582977,
+      "mean_rel_error_z": 0.10170899044060559,
+      "mean_rel_error_z_legacy": 707499.5,
+      "mean_abs_error_z_by_component": [
+        0.4818592667579651,
+        0.02829962596297264,
+        0.04454156011343002,
+        0.0
+      ],
+      "mean_rel_error_z_by_component": [
+        0.1068878322839737,
+        0.0,
+        0.09652059525251389,
+        0.0
+      ],
+      "mean_rel_error_z_by_component_legacy": [
+        0.1068878322839737,
+        2829917.75,
+        0.09652059525251389,
+        0.0
+      ],
+      "valid_rel_error_fraction_z_by_component": [
+        1.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      "z_component_labels": [
+        "Z_S",
+        "Z_H",
+        "Z_V",
+        "Z_X"
+      ]
+    }
+  },
+  "pass0": {
+    "reference_loss": 511.58212127685545,
+    "logs": [
+      {
+        "pass": 1,
+        "block": 0,
+        "t_start": 0.0,
+        "t_end": 0.5,
+        "T_block": 0.5,
+        "eval_mean_loss": 729.5504943847657,
+        "eval_std_loss": 325.29654516883323,
+        "eval_mean_loss_per_sample": 0.3647752471923828,
+        "eval_std_loss_per_sample": 0.1626482725844166,
+        "eval_mean_y0": -21.610294342041016,
+        "precision_target": 562.740333404541,
+        "refine_rounds": 3,
+        "stage_plan_used": [
+          [
+            7000,
+            0.0002
+          ],
+          [
+            7000,
+            0.0001
+          ],
+          [
+            6000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            5000,
+            1e-05
+          ],
+          [
+            4000,
+            5e-06
+          ],
+          [
+            3000,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1500,
+            1e-05
+          ],
+          [
+            1500,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_00.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_00.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 1,
+        "t_start": 0.5,
+        "t_end": 1.0,
+        "T_block": 0.5,
+        "eval_mean_loss": 314.46856384277345,
+        "eval_std_loss": 373.5541233251052,
+        "eval_mean_loss_per_sample": 0.15723428192138672,
+        "eval_std_loss_per_sample": 0.18677706166255253,
+        "eval_mean_y0": -21.30030059814453,
+        "precision_target": 562.740333404541,
+        "refine_rounds": 1,
+        "stage_plan_used": [
+          [
+            7000,
+            0.0002
+          ],
+          [
+            7000,
+            0.0001
+          ],
+          [
+            6000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            5000,
+            1e-05
+          ],
+          [
+            4000,
+            5e-06
+          ],
+          [
+            3000,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1500,
+            1e-05
+          ],
+          [
+            1500,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_01.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_01.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 2,
+        "t_start": 1.0,
+        "t_end": 1.5,
+        "T_block": 0.5,
+        "eval_mean_loss": 372.8468101501465,
+        "eval_std_loss": 203.9901355432334,
+        "eval_mean_loss_per_sample": 0.18642340507507327,
+        "eval_std_loss_per_sample": 0.10199506777161671,
+        "eval_mean_y0": -21.89578628540039,
+        "precision_target": 562.740333404541,
+        "refine_rounds": 1,
+        "stage_plan_used": [
+          [
+            7000,
+            0.0002
+          ],
+          [
+            7000,
+            0.0001
+          ],
+          [
+            6000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            5000,
+            1e-05
+          ],
+          [
+            4000,
+            5e-06
+          ],
+          [
+            3000,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1500,
+            1e-05
+          ],
+          [
+            1500,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_02.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_02.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 3,
+        "t_start": 1.5,
+        "t_end": 2.0,
+        "T_block": 0.5,
+        "eval_mean_loss": 340.5658042907715,
+        "eval_std_loss": 286.8810957665363,
+        "eval_mean_loss_per_sample": 0.17028290214538572,
+        "eval_std_loss_per_sample": 0.14344054788326815,
+        "eval_mean_y0": -21.223039627075195,
+        "precision_target": 562.740333404541,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            7000,
+            0.0002
+          ],
+          [
+            7000,
+            0.0001
+          ],
+          [
+            6000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            5000,
+            1e-05
+          ],
+          [
+            4000,
+            5e-06
+          ],
+          [
+            3000,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1500,
+            1e-05
+          ],
+          [
+            1500,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_03.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_03.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 4,
+        "t_start": 2.0,
+        "t_end": 2.5,
+        "T_block": 0.5,
+        "eval_mean_loss": 232.10809783935548,
+        "eval_std_loss": 116.5450524719237,
+        "eval_mean_loss_per_sample": 0.11605404891967772,
+        "eval_std_loss_per_sample": 0.05827252623596185,
+        "eval_mean_y0": -21.102941513061523,
+        "precision_target": 562.740333404541,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            7000,
+            0.0002
+          ],
+          [
+            7000,
+            0.0001
+          ],
+          [
+            6000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            5000,
+            1e-05
+          ],
+          [
+            4000,
+            5e-06
+          ],
+          [
+            3000,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1500,
+            1e-05
+          ],
+          [
+            1500,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_04.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_04.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 5,
+        "t_start": 2.5,
+        "t_end": 3.0,
+        "T_block": 0.5,
+        "eval_mean_loss": 941.156867980957,
+        "eval_std_loss": 1428.6975148089423,
+        "eval_mean_loss_per_sample": 0.4705784339904785,
+        "eval_std_loss_per_sample": 0.7143487574044711,
+        "eval_mean_y0": -20.79018211364746,
+        "precision_target": 562.740333404541,
+        "refine_rounds": 3,
+        "stage_plan_used": [
+          [
+            7000,
+            0.0002
+          ],
+          [
+            7000,
+            0.0001
+          ],
+          [
+            6000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            5000,
+            1e-05
+          ],
+          [
+            4000,
+            5e-06
+          ],
+          [
+            3000,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1500,
+            1e-05
+          ],
+          [
+            1500,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_05.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_05.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 6,
+        "t_start": 3.0,
+        "t_end": 3.5,
+        "T_block": 0.5,
+        "eval_mean_loss": 1495.1206604003905,
+        "eval_std_loss": 1411.0769326151915,
+        "eval_mean_loss_per_sample": 0.7475603302001953,
+        "eval_std_loss_per_sample": 0.7055384663075958,
+        "eval_mean_y0": -21.02870750427246,
+        "precision_target": 562.740333404541,
+        "refine_rounds": 3,
+        "stage_plan_used": [
+          [
+            7000,
+            0.0002
+          ],
+          [
+            7000,
+            0.0001
+          ],
+          [
+            6000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            5000,
+            1e-05
+          ],
+          [
+            4000,
+            5e-06
+          ],
+          [
+            3000,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1500,
+            1e-05
+          ],
+          [
+            1500,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_06.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_06.ckpt"
+      },
+      {
+        "pass": 1,
+        "block": 7,
+        "t_start": 3.5,
+        "t_end": 4.0,
+        "T_block": 0.5,
+        "eval_mean_loss": 511.58212127685545,
+        "eval_std_loss": 883.9660428564964,
+        "eval_mean_loss_per_sample": 0.2557910606384277,
+        "eval_std_loss_per_sample": 0.44198302142824825,
+        "eval_mean_y0": -21.59111213684082,
+        "precision_target": null,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            12000,
+            0.001
+          ],
+          [
+            9000,
+            0.0005
+          ],
+          [
+            9000,
+            0.0001
+          ],
+          [
+            7000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            6000,
+            1e-05
+          ],
+          [
+            6000,
+            5e-06
+          ],
+          [
+            4000,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1500,
+            1e-05
+          ],
+          [
+            1500,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_07.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_1/block_07.ckpt"
+      }
+    ]
+  },
+  "pass1": {
+    "reference_loss": 11.696371078491211,
+    "logs": [
+      {
+        "pass": 2,
+        "block": 0,
+        "t_start": 0.0,
+        "t_end": 0.5,
+        "T_block": 0.5,
+        "eval_mean_loss": 375.74414978027346,
+        "eval_std_loss": 128.49693381721553,
+        "eval_mean_loss_per_sample": 0.18787207489013671,
+        "eval_std_loss_per_sample": 0.06424846690860776,
+        "eval_mean_y0": -21.68974494934082,
+        "precision_target": 802.5055438232423,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            7000,
+            0.0001
+          ],
+          [
+            6000,
+            5e-05
+          ],
+          [
+            5000,
+            2e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            5000,
+            1e-05
+          ],
+          [
+            4000,
+            5e-06
+          ],
+          [
+            3000,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1500,
+            5e-06
+          ],
+          [
+            1500,
+            2e-06
+          ],
+          [
+            1200,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_00.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_00.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 1,
+        "t_start": 0.5,
+        "t_end": 1.0,
+        "T_block": 0.5,
+        "eval_mean_loss": 23.544626235961914,
+        "eval_std_loss": 5.587451720228433,
+        "eval_mean_loss_per_sample": 0.011772313117980956,
+        "eval_std_loss_per_sample": 0.0027937258601142168,
+        "eval_mean_y0": -16.03847885131836,
+        "precision_target": 345.91542022705084,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            5000,
+            0.0002
+          ],
+          [
+            5000,
+            0.0001
+          ],
+          [
+            4000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            3500,
+            1e-05
+          ],
+          [
+            3000,
+            5e-06
+          ],
+          [
+            2500,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1200,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_01.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_01.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 2,
+        "t_start": 1.0,
+        "t_end": 1.5,
+        "T_block": 0.5,
+        "eval_mean_loss": 16.090839004516603,
+        "eval_std_loss": 5.300895552024965,
+        "eval_mean_loss_per_sample": 0.008045419502258299,
+        "eval_std_loss_per_sample": 0.002650447776012483,
+        "eval_mean_y0": -14.542279243469238,
+        "precision_target": 410.13149116516115,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            5000,
+            0.0002
+          ],
+          [
+            5000,
+            0.0001
+          ],
+          [
+            4000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            3500,
+            1e-05
+          ],
+          [
+            3000,
+            5e-06
+          ],
+          [
+            2500,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1200,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_02.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_02.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 3,
+        "t_start": 1.5,
+        "t_end": 2.0,
+        "T_block": 0.5,
+        "eval_mean_loss": 8.627975845336914,
+        "eval_std_loss": 0.22656926589774554,
+        "eval_mean_loss_per_sample": 0.004313987922668458,
+        "eval_std_loss_per_sample": 0.00011328463294887258,
+        "eval_mean_y0": -13.774590492248535,
+        "precision_target": 374.6223847198487,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            5000,
+            0.0002
+          ],
+          [
+            5000,
+            0.0001
+          ],
+          [
+            4000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            3500,
+            1e-05
+          ],
+          [
+            3000,
+            5e-06
+          ],
+          [
+            2500,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1200,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_03.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_03.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 4,
+        "t_start": 2.0,
+        "t_end": 2.5,
+        "T_block": 0.5,
+        "eval_mean_loss": 8.187543582916259,
+        "eval_std_loss": 0.5280432253453132,
+        "eval_mean_loss_per_sample": 0.0040937717914581295,
+        "eval_std_loss_per_sample": 0.0002640216126726566,
+        "eval_mean_y0": -13.797435760498047,
+        "precision_target": 255.31890762329104,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            5000,
+            0.0002
+          ],
+          [
+            5000,
+            0.0001
+          ],
+          [
+            4000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            3500,
+            1e-05
+          ],
+          [
+            3000,
+            5e-06
+          ],
+          [
+            2500,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1200,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_04.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_04.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 5,
+        "t_start": 2.5,
+        "t_end": 3.0,
+        "T_block": 0.5,
+        "eval_mean_loss": 8.343631553649903,
+        "eval_std_loss": 0.7093183025228775,
+        "eval_mean_loss_per_sample": 0.004171815776824951,
+        "eval_std_loss_per_sample": 0.00035465915126143893,
+        "eval_mean_y0": -14.114825248718262,
+        "precision_target": 1035.2725547790528,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            5000,
+            0.0002
+          ],
+          [
+            5000,
+            0.0001
+          ],
+          [
+            4000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            3500,
+            1e-05
+          ],
+          [
+            3000,
+            5e-06
+          ],
+          [
+            2500,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1200,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_05.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_05.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 6,
+        "t_start": 3.0,
+        "t_end": 3.5,
+        "T_block": 0.5,
+        "eval_mean_loss": 8.73857765197754,
+        "eval_std_loss": 0.5481771577531768,
+        "eval_mean_loss_per_sample": 0.004369288825988769,
+        "eval_std_loss_per_sample": 0.0002740885788765884,
+        "eval_mean_y0": -14.11600112915039,
+        "precision_target": 1644.6327264404297,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            5000,
+            0.0002
+          ],
+          [
+            5000,
+            0.0001
+          ],
+          [
+            4000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            3500,
+            1e-05
+          ],
+          [
+            3000,
+            5e-06
+          ],
+          [
+            2500,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1200,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_06.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_06.ckpt"
+      },
+      {
+        "pass": 2,
+        "block": 7,
+        "t_start": 3.5,
+        "t_end": 4.0,
+        "T_block": 0.5,
+        "eval_mean_loss": 11.696371078491211,
+        "eval_std_loss": 0.8694820916261009,
+        "eval_mean_loss_per_sample": 0.005848185539245605,
+        "eval_std_loss_per_sample": 0.0004347410458130506,
+        "eval_mean_y0": -14.34626293182373,
+        "precision_target": 562.740333404541,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            5000,
+            0.0002
+          ],
+          [
+            5000,
+            0.0001
+          ],
+          [
+            4000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            3500,
+            1e-05
+          ],
+          [
+            3000,
+            5e-06
+          ],
+          [
+            2500,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1200,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_07.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_2/block_07.ckpt"
+      }
+    ]
+  },
+  "pass2": {
+    "reference_loss": 12.16304931640625,
+    "logs": [
+      {
+        "pass": 3,
+        "block": 0,
+        "t_start": 0.0,
+        "t_end": 0.5,
+        "T_block": 0.5,
+        "eval_mean_loss": 270.39156341552734,
+        "eval_std_loss": 180.8507270164468,
+        "eval_mean_loss_per_sample": 0.13519578170776367,
+        "eval_std_loss_per_sample": 0.0904253635082234,
+        "eval_mean_y0": -19.563800811767578,
+        "precision_target": 413.31856475830085,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            7000,
+            0.0001
+          ],
+          [
+            6000,
+            5e-05
+          ],
+          [
+            5000,
+            2e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            5000,
+            1e-05
+          ],
+          [
+            4000,
+            5e-06
+          ],
+          [
+            3000,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1500,
+            5e-06
+          ],
+          [
+            1500,
+            2e-06
+          ],
+          [
+            1200,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_00.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_00.ckpt"
+      },
+      {
+        "pass": 3,
+        "block": 1,
+        "t_start": 0.5,
+        "t_end": 1.0,
+        "T_block": 0.5,
+        "eval_mean_loss": 20.955159759521486,
+        "eval_std_loss": 9.724932472166348,
+        "eval_mean_loss_per_sample": 0.01047757987976074,
+        "eval_std_loss_per_sample": 0.004862466236083174,
+        "eval_mean_y0": -15.124267578125,
+        "precision_target": 25.89908885955811,
+        "refine_rounds": 1,
+        "stage_plan_used": [
+          [
+            5000,
+            0.0002
+          ],
+          [
+            5000,
+            0.0001
+          ],
+          [
+            4000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            3500,
+            1e-05
+          ],
+          [
+            3000,
+            5e-06
+          ],
+          [
+            2500,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1200,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_01.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_01.ckpt"
+      },
+      {
+        "pass": 3,
+        "block": 2,
+        "t_start": 1.0,
+        "t_end": 1.5,
+        "T_block": 0.5,
+        "eval_mean_loss": 9.537571144104003,
+        "eval_std_loss": 0.17374655132034925,
+        "eval_mean_loss_per_sample": 0.004768785572052002,
+        "eval_std_loss_per_sample": 8.687327566017463e-05,
+        "eval_mean_y0": -13.7994966506958,
+        "precision_target": 17.699922904968265,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            5000,
+            0.0002
+          ],
+          [
+            5000,
+            0.0001
+          ],
+          [
+            4000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            3500,
+            1e-05
+          ],
+          [
+            3000,
+            5e-06
+          ],
+          [
+            2500,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1200,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_02.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_02.ckpt"
+      },
+      {
+        "pass": 3,
+        "block": 3,
+        "t_start": 1.5,
+        "t_end": 2.0,
+        "T_block": 0.5,
+        "eval_mean_loss": 9.439899253845216,
+        "eval_std_loss": 1.810002503620815,
+        "eval_mean_loss_per_sample": 0.004719949626922608,
+        "eval_std_loss_per_sample": 0.0009050012518104074,
+        "eval_mean_y0": -13.621010780334473,
+        "precision_target": 9.490773429870607,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            5000,
+            0.0002
+          ],
+          [
+            5000,
+            0.0001
+          ],
+          [
+            4000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            3500,
+            1e-05
+          ],
+          [
+            3000,
+            5e-06
+          ],
+          [
+            2500,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1200,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_03.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_03.ckpt"
+      },
+      {
+        "pass": 3,
+        "block": 4,
+        "t_start": 2.0,
+        "t_end": 2.5,
+        "T_block": 0.5,
+        "eval_mean_loss": 8.684440231323242,
+        "eval_std_loss": 0.41392592620511753,
+        "eval_mean_loss_per_sample": 0.004342220115661622,
+        "eval_std_loss_per_sample": 0.0002069629631025586,
+        "eval_mean_y0": -13.841137886047363,
+        "precision_target": 9.006297941207885,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            5000,
+            0.0002
+          ],
+          [
+            5000,
+            0.0001
+          ],
+          [
+            4000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            3500,
+            1e-05
+          ],
+          [
+            3000,
+            5e-06
+          ],
+          [
+            2500,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1200,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_04.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_04.ckpt"
+      },
+      {
+        "pass": 3,
+        "block": 5,
+        "t_start": 2.5,
+        "t_end": 3.0,
+        "T_block": 0.5,
+        "eval_mean_loss": 8.797978019714355,
+        "eval_std_loss": 0.6857851641369958,
+        "eval_mean_loss_per_sample": 0.004398989009857178,
+        "eval_std_loss_per_sample": 0.0003428925820684978,
+        "eval_mean_y0": -13.773486137390137,
+        "precision_target": 9.177994709014895,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            5000,
+            0.0002
+          ],
+          [
+            5000,
+            0.0001
+          ],
+          [
+            4000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            3500,
+            1e-05
+          ],
+          [
+            3000,
+            5e-06
+          ],
+          [
+            2500,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1200,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_05.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_05.ckpt"
+      },
+      {
+        "pass": 3,
+        "block": 6,
+        "t_start": 3.0,
+        "t_end": 3.5,
+        "T_block": 0.5,
+        "eval_mean_loss": 8.754140281677246,
+        "eval_std_loss": 0.4381782181559202,
+        "eval_mean_loss_per_sample": 0.004377070140838622,
+        "eval_std_loss_per_sample": 0.00021908910907796005,
+        "eval_mean_y0": -13.77668285369873,
+        "precision_target": 9.612435417175295,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            5000,
+            0.0002
+          ],
+          [
+            5000,
+            0.0001
+          ],
+          [
+            4000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            3500,
+            1e-05
+          ],
+          [
+            3000,
+            5e-06
+          ],
+          [
+            2500,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1200,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_06.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_06.ckpt"
+      },
+      {
+        "pass": 3,
+        "block": 7,
+        "t_start": 3.5,
+        "t_end": 4.0,
+        "T_block": 0.5,
+        "eval_mean_loss": 12.16304931640625,
+        "eval_std_loss": 2.0813009981993402,
+        "eval_mean_loss_per_sample": 0.006081524658203124,
+        "eval_std_loss_per_sample": 0.00104065049909967,
+        "eval_mean_y0": -13.885235786437988,
+        "precision_target": 12.866008186340332,
+        "refine_rounds": 0,
+        "stage_plan_used": [
+          [
+            5000,
+            0.0002
+          ],
+          [
+            5000,
+            0.0001
+          ],
+          [
+            4000,
+            5e-05
+          ]
+        ],
+        "final_plan_used": [
+          [
+            3500,
+            1e-05
+          ],
+          [
+            3000,
+            5e-06
+          ],
+          [
+            2500,
+            2e-06
+          ]
+        ],
+        "refine_plan_used": [
+          [
+            1200,
+            5e-06
+          ],
+          [
+            1200,
+            2e-06
+          ],
+          [
+            800,
+            1e-06
+          ]
+        ],
+        "blob_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_07.npz",
+        "ckpt_path": "results/prova_da_fare/run_20260310_092219/recursive/models/pass_3/block_07.ckpt"
+      }
+    ]
+  }
+}

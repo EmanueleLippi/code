@@ -1,0 +1,10 @@
+2026-03-09 12:14:00,444 - time_stitching - INFO - Avvio esperimento con mode=recursive
+2026-03-09 12:14:00,445 - time_stitching - INFO - [TrainingPlan] loaded 35 rules from prova_da_fare/training_plan.csv
+2026-03-09 12:14:00,446 - time_stitching - INFO - [ExactSolution] enabled profile='quadratic_coupled'
+2026-03-09 12:14:00,452 - time_stitching - INFO - [Artifacts] run directory: results/run_20260309_121400
+2026-03-09 12:14:00,452 - time_stitching - INFO - 
+==================== RECURSIVE ====================
+2026-03-09 12:14:00,454 - time_stitching - INFO - [Recursive] blocks=8 -> [(0.0, 0.5), (0.5, 1.0), (1.0, 1.5), (1.5, 2.0), (2.0, 2.5), (2.5, 3.0), (3.0, 3.5), (3.5, 4.0)], n_passes=3
+2026-03-09 12:14:00,458 - time_stitching - INFO - 
+[RecursiveBlock] pass0:block7 t=[3.50,4.00] T_block=0.50
+2026-03-09 12:14:02,410 - time_stitching - INFO - === [pass0:block7] Coupling stage: const=1.0 ===
