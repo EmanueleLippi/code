@@ -1,0 +1,95 @@
+
+CUDA
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2022 NVIDIA Corporation
+Built on Wed_Sep_21_10:33:58_PDT_2022
+Cuda compilation tools, release 11.8, V11.8.89
+Build cuda_11.8.r11.8/compiler.31833905_0
+anaconda tensorflow
+no change     /usr/local/anaconda3.22/condabin/conda
+no change     /usr/local/anaconda3.22/bin/conda
+no change     /usr/local/anaconda3.22/bin/conda-env
+no change     /usr/local/anaconda3.22/bin/activate
+no change     /usr/local/anaconda3.22/bin/deactivate
+no change     /usr/local/anaconda3.22/etc/profile.d/conda.sh
+no change     /usr/local/anaconda3.22/etc/fish/conf.d/conda.fish
+no change     /usr/local/anaconda3.22/shell/condabin/Conda.psm1
+no change     /usr/local/anaconda3.22/shell/condabin/conda-hook.ps1
+no change     /usr/local/anaconda3.22/lib/python3.9/site-packages/xontrib/conda.xsh
+no change     /usr/local/anaconda3.22/etc/profile.d/conda.csh
+no change     /export/home/alessio.rondelli2/.bashrc
+No action taken.
+
+CommandNotFoundError: Your shell has not been properly configured to use 'conda activate'.
+To initialize your shell, run
+
+    $ conda init <SHELL_NAME>
+
+Currently supported shells are:
+  - bash
+  - fish
+  - tcsh
+  - xonsh
+  - zsh
+  - powershell
+
+See 'conda init --help' for more information and options.
+
+IMPORTANT: You may need to close and restart your shell after running 'conda init'.
+
+
+2026-03-09 12:07:21.493877: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2026-03-09 12:07:21.747621: E tensorflow/stream_executor/cuda/cuda_blas.cc:2981] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+2026-03-09 12:07:22.607659: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer.so.7'; dlerror: libnvinfer.so.7: cannot open shared object file: No such file or directory; LD_LIBRARY_PATH: /usr/local/cuda-11.6/lib64
+2026-03-09 12:07:22.607787: W tensorflow/stream_executor/platform/default/dso_loader.cc:64] Could not load dynamic library 'libnvinfer_plugin.so.7'; dlerror: libnvinfer_plugin.so.7: cannot open shared object file: No such file or directory; LD_LIBRARY_PATH: /usr/local/cuda-11.6/lib64
+2026-03-09 12:07:22.607800: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Cannot dlopen some TensorRT libraries. If you would like to use Nvidia GPU with TensorRT, please make sure the missing libraries mentioned above are installed properly.
+2026-03-09 12:07:24,940 - time_stitching - INFO - Avvio esperimento con mode=recursive
+2026-03-09 12:07:24,943 - time_stitching - INFO - [TrainingPlan] loaded 35 rules from prova_da_fare/training_plan.csv
+2026-03-09 12:07:24,943 - time_stitching - INFO - [ExactSolution] enabled profile='quadratic_coupled'
+2026-03-09 12:07:24,950 - time_stitching - INFO - [Artifacts] run directory: results/run_20260309_120724
+2026-03-09 12:07:24,950 - time_stitching - INFO - 
+==================== RECURSIVE ====================
+2026-03-09 12:07:24,953 - time_stitching - INFO - [Recursive] blocks=8 -> [(0.0, 0.5), (0.5, 1.0), (1.0, 1.5), (1.5, 2.0), (2.0, 2.5), (2.5, 3.0), (3.0, 3.5), (3.5, 4.0)], n_passes=3
+2026-03-09 12:07:24,958 - time_stitching - INFO - 
+[RecursiveBlock] pass0:block7 t=[3.50,4.00] T_block=0.50
+2026-03-09 12:07:25.079107: I tensorflow/core/platform/cpu_feature_guard.cc:193] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 FMA
+To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2026-03-09 12:07:25.884661: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1616] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 30975 MB memory:  -> device: 0, name: Tesla V100-PCIE-32GB, pci bus id: 0000:41:00.0, compute capability: 7.0
+/usr/local/anaconda3.22/lib/python3.9/site-packages/keras/initializers/initializers_v2.py:120: UserWarning: The initializer VarianceScaling is unseeded and being called multiple times, which will return identical values  each time (even if the initializer is unseeded). Please update your code to provide a seed to the initializer, or avoid using the same initalizer instance more than once.
+  warnings.warn(
+2026-03-09 12:07:26,937 - time_stitching - INFO - === [pass0:block7] Coupling stage: const=1.0 ===
+Traceback (most recent call last):
+  File "/export/home/alessio.rondelli2/alessio_python/modules/main.py", line 882, in <module>
+    main()
+  File "/export/home/alessio.rondelli2/alessio_python/modules/main.py", line 744, in main
+    rec = run_recursive_training(
+  File "/export/home/alessio.rondelli2/alessio_python/modules/train.py", line 1045, in run_recursive_training
+    blobs_i, logs_i, ref_loss_i, pass_dir_i = _run_pass(
+  File "/export/home/alessio.rondelli2/alessio_python/modules/train.py", line 899, in _run_pass
+    block_stats = train_with_standard_schedule(
+  File "/export/home/alessio.rondelli2/alessio_python/modules/train.py", line 133, in train_with_standard_schedule
+    train_stats = train_model(
+  File "/export/home/alessio.rondelli2/alessio_python/modules/train.py", line 62, in train_model
+    loss, _, Y_pred, _ = model.train_step(t_batch, W_batch, Xi_batch, learning_rate)
+  File "/usr/local/anaconda3.22/lib/python3.9/site-packages/tensorflow/python/util/traceback_utils.py", line 153, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "/tmp/__autograph_generated_file5j2gkzbz.py", line 12, in tf__train_step
+    (loss, X_pred, Y_pred, Z_pred) = ag__.converted_call(ag__.ld(self).loss_function, (ag__.ld(t), ag__.ld(W), ag__.ld(Xi)), None, fscope)
+  File "/tmp/__autograph_generated_filensy8953o.py", line 16, in tf__loss_function
+    Z0 = ag__.converted_call(ag__.ld(tf).squeeze, (ag__.converted_call(ag__.ld(tf).matmul, (ag__.converted_call(ag__.ld(tf).expand_dims, (ag__.ld(Du0), 1), None, fscope), ag__.ld(sigma0)), None, fscope),), dict(axis=1), fscope)
+ValueError: in user code:
+
+    File "/export/home/alessio.rondelli2/alessio_python/modules/models.py", line 159, in train_step  *
+        loss, X_pred, Y_pred, Z_pred = self.loss_function(t, W, Xi)
+    File "/export/home/alessio.rondelli2/alessio_python/modules/models.py", line 80, in loss_function  *
+        Z0 = tf.squeeze(tf.matmul(tf.expand_dims(Du0, 1), sigma0), axis=1)
+
+    ValueError: Tried to convert 'input' to a tensor and failed. Error: None values not supported.
+
+Finito 1
+2026-03-09 12:07:29.907643: E tensorflow/stream_executor/cuda/cuda_blas.cc:2981] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+WARNING:tensorflow:From /usr/local/anaconda3.22/lib/python3.9/site-packages/tensorflow/python/compat/v2_compat.py:107: disable_resource_variables (from tensorflow.python.ops.variable_scope) is deprecated and will be removed in a future version.
+Instructions for updating:
+non-resource variables are not supported in the long term
+slurmstepd-gpu01: error: *** JOB 561 ON gpu01 CANCELLED AT 2026-03-09T16:50:02 ***

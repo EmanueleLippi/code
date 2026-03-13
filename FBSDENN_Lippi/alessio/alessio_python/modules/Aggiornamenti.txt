@@ -1,0 +1,36 @@
+# Aggiornamenti.txt
+
+Di seguito è riportato il resoconto di tutte le modifiche strutturali, matematiche e stilistiche apportate al codice originale `time_stitching.py` per transizionarlo verso una codebase moderna e modulabile basata su **TensorFlow 2**, pur mantenendo intatta la logica dei modelli e dell'approssimazione ricorsiva.
+
+## 1. Migrazione a TensorFlow 2 (Rimozione Sessioni Statiche)
+
+Il codice originario era strutturato per TensorFlow 1.x, il cui paradigma a grafi statici (tramite `tf.Session` e `tf.placeholder`) è obsoleto.
+
+- Le classi **`FBSNN`** e **`NN_Quadratic_Coupled`** sono state promosse ad ereditare nativamente da `tf.keras.Model`.
+- L'istanziazione di placeholder, cicli `sess.run()` o `tf.reset_default_graph()` (causa tra l'altro di pericolosi colli di bottiglia RAM e complessi refactoring per la validazione) è stata interamente sostituita con l'utilizzo del **`tf.GradientTape`** nativo in modalità **Eager/Graph Execution** (`@tf.function`), mantenendo lo stesso identico flusso temporale backward su SDE e calcolo derivate neurali lungo la traiettoria.
+- La loss viene ora calcolata definendo una routine **`train_step()`** ottimizzata per iterazione.
+
+## 2. Modularizzazione (Refactoring Strutturale)
+
+Piuttosto di avere un file monolitico di ~2400 righe adibito a parse config, plotting, cicli neurali e logica I/O file, il codice ha acquisito una pulita organizzazione a moduli:
+
+- **`config.py`**: Incapsula tutti gli "hardcode" sparsi per lo script originale (costanti dell'equazione parabolica `mu1`, `gamma`, ecc.), le learning rates programmate (`stage_plan`, `final_plan`) e dimensioni base, offrendo due pratiche Classi Dataclass `ModelParams` e `TrainingConfig`.
+- **`utils.py`**: Espone un logger standard, moduli generatori `Xi_generator_default`, le utils di conversione ai JSON dei dict o le funzioni di dump dei blocchi NumPy `blob.npz`.
+- **`models.py`**: È il cuore algebrico dell'algoritmo. Ha al suo interno la dichiarazione della Rete Neurale `tf.keras.Sequential` e le definizioni delle derivate spaziali stocastiche per la risoluzione via E.M.
+- **`train.py`**: Estrae il cuore operativo e le logiche dei Pass ricorsivi (`train_model`, schedulazione, early stopping, roll-out).
+- **`visualization.py`**: Incapsula ogni invocazione grafiche dipendente da Matplotlib. Le invocazioni bypasseranno in silenzio la creazione dei grafici se matplotlib non è momentaneamente installato ed eviteranno fastidiosi ImportError all'apertura dello script.
+- **`main.py`**: Il file sorgente pulito destinato unicamente all'elaborazione rapida degli argomenti ArgParse e alla partenza del Training/Pass mode.
+
+## 3. Introdotto Logging Concreto
+Nel file precedente vi era un massiccio uso di `print()` customizzati per i vari blocchi. Questa pratica, per esperimenti in server o HPC (High Performance Computing) clusterizzati, rende infernale il porting di test prolungati.
+Ho introdotto in `utils.py` un formale framework di **logging** python. Ora tutto quello che transita per terminale viene *anche* automaticamente saldato formattato su disco dentro alla run directory su `execution.log`. Potrai far girare `nohup python main.py` ignorando l'output e leggere a debug i file offline.
+
+## Come lanciare il codice adesso?
+Tutto è rimasto invariato dall'esterno. L'esperimento originario ricorsivo o standard, viene lanciato partendo da `main.py` sfruttando gli script in `argparse` come prima:
+
+```bash
+python main.py --mode standard --M 100 --N 100
+```
+*(Nota: essendoci TensorFlow 2, è ora richiesto eseguire lo script in un enviroment >= Python 3.8 installando una tra le recenti release di tensorflow pulito senza compat.v1).*
+
+Tutto lo storage ricorsivo preesistente originato da numpy (`NPZ` salvati, cartelle `pass_...`) manterrà tra l'altro una pressoché identica struttura di compatibilità!
